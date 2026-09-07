@@ -1,7 +1,7 @@
 import { useDropzone } from 'react-dropzone';
 import {Camera} from '@gravity-ui/icons';
 
-export default function Dropzone({ onDrop }) {
+export default function Dropzone({ onDrop }: {onDrop: (files: File[]) => void}) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {

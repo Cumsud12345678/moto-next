@@ -1,9 +1,9 @@
 'use client'
-import { Make } from "@/types/metadata"
+import { Default } from "@/types/metadata"
 import { useEffect, useState } from "react"
 
 interface ThreeButtonProps {
-  data: Make[],
+  data: Default[],
   state: string,
   setState: React.Dispatch<React.SetStateAction<string>>
 }
@@ -12,7 +12,7 @@ interface ThreeButtonProps {
 
 const TwoButton = ({data, state, setState}: ThreeButtonProps) => {
 
-  const [newData, setNewData] = useState<Make[]>([])
+  const [newData, setNewData] = useState<Default[]>([])
 
   useEffect(() => {
     setNewData([{_id: '', label: 'Hamısı'}, ...data])
@@ -21,7 +21,7 @@ const TwoButton = ({data, state, setState}: ThreeButtonProps) => {
   return(
     <div className="flex">
       {
-        newData.map((item: Make, index) => {
+        newData.map((item: Default, index) => {
           const active = item._id === state
           return (
             <button 
