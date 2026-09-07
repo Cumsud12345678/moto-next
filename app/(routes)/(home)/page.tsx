@@ -16,7 +16,7 @@ const HomePage = () => {
         </Suspense>
       </div>
 
-      <div className='container mx-auto max-w-250 p-3 mb-10'>
+      <div className='container mx-auto max-w-250 p-3 mb-20'>
         <ProductList data={data} />
       </div>
 

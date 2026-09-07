@@ -7,8 +7,8 @@ const BookmarkPage = () => {
   const data = products
 
   return (
-    <div className='mt-12'>
-      <div className='container mx-auto max-w-250 h-1000'>
+    <div className='mt-14'>
+      <div className='container mx-auto max-w-250 h-1000 p-3'>
         <ProductList data={data} />
       </div>
     </div>

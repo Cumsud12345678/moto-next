@@ -131,10 +131,15 @@ const FilterModal = ({open}: FilterModalProps) => {
       }}
     >
       <DialogContent 
+        showCloseButton={false}
         className='w-full h-full max-w-none! sm:w-full rounded-none flex flex-col bg-[#fbfbfb] p-0 overflow-hidden'
       >
-        <DialogHeader className='h-auto px-3 mt-5 text-2xl shrink-0'>
+        <DialogHeader className='h-auto px-3 mt-3 text-2xl shrink-0 flex flex-row items-center justify-between'>
           Filterler
+          <Xmark 
+            className='size-6 mt-2'
+            onClick={() => window.history.back()}
+          />
         </DialogHeader>
 
         <div className='flex flex-col gap-3 flex-1 overflow-y-auto'>
