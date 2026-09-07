@@ -1,6 +1,7 @@
 import { products } from '@/constants/products';
 import ProductList from '@/components/ProductList';
 import Filter from './_components/Filter';
+import { Suspense } from 'react'
 
 const HomePage = () => {
 
@@ -10,7 +11,9 @@ const HomePage = () => {
     <div>
 
       <div className='mt-12 bg-[#ebedf3]'>
-        <Filter />
+        <Suspense fallback={<div>Yüklənir...</div>}>
+          <Filter />
+        </Suspense>
       </div>
 
       <div className='container mx-auto max-w-250 p-4 mb-10'>
