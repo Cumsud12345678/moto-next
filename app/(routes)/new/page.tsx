@@ -100,6 +100,7 @@ const NewPage = () => {
 
   const [images, setImages] = useState<ImageFile[]>([])
   
+  
   const handleDrop = async (files: File[]) => {
 
     // if (images.length + files.length > 10) {
