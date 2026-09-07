@@ -1,6 +1,5 @@
 import { products } from '@/constants/products';
 import ProductList from '@/components/ProductList';
-import { makes } from '@/constants/makes';
 import Filter from '../(home)/_components/Filter';
 
 type Props = {
@@ -20,7 +19,6 @@ const MotoPage = async ({searchParams}: Props) => {
   const category = params.category
 
   const data = products
-  const metadata = makes
 
   console.log('aaa')
 

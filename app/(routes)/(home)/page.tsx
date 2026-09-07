@@ -1,12 +1,10 @@
 import { products } from '@/constants/products';
 import ProductList from '@/components/ProductList';
 import Filter from './_components/Filter';
-import { makes } from '@/constants/makes';
 
 const HomePage = () => {
 
   const data = products
-  const metadata = makes
 
   return (
     <div>
