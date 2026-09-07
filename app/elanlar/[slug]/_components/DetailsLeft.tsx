@@ -32,9 +32,9 @@ import Header from '@/components/Header'
 import { useRouter } from 'next/navigation'
 
 const images = [
-  'https://api.motoelan.com/uploads/1788014539354-12553_jqnVAx7zbbVzzxmpTa2nUw.jpg',
-  'https://api.motoelan.com/uploads/1788532255563-ChatGPT%20Image%2028%20%C3%90%C2%B0%C3%90%C2%B2%C3%90%C2%B3.%202026%20%C3%90%C2%B3.,%2009_09_38.png',
-  'https://api.motoelan.com/uploads/1788532255711-ChatGPT%20Image%2028%20%C3%90%C2%B0%C3%90%C2%B2%C3%90%C2%B3.%202026%20%C3%90%C2%B3.,%2009_08_29.png',
+  'https://pub-cb8fb86f549343468a5fd508f1ad9a4a.r2.dev/uploads/1788532255563-ChatGPT%20Image%2028%20%C3%90%C2%B0%C3%90%C2%B2%C3%90%C2%B3.%202026%20%C3%90%C2%B3.,%2009_09_38.png',
+  'https://pub-cb8fb86f549343468a5fd508f1ad9a4a.r2.dev/uploads/1788517818306-1000419143.jpg',
+  'https://pub-cb8fb86f549343468a5fd508f1ad9a4a.r2.dev/uploads/1788103498147-12CE4048-6C4D-403C-965E-CEB942378007.png',
 ]
 
 const DetailsLeft = ({ data }: { data: Product }) => {
