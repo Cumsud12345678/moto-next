@@ -131,13 +131,13 @@ const FilterModal = ({open}: FilterModalProps) => {
       }}
     >
       <DialogContent 
-        className='w-full h-full max-w-none sm-w-full rounded-none flex flex-col bg-[#fbfbfb] p-0 overflow-y-auto'
+        className='w-full h-full max-w-none! sm:w-full rounded-none flex flex-col bg-[#fbfbfb] p-0 overflow-hidden'
       >
-        <DialogHeader className='h-auto px-3 mt-5 text-2xl'>
+        <DialogHeader className='h-auto px-3 mt-5 text-2xl shrink-0'>
           Filterler
         </DialogHeader>
 
-        <div className='flex flex-col gap-3 h-full'>
+        <div className='flex flex-col gap-3 flex-1 overflow-y-auto'>
           <div className='px-3'>
             <div className='bg-white px-4 rounded-lg shadow'>
               <div className='flex items-center justify-between border-b relative'>
@@ -247,15 +247,15 @@ const FilterModal = ({open}: FilterModalProps) => {
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
             <h3 className='text-xl'>Ban novu</h3>
-            <ButtonGroup data={metadata.categories} state={category} setState={setCategory} wrap isNew={false} />
+            <ButtonGroup data={metadata.categories} state={category} setState={setCategory} wrap={false} isNew={false} />
           </div>
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
             <h3 className='text-xl'>Muherrik</h3>
-            <ButtonGroup data={metadata.fuel_types} state={fuelType} setState={setFuelType} wrap isNew={false} />
+            <ButtonGroup data={metadata.fuel_types} state={fuelType} setState={setFuelType} wrap={false} isNew={false} />
           </div>
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
             <h3 className='text-xl'>Suretler qutusu</h3>
-            <ButtonGroup data={metadata.transmissions} state={transmission} setState={setTransmission} wrap isNew={false} />
+            <ButtonGroup data={metadata.transmissions} state={transmission} setState={setTransmission} wrap={false} isNew={false} />
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
@@ -388,8 +388,9 @@ const FilterModal = ({open}: FilterModalProps) => {
 
         </div>
 
-        <div className='fixed bottom-0 left-0 p-3'>
-          <button className='bg-green-500 p-3'>
+        {/* Şəffaf konteyner - yalnız padding üçün, arxası görünür */}
+        <div className='shrink-0 px-3 pb-3'>
+          <button className='bg-green-500 p-3 w-full rounded-lg text-white shadow-lg'>
             Axtar
           </button>
         </div>

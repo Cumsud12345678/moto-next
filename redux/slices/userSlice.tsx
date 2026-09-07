@@ -9,7 +9,7 @@ interface UserState {
 const initialState: UserState = {
   name: 'Cumsud',
   email: 'isayevcumu@gmail.com',
-  avatar: 'https://api.motoelan.com/uploads/1787732761034-Screenshot_20240923_235946_com.whatsapp.jpg'
+  avatar: 'https://pub-cb8fb86f549343468a5fd508f1ad9a4a.r2.dev/uploads/1788738190149-images.jpg'
 }
 
 const userSlice = createSlice({

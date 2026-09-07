@@ -101,12 +101,12 @@ const ProductCard = ({product, onDelete}: {product: Product, onDelete: (id: numb
         </div>
         <div className={`p-2 relative overflow-hidden ${product.sellerType === "premium" && 'shine-effect'}`}>
           <div className="">
-            <span className="text-2xl text-green-500 font-bold">
+            <span className="text-xl text-green-500 font-bold">
               {formatNumber(product.price)} ₼
             </span>
           </div>
-          <p className='font-semibold text-[17px]'>{product.make} {product.model}</p>
-          <p className='truncate'>{product.year}, {product.volume} sm³, {formatNumber(product.mileage)}</p>
+          <p className='font-semibold text-[16px]'>{product.make} {product.model}</p>
+          <p className='truncate text-[15px]'>{product.year}, {product.volume} sm³, {formatNumber(product.mileage)}</p>
           <p className='text-[14px] text-gray-400 truncate'>{product.city}, {product.createdAt}</p>
         </div>
 

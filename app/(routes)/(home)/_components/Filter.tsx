@@ -103,10 +103,33 @@ const Filter = () => {
   const [modelModalOpen, setModelModalOpen] = useState<boolean>(false)
 
   const [hash, setHash] = useState<string>('')
+  const [isMobile, setIsMobile] = useState<boolean>(false)
 
-  const openFilter = hash == '#filter' && window.innerWidth <= 1000
+  useEffect(() => {
+    const updateHash = () => setHash(window.location.hash)
+    updateHash()
+    window.addEventListener('hashchange', updateHash)
+    return () => window.removeEventListener('hashchange', updateHash)
+  }, [])
 
-  // console.log(window.innerWidth)
+  useEffect(() => {
+    const checkSize = () => {
+      const mobile = window.innerWidth <= 1000
+      setIsMobile(mobile)
+
+      if (!mobile && window.location.hash === '#filter') {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+        setHash('')
+      }
+    }
+
+    checkSize()
+    window.addEventListener('resize', checkSize)
+    return () => window.removeEventListener('resize', checkSize)
+  }, [])
+
+  const openFilter = hash == '#filter' && isMobile
+
 
   useEffect(() => {
     const updateHash = () => {
@@ -305,17 +328,17 @@ const Filter = () => {
       </div>
 
       <div className='flex lg:hidden flex-col gap-4'>
-        <div className='flex flex-col lg:hidden border p-4 gap-3'>
+        <div className='flex flex-col lg:hidden border p-3 gap-3'>
           <div className='flex items-center justify-between gap-3'>
-            <div onClick={() => setMakeModalOpen(true)} className='border p-3 w-full rounded-lg bg-white'>
+            <div onClick={() => setMakeModalOpen(true)} className='border p-2.5 px-3 w-full rounded-lg bg-white'>
               {make ? makes.find((item: Default) => item._id === make)?.label : 'Marka'}
             </div>
-            <div onClick={() => setModelModalOpen(true)} className='border p-3 w-full rounded-lg bg-white'>
+            <div onClick={() => setModelModalOpen(true)} className='border p-2.5 px-3 w-full rounded-lg bg-white'>
               {model ? models.find((item: Default) => item._id === model)?.label : 'Model'}
             </div>
             <div 
               onClick={() => window.location.hash = 'filter'}
-              className='border p-3 flex items-center text-white bg-blue-500 font-semibold justify-center gap-2 rounded-lg'
+              className='border p-2.5 px-3 flex items-center text-white bg-blue-500 font-semibold justify-center gap-2 rounded-lg'
             >
               <Funnel />
               Filter
