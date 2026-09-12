@@ -1,4 +1,3 @@
-import { products } from '@/constants/products'
 import React from 'react'
 import DetailsLeft from './_components/DetailsLeft'
 import DetailsRight from './_components/DetailsRight'

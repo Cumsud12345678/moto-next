@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux'
 import {BellFill} from '@gravity-ui/icons';
 import {PencilToSquare} from '@gravity-ui/icons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { products } from '@/constants/products'
 import ProductList from '@/components/ProductList'
 import ProductCard from './_components/ProductCard'
 import { ProductCard  as CardType } from '@/types/product'
@@ -14,7 +13,7 @@ import { ProductCard  as CardType } from '@/types/product'
 const ProfilePage = () => {
 
   const user = useSelector((state: RootState) => state.user)
-  const [data, setData] = useState<CardType[]>(products)
+  const [data, setData] = useState<CardType[]>([])
 
   // const [openAlertDelete, setOpenAlertDelete] = useState<boolean>(false)
   // const [deletedId, setDeletedId] = useState<number>(0)

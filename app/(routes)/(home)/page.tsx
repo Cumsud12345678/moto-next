@@ -1,4 +1,3 @@
-import { products } from '@/constants/products';
 import ProductList from '@/components/ProductList';
 import Filter from './_components/Filter';
 import { Suspense } from 'react'
