@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 
-const ProductCard = ({product, onDelete}: {product: CardType, onDelete: (id: number) => void}) => {
+const ProductCard = ({product, onDelete}: {product: CardType, onDelete: (id: string) => void}) => {
 
   const [data, setData] = useState<CardType>(product)
   const pathname = usePathname()
@@ -39,7 +39,6 @@ const ProductCard = ({product, onDelete}: {product: CardType, onDelete: (id: num
       ...prev,
       isLiked: !data.isLiked
     }))
-
   }
 
   const [openAlertDelete, setOpenAlertDelete] = useState<boolean>(false)
@@ -51,7 +50,7 @@ const ProductCard = ({product, onDelete}: {product: CardType, onDelete: (id: num
 
   return (
     <Fragment>
-      <Link
+      {/* <Link
         href={`/elanlar/${product.make}-${product.model}-${product._id}`}
         className={`rounded-lg overflow-hidden bg-white shadow ${product.sellerType === "premium" ? "border-orange-400" : ""} border-2`}
       >
@@ -151,7 +150,10 @@ const ProductCard = ({product, onDelete}: {product: CardType, onDelete: (id: num
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
+      <div>
+        test
+      </div>
 
     </Fragment>
     
