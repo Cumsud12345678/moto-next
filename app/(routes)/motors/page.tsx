@@ -1,4 +1,3 @@
-import { products } from '@/constants/products';
 import ProductList from '@/components/ProductList';
 import Filter from '../(home)/_components/Filter';
 import { Suspense } from 'react';
@@ -19,7 +18,7 @@ const MotoPage = async ({searchParams}: Props) => {
   const model = params.model
   const category = params.category
 
-  const data = products
+  // const data = products
 
   console.log('aaa')
 
@@ -33,7 +32,8 @@ const MotoPage = async ({searchParams}: Props) => {
       </div>
      
       <div className='container mx-auto max-w-250 h-1000 p-4'>
-        <ProductList data={data} />
+        {/* <ProductList data={data} /> */}
+        aaa
       </div>
 
     </div>
