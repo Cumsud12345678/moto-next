@@ -15,6 +15,7 @@ import TwoInputGroup from './TwoInputGroup'
 import CustomSwitch from '@/components/buttons/CustomSwitch'
 import ButtonGroup from '@/components/buttons/ButtonGroup'
 import CheckboxButtons from '@/components/buttons/CheckboxButtons'
+import { useMetadata } from '@/hooks/useMetadata'
 
 
 interface FilterModalProps {
@@ -24,10 +25,11 @@ interface FilterModalProps {
 
 const FilterModal = ({open, data}: FilterModalProps) => {
   
+  const metadataHook = useMetadata()
+
   const {
     make,
     setMake,
-    models,
     model,
     setModel,
     used,
@@ -85,9 +87,26 @@ const FilterModal = ({open, data}: FilterModalProps) => {
     setDocument,
     category,
     setCategory,
+  } = data
+
+  const {
+    isLoading,
+    error,
     usedTypes,
     metadata
-  } = data
+  } = metadataHook
+
+  const [filteredModels, setFilteredModels] = useState<Array<Default>>([])
+
+  useEffect(() => {
+    if (make && metadata) {
+      setFilteredModels(metadata.models.filter((model: Default) => model.make === make))
+    } else if (!make) {
+      console.log('sifirladim')
+      setModel('')
+      setFilteredModels([])
+    }
+  }, [make, metadata])
 
   const [makeModalOpen, setMakeModalOpen] = useState<boolean>(false)
   const [modelModalOpen, setModelModalOpen] = useState<boolean>(false)
@@ -411,7 +430,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
           setOpen={setModelModalOpen}
           state={model}
           setState={selectedModel}
-          data={models}
+          data={filteredModels}
           label='Model'
         />
 
