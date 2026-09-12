@@ -1,5 +1,4 @@
 'use client'
-import { Product } from '@/types/product'
 import { Heart, PencilToSquare, TrashBin } from '@gravity-ui/icons'
 import {HeartFill} from '@gravity-ui/icons';
 import Image from 'next/image'
@@ -8,7 +7,7 @@ import {ArrowsRotateLeft} from '@gravity-ui/icons';
 import {FileText} from '@gravity-ui/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
+import { ProductCard as CardType } from '@/types/product';
 import { Trash2Icon } from "lucide-react"
 
 import {
@@ -23,9 +22,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-const ProductCard = ({product, onDelete}: {product: Product, onDelete: (id: number) => void}) => {
 
-  const [data, setData] = useState<Product>(product)
+const ProductCard = ({product, onDelete}: {product: CardType, onDelete: (id: number) => void}) => {
+
+  const [data, setData] = useState<CardType>(product)
   const pathname = usePathname()
 
   const formatNumber = (value: number) => {
