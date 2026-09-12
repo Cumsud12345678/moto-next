@@ -1,29 +1,47 @@
 import { Default } from "./metadata"
 
-export interface Product {
-  _id: number
+export interface ProductCard {
+  _id: string
   price: number
-  make: string
-  model: string
   year: number
   volume: number
-  category: string
-  used: string
-  color: string
-  fuel_type: string
-  transmission: string  // suretler qutusu
-  power: number  // guc
   mileage: number
-  image: string
-  city: string
+  barter: boolean
+  credit: boolean
+  document: boolean
+  images: string[]
+  isLiked: boolean
+  make: Default
+  model: Default
+  region: Default
+  isUrgent: boolean
+  seller: { _id: string, role: string }
+}
+
+
+export interface ProductDescription {
+  _id: string
+  price: number
+  make: Default
+  model: Default
+  year: number
+  volume: number
+  category: Default
+  used: boolean
+  color: Default
+  fuelType: Default
+  transmission: Default
+  power: number
+  mileage: number
+  images: string[]
   equipment: Default[]
-  phone: string
-  createdAt: string
-  sellerType: string
+  region: Default
+  phone: number
   barter: boolean
   document: boolean
+  credit: boolean
   description: string
-  role: string
-  user: Array<{name: string}>
+  seller: { _id: string, role: string, name: string }
   isLiked: boolean
+  isUrgent: boolean
 }

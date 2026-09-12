@@ -1,5 +1,4 @@
 'use client'
-import { Product } from '@/types/product'
 import Image from 'next/image'
 import React, { Fragment, useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -30,17 +29,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Galery from './Galery'
 import Header from '@/components/Header'
 import { useRouter } from 'next/navigation'
+import { ProductDescription } from '@/types/product'
 
-const images = [
-  'https://pub-cb8fb86f549343468a5fd508f1ad9a4a.r2.dev/uploads/1788532255563-ChatGPT%20Image%2028%20%C3%90%C2%B0%C3%90%C2%B2%C3%90%C2%B3.%202026%20%C3%90%C2%B3.,%2009_09_38.png',
-  'https://pub-cb8fb86f549343468a5fd508f1ad9a4a.r2.dev/uploads/1788517818306-1000419143.jpg',
-  'https://pub-cb8fb86f549343468a5fd508f1ad9a4a.r2.dev/uploads/1788103498147-12CE4048-6C4D-403C-965E-CEB942378007.png',
-]
-
-const DetailsLeft = ({ data }: { data: Product }) => {
+const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
 
   const [scrolled, setScrolled] = useState(false)
-  const [product, setProduct] = useState<Product>(data)
+  const [product, setProduct] = useState<ProductDescription | null>(data)
   const router = useRouter()
 
 
@@ -58,10 +52,22 @@ const DetailsLeft = ({ data }: { data: Product }) => {
   }
 
   const handleLike = () => {
-    setProduct(prev => ({
-      ...prev,
-      isLiked: !product.isLiked
-    }))
+    setProduct(prev => {
+      if(!prev) return prev;
+      
+      return {
+        ...prev,
+        isLiked: !prev.isLiked
+      }
+    })
+  }
+
+  if(!product) {
+    return(
+      <div>
+
+      </div>
+    )
   }
 
   return (
@@ -104,7 +110,7 @@ const DetailsLeft = ({ data }: { data: Product }) => {
             <div className="flex items-center justify-between">
               <div className='flex items-center gap-2'>
                 <ChevronLeft className="size-7" />
-                <h3 className='text-xl font-semibold'>{product.make} {product.model}, {product.volume} sm³, {product.year} il, {product.price} AZN</h3>
+                <h3 className='text-xl font-semibold'>{product.make.label} {product.model.label}, {product.volume} sm³, {product.year} il, {product.price} AZN</h3>
               </div>
 
               <div className="flex gap-3">
@@ -124,17 +130,17 @@ const DetailsLeft = ({ data }: { data: Product }) => {
       </div>
 
       <Galery 
-        images={images}
+        images={product.images}
         price={product.price}
-        make={product.make}
-        model={product.model}
+        make={product.make.label}
+        model={product.model.label}
         volume={product.volume}
         year={product.year}
       />
 
       <div className='p-3 bg-white'>
         <p className='text-xl font-semibold'>{formatNumber(product.price)} AZN</p>
-        <p className='text-xl'>{product.make} {product.model}, {product.volume} sm³, {product.year} il, {formatNumber(product.mileage)} km</p>
+        <p className='text-xl'>{product.make.label} {product.model.label}, {product.volume} sm³, {product.year} il, {formatNumber(product.mileage)} km</p>
 
         <div className='flex flex-row py-3 gap-3 flex-nowrap overflow-auto scrollbar-none'>
           <div className='shrink-0 border flex items-center p-2 pr-4 gap-2 bg-gray-200 rounded-xl'>
@@ -166,25 +172,25 @@ const DetailsLeft = ({ data }: { data: Product }) => {
             <div className="flex flex-col gap-2 w-full">
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Şəhər</span>
-                <span>{product.city}</span>
+                <span>{product.region.label}</span>
               </div>
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Marka</span>
-                <span>{product.make}</span>
+                <span>{product.make.label}</span>
               </div>
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Model</span>
-                <span>{product.model}</span>
+                <span>{product.model.label}</span>
               </div>
             </div>
             <div className="flex flex-col gap-2 w-full mt-2">
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Sürətlər qutusu</span>
-                <span>{product.transmission}</span>
+                <span>{product.transmission.label}</span>
               </div>
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Rəng</span>
-                <span>{product.color}</span>
+                <span>{product.color.label}</span>
               </div>
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Qiymət</span>
@@ -198,11 +204,11 @@ const DetailsLeft = ({ data }: { data: Product }) => {
               </div>
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Ban növü</span>
-                <span>{product.category}</span>
+                <span>{product.category.label}</span>
               </div>
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Muhərrik</span>
-                <span>{product.volume} sm³ / {product.power} a.g. / {product.fuel_type}</span>
+                <span>{product.volume} sm³ / {product.power} a.g. / {product.fuelType.label}</span>
               </div>
             </div>
             <div className="flex flex-col gap-2 w-full mt-2">
@@ -247,8 +253,8 @@ const DetailsLeft = ({ data }: { data: Product }) => {
             </Avatar>
             {/* <img className="rounded-full w-[60px] h-[60px] object-contain border-2" src={profile ? `${BASE_URL}/uploads/${profile}` : '/profile.jpg'} alt="" /> */}
             <div className="mx-2 flex flex-col">
-              <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{product.user[0].name}</span>
-              <span>{product.city}</span>
+              <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{product.seller.name}</span>
+              <span>{product.region.label}</span>
             </div>
           </div>
 

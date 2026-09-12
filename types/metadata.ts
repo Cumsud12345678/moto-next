@@ -1,11 +1,9 @@
 export interface Metadata {
   makes: Array<Default>
   models: Array<Default>
-  used_types: Array<Type1>
   cities: Array<Default>
-  document: Array<Type1>,
   categories: Array<Default>
-  fuel_types: Array<Default>
+  fuelTypes: Array<Default>
   transmissions: Array<Default>
   colors: Array<Default>
   equipments: Array<Default>

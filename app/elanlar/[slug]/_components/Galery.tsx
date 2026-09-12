@@ -53,6 +53,9 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
     }
   }, [gridOpen])
 
+  console.log("IMAGE URL:", process.env.NEXT_PUBLIC_IMAGE_URL)
+console.log("IMAGES:", images)
+
   return (
     <Fragment>
       <Swiper
@@ -81,7 +84,7 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
             >
               {/* Arxa fon - bulanıq */}
               <Image
-                src={image}
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
                 alt=""
                 aria-hidden="true"
                 fill
@@ -90,7 +93,7 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
 
               {/* Ön plan - əsl şəkil */}
               <Image
-                src={image}
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
                 alt=""
                 fill
                 className="absolute w-full h-full object-contain hidden lg:block top-1/2 left-1/2 -transform-y-1/2 -transform-x-1/2"
@@ -106,7 +109,7 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
                   lg:hidden
                 "
                 style={{
-                  backgroundImage: `url(${image})`,
+                  backgroundImage: `url(${process.env.NEXT_PUBLIC_IMAGE_URL}/${image})`,
                 }}
               />
 
@@ -127,7 +130,7 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
           {images.map((image, index) => (
             <SwiperSlide key={index}>
               <Image
-                src={image}
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
                 alt=""
                 fill
                 className="object-contain bg-black rounded-lg cursor-pointer"
@@ -158,7 +161,7 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
                 onClick={() => handleOpenLightbox(index)}
               >
                 <Image
-                  src={image}
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
                   alt=""
                   fill
                   className="object-cover"
@@ -173,8 +176,9 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
         open={open}
         close={() => setOpen(false)}
         index={lightboxIndex}
-        slides={images.map((src) => ({ src }))}
-
+        slides={images.map((src) => ({
+          src: `${process.env.NEXT_PUBLIC_IMAGE_URL}/${src}`,
+        }))}
         on={{
           view: ({ index }) => {
             setLightboxIndex(index)
@@ -229,7 +233,7 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
                             ${index === lightboxIndex ? 'opacity-100' : 'opacity-40 hover:opacity-70'}
                           `}
                           style={{
-                            backgroundImage: `url(${image})`,
+                           backgroundImage: `url(${process.env.NEXT_PUBLIC_IMAGE_URL}/${image})`
                           }}
                         />
                       ))

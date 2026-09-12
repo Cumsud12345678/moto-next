@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
         hostname: 'pub-cb8fb86f549343468a5fd508f1ad9a4a.r2.dev',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'pub-8758a577ec5346e18f2b76891ba616b3.r2.dev',
+        pathname: '/listings/**',
+      },
     ],
   },
 };

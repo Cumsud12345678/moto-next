@@ -35,16 +35,14 @@ export default function InputAndListString({ state, setState, label, length=20, 
   }, [data])
 
   useEffect(() => {
-    const a = data.filter((item: Default) => item.label.toLowerCase().startsWith(value.toLowerCase()))
+    const a = data?.filter((item: Default) => item.label.toLowerCase().startsWith(value.toLowerCase()))
     setNewData(a)
   }, [value])
-
 
   const clearValue = () => {
     setState('')
     setValue('')
   }
-
 
   return (
     <div className="relative w-full">
@@ -78,7 +76,7 @@ export default function InputAndListString({ state, setState, label, length=20, 
         {
           !state &&
           (
-            newData.map((item: Default, index) => (
+            newData?.map((item: Default, index) => (
               <div key={index} onClick={() => handleChangeList(item._id, item.label)} className="cursor-pointer flex gap-2 items-center hover:bg-gray-200 p-2 border-b">
                 {item.logo &&
                   <Image src={item.logo} width={30} height={30} alt={item.label} />

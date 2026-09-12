@@ -1,19 +1,35 @@
 'use client'
-import PlaceholderEffectInput from '@/components/inputs/PlaceholderEffectInput'
 import { useFilter } from '@/hooks/useFilter'
+import axios from 'axios'
+import { Spinner } from "@/components/ui/spinner"
+import Step1 from './steps/Step1'
+import Step2 from './steps/Step2'
+import Step3 from './steps/Step3'
+import { Fragment, useEffect, useState } from 'react'
+import { toast } from '@/components/ui/toast'
+import { useMetadata } from '@/hooks/useMetadata'
 import { Default } from '@/types/metadata'
-import Image from 'next/image'
-import React, { Fragment, useEffect, useState } from 'react'
-import InputAndListString from './_components/InputAndListString'
-import InputAndListNumber from './_components/InputAndListNumber'
-import ButtonGroup from '@/components/buttons/ButtonGroup'
-import CustomSwitch from '@/components/buttons/CustomSwitch'
-import PlaceholderNumberInput from '@/components/inputs/numberType/PlaceholderNumberInput'
-import CheckboxButtons from '@/components/buttons/CheckboxButtons'
-import SearchAndSelect from '@/components/inputs/SearchAndSelect'
-import { ArrowsExpand, Xmark } from '@gravity-ui/icons'
-import Dropzone from '@/components/Dropzone'
-import imageCompression from 'browser-image-compression'
+import { api } from '@/lib/axios'
+
+import { REGEXP_ONLY_DIGITS } from "input-otp"
+import { Field, FieldLabel } from "@/components/ui/field"
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
+
+import { useSendOtp } from '@/hooks/useSendOtp'
+import { useCreateEvent } from '@/hooks/useCreateEvent'
+import { useVerifyOtp } from '@/hooks/useVerifyOtp'
+
+const API = process.env.NEXT_PUBLIC_API_URL!;
+
+interface User {
+  _id: string,
+  name: string,
+  email: string
+}
 
 interface ImageFile  {
   id: string 
@@ -22,384 +38,291 @@ interface ImageFile  {
 }
 
 const NewPage = () => {
+  
+  const [formStep, setFormStep] = useState<string>('start')
+  const [userData, setUserData] = useState<User | undefined>(undefined)
+
+  console.log(userData)
+
+  useEffect(() => {
+    const getMe = async () => {
+      try {
+        const res = await axios.get(
+          `${API}/api/auth/me`,
+          { withCredentials: true }
+        )
+
+        console.log(res.data)
+        // if(res.data.data.length > 0) {
+          setUserData(res.data.data)
+        // }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    getMe()
+  }, [])
+
+  const filterStates = useFilter()
+  const metadataHook = useMetadata()
 
   const {
     make,
-    setMake,
-
-    models,
     model,
     setModel,
-
-    years,
-    minYear,
-    setMinYear,
-
-    volumes,
-    minVolume,
-    setMinVolume,
-
-    category,
-    setCategory,
-
     used,
-    setUsed,
-
-    barter,
-    setBarter,
-
-    credit,
-    setCredit,
-
-    document,
-    setDocument,
-
-    color,
-    setColor,
-
-    transmission,
-    setTransmission,
-
-    fuelType,
-    setFuelType,
-
-    minPower,
-    setMinPower,
-
-    minDistance,
-    setMinDistance,
-
-    equipment,
-    addEquipment,
-
     city,
-    setCity,
+    credit,
+    barter,
+    fuelType,
+    transmission,
+    minVolume,
+    minYear,
+    color,
+    equipment,
+    document,
+    category,
+  } = filterStates
 
-    minPrice,
-    setMinPrice,
-    
-    
-    setElement,
-    
+  const {
+    isLoading,
+    error,
+    usedTypes,
     metadata
-  } = useFilter()
+  } = metadataHook
+
+  const [filteredModels, setFilteredModels] = useState<Array<Default>>([])
 
   useEffect(() => {
-    if(!make) {
-      setMinYear(0)
-      setMinVolume(0)
+    if(make && metadata) {
+      setFilteredModels(metadata.models.filter((model: Default) => model.make === make))
+    }else if(!make) {
+      console.log('sifirladim')
+      setModel('')
+      setFilteredModels([])
     }
-    if(!model) {
-      setMinYear(0)
-      setMinVolume(0)
-    }
-  }, [make, model, minYear])
+  }, [make, metadata])
 
-  const [description, setDescription] = useState<string>('')
 
+  const [power, setPower] = useState<number>(0)
+  const [distance, setDistance] = useState<number>(0)
+  const [price, setPrice] = useState<number>(0)
 
   const [images, setImages] = useState<ImageFile[]>([])
-  
-  
-  const handleDrop = async (files: File[]) => {
+  const [description, setDescription] = useState<string>('')
+  const [phone, setPhone] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
+  const [name, setName] = useState<string>('')
+  const [otp, setOtp] = useState<string>("")
 
-    // if (images.length + files.length > 10) {
-    //   toast.danger("Maksimum 10 şəkil əlavə edə bilərsiniz");
-    //   return;
-    // }
 
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1600,
-      initialQuality: 0.85,
-      useWebWorker: true
+
+  const sendOtpMutation = useSendOtp()
+  const verifyOtpMutation = useVerifyOtp()
+  const createEventMutation = useCreateEvent()
+
+  // ADDIM 1: email+name+phone göndər, OTP istə (yalnız userData yoxdursa lazımdır)
+  const handleSendOtp = () => {
+    if (userData) {
+      // İstifadəçi artıq login-dir — OTP-yə ehtiyac yoxdur, birbaşa elanı göndər
+      submitListing()
+      return
     }
 
-    const compressedImages = await Promise.all(
-      files.map(async (file) => {
-        const compressedBlob = await imageCompression(file, options)
+    sendOtpMutation.mutate({ email, name }, {
+      onSuccess: (data) => {
+        if (data.success) setFormStep('verify')
+      },
+      onError: () => {
+        toast.add({ type: 'error', description: 'Kod göndərilmədi.', priority: 'high' })
+      },
+    })
+  }
 
-        // ✅ orijinal adı və tipi qoruyaraq real File obyekti yarat
-        const compressedFile = new File(
-          [compressedBlob],
-          file.name,              // orijinal ad (uzantı daxil) saxlanılır
-          { type: compressedBlob.type || file.type }
-        )
-
-        return {
-          id: crypto.randomUUID(),
-          url: URL.createObjectURL(compressedFile),
-          file: compressedFile
+  // ADDIM 2: OTP-ni yoxla, uğur olsa elanı göndər
+  const handleVerify = () => {
+    verifyOtpMutation.mutate({ email, otp }, {
+      onSuccess: (data) => {
+        if (data.success) {
+          submitListing() // yalnız İNDİ elanı göndər
         }
-      })
-    )
-
-    setImages((prev) => [...prev, ...compressedImages])
-  }
-
-  const removeImage = (id: string) => {
-    setImages((prev) => {
-      const img = prev.find(i => i.id === id)
-      if (img) URL.revokeObjectURL(img.url)
-      return prev.filter((img) => img.id !== id)
-    })
-  }
-
-  const reorderImages = (fromIndex: number, toIndex: number) => {
-    if (
-      fromIndex === toIndex ||
-      fromIndex < 0 ||
-      toIndex < 0
-    ) return
-
-    setImages((prev) => {
-      if (fromIndex >= prev.length || toIndex >= prev.length) return prev
-
-      const updated = [...prev]
-      const [moved] = updated.splice(fromIndex, 1)
-
-      if (!moved) return prev
-
-      updated.splice(toIndex, 0, moved)
-
-      return updated
+      },
+      onError: () => {
+        toast.add({ type: 'error', description: 'Kod yanlışdır.', priority: 'high' })
+      },
     })
   }
 
 
-  // Şəkillərin sürüklə-burax ilə sıralanması
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
-  const [overIndex, setOverIndex] = useState<number | null>(null)
+  // ADDIM 3: elanı yarat (FormData-da artıq `otp` YOXDUR)
+  const submitListing = () => {
+    const formData = new FormData()
 
-  const handleDragStart = (
-    e: React.PointerEvent,
-    index: number
-  ) => {
-    setDraggedIndex(index)
-    e.currentTarget.setPointerCapture(e.pointerId)
+    formData.append('price', String(price))
+    formData.append('make', make)
+    formData.append('model', model)
+    formData.append('year', String(minYear))
+    formData.append('volume', String(minVolume))
+    formData.append('category', category)
+    formData.append('color', color)
+    formData.append('fuelType', fuelType)
+    formData.append('transmission', transmission)
+    formData.append('power', String(power))
+    formData.append('mileage', String(distance))
+    formData.append('description', description)
+    formData.append('region', city) // diqqət #6-ya bax
+    formData.append('phone', phone.replace(/\s/g, '')) // diqqət #5-ə bax
+
+    if (used !== null) formData.append('used', String(used))
+    if (credit !== null) formData.append('credit', String(credit))
+    if (barter !== null) formData.append('barter', String(barter))
+    if (document !== null) formData.append('document', String(document))
+
+    images.forEach((image) => formData.append('images', image.file))
+    equipment.forEach((eq) => formData.append('equipment', eq))
+
+    createEventMutation.mutate(formData, {
+      onSuccess: () => {
+        toast.add({ type: 'success', description: 'Elan uğurla yaradıldı.' })
+      },
+      onError: () => {
+        toast.add({ type: 'error', description: 'Elan yaradıla bilmədi.', priority: 'high' })
+      },
+    })
   }
 
-  const handleDragMove = (e: React.PointerEvent) => {
-    if (draggedIndex === null) return
 
-    const target = window.document.elementFromPoint(
-      e.clientX,
-      e.clientY
-    )
-
-    const card = target?.closest('[data-image-index]')
-
-    if (card) {
-      const index = Number(
-        card.getAttribute('data-image-index')
-      )
-
-      if (!Number.isNaN(index)) {
-        setOverIndex(index)
-      }
+  // BÜTÜN hook-lar əvvəl:
+  useEffect(() => {
+    if (error) {
+      toast.add({
+        type: "error",
+        description: "The event could not be created.",
+        priority: "high",
+      });
     }
+  }, [error]);
+
+  // yalnız BUNDAN SONRA early return-lar:
+  if (isLoading) {
+    return (
+      <div>
+        <div className="flex flex-col w-full mt-10 lg:mt-30 lg:container mx-auto lg:max-w-187.5">
+          <div className="lg:rounded-3xl lg:p-15 lg:bg-white flex flex-col lg:gap-8 gap-2 bg-[#f5f5f5]">
+            <div className="flex items-center justify-center p-4 bg-white mt-3 lg:mt-0">
+              <h1 className="lg:text-3xl text-2xl font-bold">Yeni elan</h1>
+            </div>
+            <div className="lg:p-10 border rounded-3xl bg-white p-5 flex flex-col gap-2 lg:gap-0 items-center justify-center">
+              <Spinner />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  const handleDragEnd = () => {
-    if (
-      draggedIndex !== null &&
-      overIndex !== null &&
-      draggedIndex !== overIndex
-    ) {
-      reorderImages(draggedIndex, overIndex)
-    }
+  if (error) return null;
+  if (!metadata) return null;
 
-    setDraggedIndex(null)
-    setOverIndex(null)
-  }
   return (
     <div>
       <div className="flex flex-col w-full mt-10 lg:mt-30 lg:container mx-auto lg:max-w-187.5">
         <div className="lg:rounded-3xl lg:p-15 lg:bg-white flex flex-col lg:gap-8 gap-2 bg-[#f5f5f5]">
-          <div className="flex items-center justify-center p-4 bg-white mt-3 lg:mt-0">
-            <h1 className="lg:text-3xl text-2xl font-bold">Yeni elan</h1>
+          
+        {
+          formStep === 'start'
+          &&
+          <Fragment>
+            <div className="flex items-center justify-center p-4 bg-white mt-3 lg:mt-0">
+              <h1 className="lg:text-3xl text-2xl font-bold">Yeni elan</h1>
+            </div>
+
+            <Step1
+              metadata={metadata}
+              models={filteredModels}
+              filterState={filterStates}
+            />
+
+            {
+              fuelType &&
+
+              <Fragment>
+
+                <Step2
+                  filterState={filterStates}
+                  metadata={metadata}
+                  images={images}
+                  setImages={setImages}
+                  description={description}
+                  setDescription={setDescription}
+                  power={power}
+                  setPower={setPower}
+                  distance={distance}
+                  setDistance={setDistance}
+                  price={price}
+                  setPrice={setPrice}
+                />
+
+                <Step3
+                  setForm={handleSendOtp}          // 'setFormAndLogin' əvəzinə
+                  isSubmitting={sendOtpMutation.isPending}
+                  userData={userData}
+                  phone={phone}
+                  setPhone={setPhone}
+                  name={name}
+                  setName={setName}
+                  email={email}
+                  setEmail={setEmail}
+                />
+
+              </Fragment>
+            }
+
+          </Fragment>
+        }
+
+        {
+          formStep === 'verify'
+          &&
+          <div className="lg:rounded-3xl lg:p-15 lg:bg-white flex flex-col lg:gap-8 gap-2 bg-[#f5f5f5]">
+            <Field className="w-fit">
+              <FieldLabel htmlFor="digits-only">Digits Only</FieldLabel>
+              <InputOTP
+                id="digits-only"
+                maxLength={6}
+                pattern={REGEXP_ONLY_DIGITS}
+                value={otp}
+                onChange={setOtp}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+            </Field>
+
+            <div>
+              <button
+                onClick={handleVerify}
+                disabled={verifyOtpMutation.isPending || otp.length < 6}
+                className="w-full p-4 rounded-xl bg-blue-500 text-white cursor-pointer disabled:opacity-50"
+              >
+                {verifyOtpMutation.isPending ? 'Yoxlanılır...' : 'Gonder'}
+              </button>
+            </div>
+
           </div>
-
-          <div className="lg:p-10 border rounded-3xl bg-white p-5 flex flex-col">
-
-            <InputAndListString state={make} setState={setMake} label='Marka' length={20} data={metadata.makes} />
-
-            {
-              make
-              &&  <InputAndListString state={model} setState={setModel} label='Model' length={20} data={models} />
-            }
-
-            {
-              model &&
-              <InputAndListNumber state={minYear} setState={setMinYear} label='il' length={20} data={years} />
-            }
-
-            {
-              minYear !== 0 &&
-              <InputAndListNumber state={minVolume} setState={setMinVolume} label='hecm' length={20} data={volumes} />
-            }
-
-            {
-              minYear !== 0 &&
-              <div>
-                <h3>Ban novu</h3>
-                <ButtonGroup data={metadata.categories} state={category} setState={setCategory} wrap={false} isNew />
-              </div>
-            }
-            
-            {
-              category &&
-              <div>
-                <div className='grid grid-cols-2 pt-7 gap-3'>
-                  <div className='flex items-center justify-between w-full pr-5 border-r-3'>
-                    <span>Yeni?</span>
-                    <CustomSwitch checked={used} setChecked={setUsed} />
-                  </div>
-                  <div className='flex items-center justify-between w-full pl-5'>
-                    <span>Barter?</span>
-                    <CustomSwitch checked={barter} setChecked={setBarter} />
-                  </div>
-                  <div className='flex items-center justify-between w-full pr-5 border-r-3'>
-                    <span>Kredit?</span>
-                    <CustomSwitch checked={credit} setChecked={setCredit} />
-                  </div>
-                  <div className='flex items-center justify-between w-full pl-5'>
-                    <span>Senedli?</span>
-                    <CustomSwitch checked={document} setChecked={setDocument} />
-                  </div>
-                </div>
-
-                <div className='pt-6'>
-                  <h3 className='mb-2'>Reng</h3>
-                  <ButtonGroup data={metadata.colors} state={color} setState={setColor} wrap={false} isNew />
-                </div>
-
-                <div className='pt-6'>
-                  <h3 className='mb-2'>Muherrik</h3>
-                  <ButtonGroup data={metadata.transmissions} state={transmission} setState={setTransmission} wrap={false} isNew />
-                </div>
-
-                <div className='pt-6'>
-                  <h3 className='mb-2'>Suretler qutusu</h3>
-                  <ButtonGroup data={metadata.fuel_types} state={fuelType} setState={setFuelType} wrap={false} isNew />
-                </div>
-
-              </div>
-              
-            }
-
-          </div>
-
-          {
-            category && 
-            <Fragment>
-              <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-4 bg-white p-5">
-                <h3 className="text-xl">Güc və Yürüş</h3>
-                <div>
-                  <PlaceholderNumberInput state={minPower} setState={setMinPower} label='Guc a.g.' length={30}  />
-                </div>
-                <div>
-                  <PlaceholderNumberInput state={minDistance} setState={setMinDistance} label='Yuruyush km.' length={30} />
-                </div>
-              </div>
-
-              <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">
-                <div>
-                  <h3 className="text-xl mb-3">Məlumat *</h3>
-                  <textarea
-                    className="border focus:outline-sky-500 w-full rounded-xl px-3 py-2 h-32 bg-[#f5f5f5] resize-none"
-                    placeholder="Motosiklet haqqında vacib məlumatları qeyd edin."
-                    value={description}
-                    maxLength={1000}
-                    onChange={(e) => setDescription(e.target.value)}
-                  ></textarea>
-                  <span className="text-gray-500">
-                    {description.length} / 1 000
-                  </span>
-                </div>
-              </div>
-
-              {/* Sekil */}
-              <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">
-                <div>
-                  <h3 className="text-xl mb-3">Şəkillər *</h3>
-                  <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                    {images.map((img, index) => (
-                      <div
-                        key={img.id}
-                        data-image-index={index}
-                        onPointerMove={handleDragMove}
-                        onPointerUp={handleDragEnd}
-                        onPointerCancel={handleDragEnd}
-                      >
-                        <div
-                          className={`relative overflow-hidden rounded-2xl border transition-all ${draggedIndex === index
-                              ? 'border-blue-400 opacity-50'
-                              : overIndex === index && draggedIndex !== null
-                                ? 'border-blue-400 scale-95'
-                                : 'border-gray-200'
-                            }`}
-                        >
-
-                          <img
-                            src={img.url}
-                            alt=""
-                            className="w-full h-25 object-cover pointer-events-none"
-                          />
-
-                          <button
-                            onClick={() => removeImage(img.id)}
-                            className="absolute cursor-pointer top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full border-0 bg-white shadow-sm hover:bg-gray-100"
-                          >
-                            <Xmark />
-                          </button>
-
-                          <div
-                            onPointerDown={(e) => handleDragStart(e, index)}
-                            style={{ touchAction: 'none' }}
-                            className="absolute cursor-grab active:cursor-grabbing top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm hover:bg-gray-100"
-                          >
-                            <ArrowsExpand />
-                          </div>
-
-                        </div>
-                      </div>
-                    ))}
-
-                    <div>
-                      <Dropzone onDrop={handleDrop} />
-                    </div>
-
-                  </div>
-                  <p className="text-md mt-4">Şəkillərin sırasını dəyişmək üçün sol yuxarı küncdəki tutacaqdan sürükləyin. Minimum 1, maksimum 10 şəkil</p>
-                </div>
-              </div>
-
-              <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">
-                <div>
-                  <h3 className="text-xl mb-3">Təchizat *</h3>
-                  <CheckboxButtons data={metadata.equipments} ids={equipment} onClick={addEquipment} />
-                </div>
-              </div>
-
-
-              <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-5 bg-white p-5">
-                <h3 className="text-xl">Şəhər və Qiymət</h3>
-                <div>
-                  <SearchAndSelect data={metadata.cities} state={city} setState={setCity} label='Region' />
-                </div>
-
-                <div>
-                  <PlaceholderNumberInput state={minPrice} setState={setMinPrice} label={'Qiymət *'} length={30} />
-                </div>
-              </div>
-            </Fragment>
         }
 
         </div>
       </div>
     </div>
   )
+
 }
 
 export default NewPage

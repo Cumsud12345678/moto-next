@@ -27,6 +27,7 @@ const ButtonGroup = ({data, state, setState, wrap=false, isNew=false}: ButtonGro
   const [newData, setNewData] = useState<Default[]>([])
 
   useEffect(() => {
+    if(!data) return;
     setNewData([{_id: '', label: 'Hamisi'}, ...data])
   }, [data])
 

@@ -2,10 +2,22 @@ import { products } from '@/constants/products';
 import ProductList from '@/components/ProductList';
 import Filter from './_components/Filter';
 import { Suspense } from 'react'
+import { api } from '@/lib/axios';
+import { ProductCard } from '@/types/product';
 
-const HomePage = () => {
+async function getProducts(): Promise<ProductCard[]> {
+  try {
+    const res = await api.get('/api/listings', { withCredentials: true });
+    return res.data.data;
+  } catch (err) {
+    console.error('Failed to fetch products:', err);
+    return [];
+  }
+}
 
-  const data = products
+const HomePage = async () => {
+
+  const data = await getProducts();
 
   return (
     <div>

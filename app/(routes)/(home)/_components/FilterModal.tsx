@@ -5,34 +5,26 @@ import {
   DialogContent,
   DialogHeader,
 } from "@/components/ui/dialog"
-import { Default, Metadata } from '@/types/metadata'
+import { Default } from '@/types/metadata'
 import { useFilter } from '@/hooks/useFilter'
-import CustomDrawer from '@/components/CustomDrawer'
 import ThreeButton from '@/components/buttons/ThreeButton'
 
 import {ChevronRight, Xmark} from '@gravity-ui/icons';
 import DialogModal from './DialogModal'
-import PlaceholderEffectInput from '@/components/inputs/PlaceholderEffectInput'
-import PlaceholderNumberInput from '@/components/inputs/numberType/PlaceholderNumberInput'
 import TwoInputGroup from './TwoInputGroup'
-import { Switch } from "@/components/ui/switch"
 import CustomSwitch from '@/components/buttons/CustomSwitch'
 import ButtonGroup from '@/components/buttons/ButtonGroup'
 import CheckboxButtons from '@/components/buttons/CheckboxButtons'
 
-type SetElement = (
-  key: React.Dispatch<React.SetStateAction<string>>,
-  value: string
-) => void
 
 interface FilterModalProps {
   open: boolean,
+  data: ReturnType<typeof useFilter>
 }
 
-const FilterModal = ({open}: FilterModalProps) => {
+const FilterModal = ({open, data}: FilterModalProps) => {
   
   const {
-    makes,
     make,
     setMake,
     models,
@@ -40,7 +32,6 @@ const FilterModal = ({open}: FilterModalProps) => {
     setModel,
     used,
     setUsed,
-    cities,
     city,
     setCity,
     
@@ -54,9 +45,6 @@ const FilterModal = ({open}: FilterModalProps) => {
 
     barter,
     setBarter,
-
-    isNew,
-    setIsNew,
 
     fuelType,
     setFuelType,
@@ -97,8 +85,9 @@ const FilterModal = ({open}: FilterModalProps) => {
     setDocument,
     category,
     setCategory,
+    usedTypes,
     metadata
-  } = useFilter()
+  } = data
 
   const [makeModalOpen, setMakeModalOpen] = useState<boolean>(false)
   const [modelModalOpen, setModelModalOpen] = useState<boolean>(false)
@@ -119,6 +108,14 @@ const FilterModal = ({open}: FilterModalProps) => {
   const selectedCity = (id: string) => {
     setCity(id)
     setCityModalOpen(false)
+  }
+
+  if(!metadata) {
+    return (
+      <div>
+        {/* Burda skeleton */}
+      </div>
+    )
   }
   
   return (
@@ -155,7 +152,7 @@ const FilterModal = ({open}: FilterModalProps) => {
                     ? 
                     <div className='flex flex-col'>
                       <span className='text-gray-400 text-[13px] absolute top-2'>Marka</span>
-                      <span className='text-[17px] mt-4'>{makes.find((item: Default) => item._id === make)?.label}</span>
+                      <span className='text-[17px] mt-4'>{metadata?.makes.find((item: Default) => item._id === make)?.label}</span>
                     </div>
                      : <span className='text-[17px]'>Butun markalar</span>
                   }
@@ -178,7 +175,7 @@ const FilterModal = ({open}: FilterModalProps) => {
                     ? 
                     <div className='flex flex-col'>
                       <span className='text-gray-400 text-[13px] absolute top-2'>Model</span>
-                      <span className='text-[17px] mt-4'>{model ? metadata.models.find((item: Default) => item._id === model)?.label : 'Butun modeller'}</span>
+                      <span className='text-[17px] mt-4'>{model ? metadata?.models.find((item: Default) => item._id === model)?.label : 'Butun modeller'}</span>
                     </div>
                      : <span className='text-[17px]'>Butun modeller</span>
                   }
@@ -201,7 +198,7 @@ const FilterModal = ({open}: FilterModalProps) => {
                     ? 
                     <div className='flex flex-col'>
                       <span className='text-gray-400 text-[13px] absolute top-2'>Region</span>
-                      <span className='text-[17px] mt-4'>{city ? metadata.cities.find((item: Default) => item._id === city)?.label : 'Butun regionlar'}</span>
+                      <span className='text-[17px] mt-4'>{city ? metadata?.cities.find((item: Default) => item._id === city)?.label : 'Butun regionlar'}</span>
                     </div>
                      : <span className='text-[17px]' onClick={() => setCityModalOpen(true)}>Butun regionlar</span>
                   }
@@ -218,7 +215,7 @@ const FilterModal = ({open}: FilterModalProps) => {
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2'>
-            <ThreeButton data={metadata.used_types} state={used} setState={setUsed} />
+            <ThreeButton data={usedTypes} state={used} setState={setUsed} />
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
@@ -244,10 +241,10 @@ const FilterModal = ({open}: FilterModalProps) => {
               Barter
               <CustomSwitch checked={barter} setChecked={setBarter} />
             </div>
-            <div className='flex items-center justify-between'>
+            {/* <div className='flex items-center justify-between'>
               Yeni
               <CustomSwitch checked={isNew} setChecked={setIsNew} />
-            </div>
+            </div> */}
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
@@ -256,7 +253,7 @@ const FilterModal = ({open}: FilterModalProps) => {
           </div>
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
             <h3 className='text-xl'>Muherrik</h3>
-            <ButtonGroup data={metadata.fuel_types} state={fuelType} setState={setFuelType} wrap={false} isNew={false} />
+            <ButtonGroup data={metadata.fuelTypes} state={fuelType} setState={setFuelType} wrap={false} isNew={false} />
           </div>
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
             <h3 className='text-xl'>Suretler qutusu</h3>
@@ -405,7 +402,7 @@ const FilterModal = ({open}: FilterModalProps) => {
           setOpen={setMakeModalOpen}
           state={make}
           setState={selectedMake}
-          data={makes}
+          data={metadata.makes}
           label='Marka'
         />
 
@@ -423,7 +420,7 @@ const FilterModal = ({open}: FilterModalProps) => {
           setOpen={setCityModalOpen}
           state={city}
           setState={selectedCity}
-          data={cities}
+          data={metadata.cities}
           label='Region'
         />
 

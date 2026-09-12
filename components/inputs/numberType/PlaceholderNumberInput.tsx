@@ -24,17 +24,9 @@ export default function PlaceholderNumberInput({ state, setState, label, length=
       .replace(/\u202F|\u00A0/g, " ");
   };
 
-  const changeInput = (value: string | number) => {
-    // if(typeof value === 'string') {
-    //   const rawValue = value.replace(/\s/g, "");
-    //   setState(rawValue);
-    // }
-
-    if (typeof value === 'number') {
-      const newValue = value
-      return setState(newValue);
-    }
-    
+  const changeInput = (value: string) => {
+    const rawValue = value.replace(/\s/g, "");
+    setState(Number(rawValue));
   }
 
   return (
