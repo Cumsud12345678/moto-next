@@ -71,7 +71,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
   }
 
   return (
-    <div className="h-500 w-full overflow-x-hidden">
+    <div className="w-full overflow-x-hidden">
       <div
         className={`
         fixed top-0 w-full z-50 p-3

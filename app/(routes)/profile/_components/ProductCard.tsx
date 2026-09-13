@@ -1,13 +1,10 @@
 'use client'
-import { Heart, PencilToSquare, TrashBin } from '@gravity-ui/icons'
-import {HeartFill} from '@gravity-ui/icons';
+import { PencilToSquare, TrashBin } from '@gravity-ui/icons'
 import Image from 'next/image'
-import React, { Fragment, useEffect, useState } from 'react'
-import {ArrowsRotateLeft} from '@gravity-ui/icons';
-import {FileText} from '@gravity-ui/icons';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ProductCard as CardType } from '@/types/product';
+import { useState } from 'react'
+import { ArrowsRotateLeft, FileText } from '@gravity-ui/icons'
+import Link from 'next/link'
+import { ProductCard as CardType } from '@/types/product'
 import { Trash2Icon } from "lucide-react"
 
 import {
@@ -22,107 +19,104 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
+interface Props {
+  product: CardType
+  onDelete: (id: string) => void
+}
 
-const ProductCard = ({product, onDelete}: {product: CardType, onDelete: (id: string) => void}) => {
-
-  const [data, setData] = useState<CardType>(product)
-  const pathname = usePathname()
-
+const ProductCard = ({ product, onDelete }: Props) => {
   const formatNumber = (value: number) => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   }
 
-  const handleLike = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    
-    setData(prev => ({
-      ...prev,
-      isLiked: !data.isLiked
-    }))
-  }
+  const [openAlertDelete, setOpenAlertDelete] = useState(false)
 
-  const [openAlertDelete, setOpenAlertDelete] = useState<boolean>(false)
-
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
+    e.stopPropagation()
     setOpenAlertDelete(true)
   }
 
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    // navigate to edit — router.push istifadə etmək istəsən useRouter əlavə et
+    window.location.href = `/elan-yerlesdir/${product._id}` // öz edit route-una uyğunlaşdır
+  }
+
+  if (!product) return null
+
   return (
-    <Fragment>
-      {/* <Link
-        href={`/elanlar/${product.make}-${product.model}-${product._id}`}
-        className={`rounded-lg overflow-hidden bg-white shadow ${product.sellerType === "premium" ? "border-orange-400" : ""} border-2`}
+    <>
+      <Link
+        href={`/elanlar/${product.make.label}-${product.model.label}-${product._id}`}
+        className={`rounded-lg overflow-hidden bg-white shadow border-2 ${
+          product.isUrgent ? "border-orange-400" : ""
+        }`}
       >
         <div className='relative aspect-4/3 overflow-hidden'>
-          {
-            product.sellerType === "premium" &&
-            <div className='absolute p-0.5 px-1.5 bg-orange-400 text-white top-0 left-0 z-40 rounded-br-lg overflow-hidden shine-effect'>
+          {product.isUrgent && (
+            <div className='absolute p-0.5 px-1.5 bg-orange-400 text-white top-0 left-0 z-40 rounded-br-lg overflow-hidden shine-effect text-sm'>
               Tecili satilir
             </div>
-          }
+          )}
 
-          <div onClick={(e: React.MouseEvent<HTMLDivElement>) => handleLike(e)}>
-            {
-              data.isLiked
-                ? <HeartFill className='absolute top-0 right-0 z-10 size-6 m-2 text-red-600' />
-                : <Heart className='absolute top-0 right-0 z-10 size-6 m-2 text-white' />
-            }
-          </div>
+          <Image
+            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${product.images[0]}`}
+            alt=''
+            fill
+            className='object-cover hover:scale-105 transition-transform duration-300'
+          />
 
-
-          <Image src={product.image} alt='' fill className='object-cover hover:scale-105 transition-transform duration-300' />
           <div className='absolute bottom-0 right-0 m-2 flex gap-1 z-10'>
-            {
-              product.barter &&
+            {product.barter && (
               <div className='bg-green-500 p-1.5 rounded-full z-10'>
                 <ArrowsRotateLeft className='text-white' />
               </div>
-            }
-            {
-              product.document &&
+            )}
+            {product.document && (
               <div className='bg-blue-500 p-1.5 rounded-full'>
                 <FileText className='text-white' />
               </div>
-            }
-
+            )}
           </div>
 
-          {
-            product.role === "seller" &&
+          {product.seller?.role === "seller" && (
             <div className='absolute bottom-0 left-0 z-10 m-2 flex gap-1'>
-              <div className='bg-blue-500 text-white rounded-lg px-1.5 text-[12px]'>
-                Resmi
-              </div>
+              <div className='bg-blue-500 text-white rounded-lg px-1.5 text-[12px]'>Resmi</div>
             </div>
-          }
-
+          )}
         </div>
-        <div className={`p-2 relative overflow-hidden ${product.sellerType === "premium" && 'shine-effect'}`}>
-          <div className="">
+
+        <div className={`p-2 relative overflow-hidden ${product.isUrgent && 'shine-effect'}`}>
+          <div>
             <span className="text-xl text-green-500 font-bold">
               {formatNumber(product.price)} ₼
             </span>
           </div>
-          <p className='font-semibold text-[16px]'>{product.make} {product.model}</p>
+          <p className='font-semibold text-[16px]'>{product.make.label} {product.model.label}</p>
           <p className='truncate text-[15px]'>{product.year}, {product.volume} sm³, {formatNumber(product.mileage)}</p>
-          <p className='text-[14px] text-gray-400 truncate'>{product.city}, {product.createdAt}</p>
+          <p className='text-[14px] text-gray-400 truncate'>{product.region.label}</p>
         </div>
 
-
         <div className="flex flex-col sm:flex-row gap-2 p-2 pt-0">
-          <button className='w-full flex items-center justify-center gap-3 bg-blue-500 text-white p-2 rounded-lg'>
+          <button
+            onClick={handleEditClick}
+            className='w-full flex items-center justify-center gap-3 bg-blue-500 text-white p-2 rounded-lg'
+          >
             <PencilToSquare />
             Düzəlt
           </button>
 
-          <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleDelete(e)} className='w-full flex items-center justify-center gap-3 bg-red-500 text-white p-2 rounded-lg'>
+          <button
+            onClick={handleDeleteClick}
+            className='w-full flex items-center justify-center gap-3 bg-red-500 text-white p-2 rounded-lg'
+          >
             <TrashBin />
             Sil
           </button>
         </div>
       </Link>
-
 
       <AlertDialog open={openAlertDelete} onOpenChange={setOpenAlertDelete}>
         <AlertDialogContent size="sm">
@@ -130,33 +124,26 @@ const ProductCard = ({product, onDelete}: {product: CardType, onDelete: (id: str
             <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
               <Trash2Icon />
             </AlertDialogMedia>
-            <AlertDialogTitle>Delete chat?</AlertDialogTitle>
+            <AlertDialogTitle>Elanı silmək istəyirsiniz?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this chat conversation. View{" "}
-              <a href="#">Settings</a> delete any memories saved during this chat.
+              Bu əməliyyat geri qaytarıla bilməz, elan tam silinəcək.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel 
-              variant="outline"
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogCancel variant="outline">Ləğv et</AlertDialogCancel>
+            <AlertDialogAction
               variant="destructive"
-              onClick={() => onDelete(product._id)}
+              onClick={() => {
+                onDelete(product._id)
+                setOpenAlertDelete(false)
+              }}
             >
-              Delete
+              Sil
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog> */}
-      <div>
-        test
-      </div>
-
-    </Fragment>
-    
+      </AlertDialog>
+    </>
   )
 }
 

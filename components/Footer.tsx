@@ -4,8 +4,13 @@ import Link from 'next/link';
 import { navs } from '@/constants/navs';
 import { Nav } from '@/types/nav';
 import { usePathname } from 'next/navigation';
+import { Default } from '@/types/metadata';
 
-export default function Footer() {
+interface FooterProps {
+  makes: Default[]
+}
+
+export default function Footer({ makes }: FooterProps) {
 
   const [visible, setVisible] = useState<boolean>(true)
   const pathname = usePathname()
@@ -43,6 +48,30 @@ export default function Footer() {
         ${visible ? 'translate-y-0' : 'translate-y-full'}
       `}>
    
+      {
+        pathname !== '/new'
+        &&
+        <div className='container max-w-250 mx-auto bg-gray-200 px-3'>
+          <div className='flex flex-row items-center justify-between block border-b border-red-50 py-2'>
+            <span>Reklam yerlesdirin</span>
+            <div className='flex gap-3 text-[14px]'>
+              <span>TikTok</span>
+              <span>motoelan@support.az</span>
+            </div>
+          </div>
+          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+            {
+              makes.map(make => (
+                <Link key={make._id} href={`/motors?make=${make._id}`} className='py-2'>
+                  <span>{make.label}</span>
+                </Link>
+              ))
+            }
+          </div>
+        </div>
+      }
+      
+
       <div
         className="
         lg:hidden

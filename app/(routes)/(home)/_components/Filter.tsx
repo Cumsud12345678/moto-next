@@ -7,7 +7,7 @@ import {Funnel} from '@gravity-ui/icons';
 import React, { useEffect, useState } from 'react'
 import FilterModal from './FilterModal'
 import CustomDrawer from '@/components/CustomDrawer'
-import { Default } from '@/types/metadata'
+import { Default, Metadata } from '@/types/metadata'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import TwoInputGroup from './TwoInputGroup'
 import CustomSwitch from '@/components/buttons/CustomSwitch'
@@ -22,21 +22,22 @@ async function getProducts() {
     '/api/listings',
     { withCredentials: true }
   )
-
-  console.log(res.data)
 }
 
 getProducts()
 
+interface Props {
+  initialMetadata: Metadata
+}
 
-const Filter = () => {
+const Filter = ({ initialMetadata }: Props) => {
 
   const router = useRouter();
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const filterStates = useFilter()
-  const metadataHook = useMetadata()
+  const metadata = initialMetadata
 
   const {
     make,
@@ -101,12 +102,25 @@ const Filter = () => {
 
   } = filterStates
 
-  const {
-    isLoading,
-    error,
-    usedTypes,
-    metadata
-  } = metadataHook
+  // const {
+  //   isLoading,
+  //   error,
+  //   usedTypes,
+  //   metadata
+  // } = metadata
+
+  const usedTypes = [
+    {
+      _id: '1a',
+      label: 'Yeni',
+      status: true
+    },
+    {
+      _id: '1b',
+      label: 'Surulmus',
+      status: false
+    }
+  ]
 
   const [filteredModels, setFilteredModels] = useState<Array<Default>>([])
 
@@ -114,7 +128,6 @@ const Filter = () => {
     if(make && metadata) {
       setFilteredModels(metadata.models.filter((model: Default) => model.make === make))
     }else if(!make) {
-      console.log('sifirladim')
       setModel('')
       setFilteredModels([])
     }
@@ -201,28 +214,28 @@ const Filter = () => {
     if (typeof used !== 'object') params.set('used', used ? '1' : '0');
     if (city) params.set('city', city);
 
-    if (minPrice) params.set('min_price', String(minPrice));
-    if (maxPrice) params.set('max_price', String(maxPrice));
+    if (minPrice) params.set('minPrice', String(minPrice));
+    if (maxPrice) params.set('maxPrice', String(maxPrice));
 
     if (document) params.set('document', '1');
     if (credit) params.set('credit', '1');
     if (barter) params.set('barter', '1');
 
-    if (fuelType) params.set('fuel_type', fuelType);
+    if (fuelType) params.set('fuelType', fuelType);
     if (transmission) params.set('transmission', transmission);
     if (color) params.set('color', color);
 
-    if (minVolume) params.set('min_volume', String(minVolume));
-    if (maxVolume) params.set('max_volume', String(maxVolume));
+    if (minVolume) params.set('minVolume', String(minVolume));
+    if (maxVolume) params.set('maxVolume', String(maxVolume));
 
-    if (minDistance) params.set('min_distance', String(minDistance));
-    if (maxDistance) params.set('max_distance', String(maxDistance));
+    if (minDistance) params.set('minDistance', String(minDistance));
+    if (maxDistance) params.set('maxDistance', String(maxDistance));
 
-    if (minYear) params.set('min_year', String(minYear));
-    if (maxYear) params.set('max_year', String(maxYear));
+    if (minYear) params.set('minYear', String(minYear));
+    if (maxYear) params.set('maxYear', String(maxYear));
 
-    if (minPower) params.set('min_power', String(minPower));
-    if (maxPower) params.set('max_power', String(maxPower));
+    if (minPower) params.set('minPower', String(minPower));
+    if (maxPower) params.set('maxPower', String(maxPower));
 
     if (equipment.length) params.set('equipment', equipment.join(','));
 
@@ -237,8 +250,8 @@ const Filter = () => {
       setCategory(searchParams.get('category') || '')
       setCity(searchParams.get('city') || '')
 
-      setMinPrice(Number(searchParams.get('min_price')) || 0)
-      setMaxPrice(Number(searchParams.get('max_price')) || 0)
+      setMinPrice(Number(searchParams.get('minPrice')) || 0)
+      setMaxPrice(Number(searchParams.get('maxPrice')) || 0)
 
       const newUsed = searchParams.get('used')
       setUsed(newUsed === null ? null : newUsed === '1')
@@ -247,21 +260,21 @@ const Filter = () => {
       setBarter(searchParams.get('barter') === '1')
       setDocument(searchParams.get('document') === '1')
 
-      setFuelType(searchParams.get('fuel_type') || '')
+      setFuelType(searchParams.get('fuelType') || '')
       setTransmission(searchParams.get('transmission') || '')
       setColor(searchParams.get('color') || '')
 
-      setMinVolume(Number(searchParams.get('min_volume')) || 0)
-      setMaxVolume(Number(searchParams.get('max_volume')) || 0)
+      setMinVolume(Number(searchParams.get('minVolume')) || 0)
+      setMaxVolume(Number(searchParams.get('maxVolume')) || 0)
 
-      setMinDistance(Number(searchParams.get('min_distance')) || 0)
-      setMaxDistance(Number(searchParams.get('max_distance')) || 0)
+      setMinDistance(Number(searchParams.get('minDistance')) || 0)
+      setMaxDistance(Number(searchParams.get('maxDistance')) || 0)
 
-      setMinYear(Number(searchParams.get('min_year')) || 0)
-      setMaxYear(Number(searchParams.get('max_year')) || 0)
+      setMinYear(Number(searchParams.get('minYear')) || 0)
+      setMaxYear(Number(searchParams.get('maxYear')) || 0)
 
-      setMinPower(Number(searchParams.get('min_power')) || 0)
-      setMaxPower(Number(searchParams.get('max_power')) || 0)
+      setMinPower(Number(searchParams.get('minPower')) || 0)
+      setMaxPower(Number(searchParams.get('maxPower')) || 0)
 
       const equipmentParam = searchParams.get('equipment')
       setEquipment(equipmentParam ? equipmentParam.split(',') : [])

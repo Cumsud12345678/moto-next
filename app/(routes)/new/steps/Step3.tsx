@@ -52,7 +52,7 @@ const Step3 = ({setForm, isSubmitting, userData, phone, setPhone, name, setName,
         </div>
 
         {
-          userData
+          userData && userData
           &&
           <div>
             <button

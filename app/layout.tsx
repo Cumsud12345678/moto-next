@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import ReduxProvider from "@/redux/Provider";
 import { Toaster } from "@/components/ui/toast";
 import { Providers } from './providers';
+import AuthProvider from '@/components/AuthProvider'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,9 @@ export default function RootLayout({ children }: Readonly<{children: ReactNode}>
       <body className="min-h-full flex flex-col">
         <ReduxProvider>
           <Providers>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
             <Toaster />
           </Providers>
         </ReduxProvider>

@@ -16,6 +16,7 @@ export interface ProductCard {
   region: Default
   isUrgent: boolean
   seller: { _id: string, role: string }
+  status?: string
 }
 
 

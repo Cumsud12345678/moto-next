@@ -7,6 +7,7 @@ import {ArrowsRotateLeft} from '@gravity-ui/icons';
 import {FileText} from '@gravity-ui/icons';
 import Link from 'next/link';
 import { ProductCard as CardType } from '@/types/product';
+import LikeButton from './LikeButton';
 
 const ProductCard = ({product}: {product: CardType}) => {
 
@@ -14,16 +15,6 @@ const ProductCard = ({product}: {product: CardType}) => {
 
   const formatNumber = (value: number) => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-  }
-
-  const handleLike = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    
-    setData(prev => ({
-      ...prev,
-      isLiked: !data.isLiked
-    }))
-
   }
 
   if(!product) {
@@ -34,7 +25,7 @@ const ProductCard = ({product}: {product: CardType}) => {
     )
   }
 
-  console.log(product.images[0])
+  console.log(product)
 
   return (
     <Link
@@ -49,13 +40,14 @@ const ProductCard = ({product}: {product: CardType}) => {
           </div>
         }
 
-        <div onClick={(e: React.MouseEvent<HTMLDivElement>) => handleLike(e)}>
+        {/* <div onClick={(e: React.MouseEvent<HTMLDivElement>) => handleLike(e)}>
           {
             data.isLiked
             ? <HeartFill className='absolute top-0 right-0 z-10 size-6 m-2 text-red-600' />
             : <Heart className='absolute top-0 right-0 z-10 size-6 m-2 text-white'/> 
           }
-        </div>
+        </div> */}
+        <LikeButton listingId={product._id} initialLiked={product.isLiked} />
         
         
         <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${product.images[0]}`} alt='' fill className='object-cover hover:scale-105 transition-transform duration-300'/>
