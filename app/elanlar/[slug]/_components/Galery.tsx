@@ -107,27 +107,29 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
 />
               {/* Öz play/pause düymən */}
               <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (videoRef.current?.paused) {
-                    videoRef.current.play()
-                    setIsPlaying(true)
-                  } else {
-                    videoRef.current?.pause()
-                    setIsPlaying(false)
-                  }
-                }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                {!isPlaying && (
-                  <div className="bg-black/50 rounded-full p-4">
-                    {/* play ikonu */}
-                    <svg className="size-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                )}
-              </button>
+  onClick={(e) => {
+    e.stopPropagation()
+    if (videoRef.current?.paused) {
+      videoRef.current.play()
+      setIsPlaying(true)
+    } else {
+      videoRef.current?.pause()
+      setIsPlaying(false)
+    }
+  }}
+  className="absolute inset-0 flex items-center justify-center"
+  style={{ touchAction: 'none' }}
+>
+  <div
+    className={`bg-black/50 rounded-full p-4 transition-opacity ${
+      isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'
+    }`}
+  >
+    <svg className="size-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  </div>
+</button>
             </div>
           </SwiperSlide>
         )}
