@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Thumbs } from 'swiper/modules'
 
@@ -19,6 +19,7 @@ import { Xmark, Heart } from '@gravity-ui/icons'
 
 interface GaleryProps {
   images: Array<string>
+  video: string | undefined
   price: number
   make: string
   model: string
@@ -26,7 +27,7 @@ interface GaleryProps {
   year: number
 }
 
-const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
+const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) => {
 
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null)
   const [imageCount, setImageCount] = useState<number>(1)
@@ -54,7 +55,22 @@ const Galery = ({images, price, make, model, volume, year}: GaleryProps) => {
   }, [gridOpen])
 
   console.log("IMAGE URL:", process.env.NEXT_PUBLIC_IMAGE_URL)
-console.log("IMAGES:", images)
+  console.log("IMAGES:", images)
+
+
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  // const [newImages, setNewImages] = useState<Array<string>>(images)
+
+  // useEffect(() => {
+  //   if(video) {
+  //     setNewImages(prev => ({
+  //       ...prev,
+  //       video
+  //     }))
+  //   }
+  // }, [video])
 
   return (
     <Fragment>
@@ -67,7 +83,7 @@ console.log("IMAGES:", images)
         loop
       >
         <div className="absolute z-10 bg-black text-white p-1 px-2 rounded-lg left-0 bottom-0 m-3 text-sm bg-black/30">
-          {imageCount} / {images.length}
+          {imageCount} / {video ? images.length + 1 : images.length}
         </div>
         <div
           onClick={() => setGridOpen(true)}
@@ -76,8 +92,49 @@ console.log("IMAGES:", images)
           Bütün şəkillər
         </div>
 
+        {/* Video varsa, ilk slayd kimi əlavə olunur */}
+        {video && (
+          <SwiperSlide>
+            <div className="relative w-full h-85 lg:h-115 overflow-hidden rounded-md bg-black">
+              <video
+  ref={videoRef}
+  src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${video}`}
+  playsInline
+  disablePictureInPicture
+  controlsList="nodownload nofullscreen noremoteplayback"
+  className="aspect-video w-full object-cover h-full pointer-events-none"
+  style={{ touchAction: 'none' }}
+/>
+              {/* Öz play/pause düymən */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (videoRef.current?.paused) {
+                    videoRef.current.play()
+                    setIsPlaying(true)
+                  } else {
+                    videoRef.current?.pause()
+                    setIsPlaying(false)
+                  }
+                }}
+                className="absolute inset-0 flex items-center justify-center"
+              >
+                {!isPlaying && (
+                  <div className="bg-black/50 rounded-full p-4">
+                    {/* play ikonu */}
+                    <svg className="size-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                )}
+              </button>
+            </div>
+          </SwiperSlide>
+        )}
+
         {images.map((image, index) => (
           <SwiperSlide key={index}>
+
             <div
               className="relative w-full h-85 lg:h-115 overflow-hidden rounded-md cursor-pointer"
               onClick={() => handleOpenLightbox(index)}
@@ -127,6 +184,17 @@ console.log("IMAGES:", images)
           spaceBetween={10}
           className="w-177 h-13"
         >
+          {/* Video varsa, ilk slayd kimi əlavə olunur */}
+          {video && (
+            <SwiperSlide className='flex'>
+              <video
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${video}`}
+                controls
+                playsInline
+                className="aspect-video w-full object-cover h-full"
+              />
+            </SwiperSlide>
+          )}
           {images.map((image, index) => (
             <SwiperSlide key={index}>
               <Image
@@ -216,6 +284,7 @@ console.log("IMAGES:", images)
               <div className='hidden lg:block'>
                 <div className='absolute bottom-5 left-0 w-full'>
                   <div className='mx-auto flex flex-row gap-2 items-center justify-center overflow-auto flex-nowrap max-w-200'>
+                    
                     {
                       images.map((image:string, index:number) => (
                         <div

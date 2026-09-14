@@ -131,6 +131,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
 
       <Galery 
         images={product.images}
+        video={product.video}
         price={product.price}
         make={product.make.label}
         model={product.model.label}
@@ -257,15 +258,6 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
               <span>{product.region.label}</span>
             </div>
           </div>
-
-          {product.video && (
-            <video
-              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${product.video}`}
-              controls
-              playsInline
-              className="aspect-video w-full object-cover"
-            />
-          )}
 
           <a
             href={`tel:+994519478134`}
