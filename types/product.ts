@@ -44,5 +44,6 @@ export interface ProductDescription {
   description: string
   seller: { _id: string, role: string, name: string }
   isLiked: boolean
-  isUrgent: boolean
+  isUrgent: boolean,
+  video: string
 }

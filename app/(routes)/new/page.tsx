@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation'
 import { RefreshCwIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { createVideoUrl } from '@/lib/api/listings'
 
 const API = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -106,6 +107,7 @@ const NewPage = () => {
   const [distance, setDistance] = useState<number>(0)
   const [price, setPrice] = useState<number>(0)
 
+  const [video, setVideo] = useState<File | null>(null)
   const [images, setImages] = useState<ImageFile[]>([])
   const [description, setDescription] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
@@ -156,10 +158,37 @@ const NewPage = () => {
   }
 
 
-  // ADDIM 3: elanı yarat (FormData-da artıq `otp` YOXDUR)
-  const submitListing = () => {
+  // ADDIM 3: elanı yarat
+  const submitListing = async () => {
+
+
     const formData = new FormData()
 
+    let uploadedVideoKey: string | null = null
+    let uploadedListingId: string | null = null
+
+    // Video varsa once onu upload edirik
+    if(video) {
+      const { uploadUrl, key, listingId } = await createVideoUrl()
+      uploadedListingId = listingId
+      uploadedVideoKey = key
+
+      // burda sekili r2 ye gonderirik
+      await fetch(uploadUrl, {
+        method: "PUT",
+        body: video,
+        headers: {
+          "Content-Type": video.type
+        }
+      })
+
+      if(uploadedListingId && uploadedVideoKey) {
+        formData.append('listingId', uploadedListingId)
+        formData.append('video', uploadedVideoKey)
+      }
+    }
+
+    
     formData.append('price', String(price))
     formData.append('make', make)
     formData.append('model', model)
@@ -264,6 +293,7 @@ const NewPage = () => {
                       setDistance={setDistance}
                       price={price}
                       setPrice={setPrice}
+                      setVideo={setVideo}
                     />
 
                     <Step3

@@ -258,6 +258,15 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
             </div>
           </div>
 
+          {product.video && (
+            <video
+              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${product.video}`}
+              controls
+              playsInline
+              className="aspect-video w-full object-cover"
+            />
+          )}
+
           <a
             href={`tel:+994519478134`}
             target="_blank"

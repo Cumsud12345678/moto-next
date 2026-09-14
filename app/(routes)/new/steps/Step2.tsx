@@ -4,11 +4,12 @@ import CustomSwitch from '@/components/buttons/CustomSwitch'
 import Dropzone from '@/components/Dropzone'
 import PlaceholderNumberInput from '@/components/inputs/numberType/PlaceholderNumberInput'
 import SearchAndSelect from '@/components/inputs/SearchAndSelect'
+import { toast } from '@/components/ui/toast'
 import { useFilter } from '@/hooks/useFilter'
 import { useImageDrop } from '@/hooks/useImageDrop'
 import { Metadata } from '@/types/metadata'
 import { ArrowsExpand, Xmark } from '@gravity-ui/icons'
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useRef, useState } from 'react'
 
 interface ImageFile  {
   id: string 
@@ -28,7 +29,8 @@ interface Step2Props {
   distance: number,
   setDistance: React.Dispatch<React.SetStateAction<number>>,
   price: number,
-  setPrice: React.Dispatch<React.SetStateAction<number>>
+  setPrice: React.Dispatch<React.SetStateAction<number>>,
+  setVideo: React.Dispatch<React.SetStateAction<File | null>>
 }
 
 const Step2 = ({
@@ -43,7 +45,8 @@ const Step2 = ({
   distance,
   setDistance,
   price,
-  setPrice
+  setPrice,
+  setVideo
 }: Step2Props) => {
 
   const {
@@ -87,6 +90,53 @@ const Step2 = ({
     overIndex,
     setOverIndex,
   })
+
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleVideoClick = () => {
+    inputRef.current?.click()
+  }
+
+  // const [video, setVideo] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+
+    if(!file) return;
+
+    if(!file.type.startsWith('video')) {
+      toast.add({
+        type: 'warning',
+        description: 'Yalniz video qebul olunur'
+      })
+      return
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+      toast.add({
+        type: 'warning',
+        description: "Video maksimum 50 MB ola bilər",
+      })
+      return
+    }
+
+    if(videoPreview) {
+      URL.revokeObjectURL(videoPreview)
+    }
+
+    setVideo(file)
+
+    const previewUrl = URL.createObjectURL(file)
+    setVideoPreview(previewUrl)
+
+  }
+
+  const handleDeleteVidoe = () => {
+    setVideo(null)
+    setVideoPreview(null)
+  }
 
   return (
     <Fragment>
@@ -194,6 +244,47 @@ const Step2 = ({
 
           </div>
           <p className="text-md mt-4">Şəkillərin sırasını dəyişmək üçün sol yuxarı küncdəki tutacaqdan sürükləyin. Minimum 1, maksimum 10 şəkil</p>
+        
+
+          <p>Video əlavə et</p>
+          {
+            !videoPreview
+            ?
+              <div
+                onClick={handleVideoClick}
+                className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center"
+              >
+
+                <span className="text-sm text-gray-500">
+                  Kliklə və video seç
+                </span>
+
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="video/*"
+                  hidden
+                  onChange={handleVideoChange}
+                />
+              </div>
+            :
+              <div className='relative'>
+                <button 
+                  onClick={handleDeleteVidoe}
+                  className='absolute top-0 right-0 m-3 bg-red-500 p-2 rounded-full'
+                >
+                  <Xmark className='size-5 text-white' />
+                </button>
+                <video
+                  src={videoPreview}
+                  controls
+                  playsInline
+                  className="aspect-video w-full object-cover"
+                />
+              </div>
+          }
+          
+
         </div>
       </div>
 

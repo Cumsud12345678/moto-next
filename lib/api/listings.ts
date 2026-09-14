@@ -19,3 +19,8 @@ export async function deleteListing(listingId: string) {
   const res = await api.delete(`/api/listings/${listingId}`, { withCredentials: true })
   return res.data
 }
+
+export async function createVideoUrl() {
+  const res = await api.get('/api/listings/create/uploads/video/url', { withCredentials: true })
+  return res.data
+}
