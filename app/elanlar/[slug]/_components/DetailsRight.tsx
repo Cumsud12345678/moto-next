@@ -16,7 +16,7 @@ const DetailsRight = ({price, name, city}: DetailsRightProps) => {
 
   return (
     <div className="hidden lg:block lg:w-130 min-w-0">
-      <div className="sticky top-27 z-[999] mt-3 rounded-lg border bg-[#f5f5f5] shadow-sm w-full h-auto">
+      <div className="sticky top-27 z-10 mt-3 rounded-lg border bg-[#f5f5f5] shadow-sm w-full h-auto">
 
         <div className="flex items-center justify-between border-b px-4 py-3">
           <h5 className="text-2xl font-bold">Qiymət</h5>

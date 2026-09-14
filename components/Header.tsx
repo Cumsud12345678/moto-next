@@ -150,7 +150,13 @@ const Header = () => {
                   menuLinks.map((link: Menu) => {
                     const Icon = link.icon
                     return (
-                      <Link href={link.url} key={link.url} className='bg-[#f5f5f5] p-2 rounded-2xl cursor-pointer border border-[#f5f5f5] hover:border-blue-500'>
+                      <Link 
+                        href={link.url} 
+                        key={link.url} 
+                        className={`
+                          ${link.content && link.content === 'Çox yaxında...' ? 'bg-yellow-200' : 'bg-[#f5f5f5]'}
+                          p-2 rounded-2xl cursor-pointer border border-[#f5f5f5] hover:border-blue-500`}
+                      >
                         <div>
                           <div className='flex items-center justify-between'>
                             <div className='flex items-center'>

@@ -105,7 +105,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
       <div className='hidden lg:block relative w-full'>
         <Header />
 
-        <div className="fixed top-12 left-0 right-0 z-50">
+        <div className="fixed top-13 left-0 right-0 z-50">
           <div className="max-w-250 mx-auto p-3 bg-white/90 backdrop-blur-md border-b text-black">
             <div className="flex items-center justify-between">
               <div className='flex items-center gap-2'>
