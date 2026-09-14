@@ -7,6 +7,7 @@ import { Navigation, Thumbs } from 'swiper/modules'
 // Lightbox və lazım olan CSS faylları
 import Lightbox from "yet-another-react-lightbox"
 import Zoom from "yet-another-react-lightbox/plugins/zoom"
+import Video from "yet-another-react-lightbox/plugins/video"
 import "yet-another-react-lightbox/styles.css"
 
 // Swiper CSS faylları
@@ -63,20 +64,75 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
 
   // const [newImages, setNewImages] = useState<Array<string>>(images)
 
-  // useEffect(() => {
-  //   if(video) {
-  //     setNewImages(prev => ({
-  //       ...prev,
-  //       video
-  //     }))
-  //   }
-  // }, [video])
+  const handleFullscreen = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const videoEl = videoRef.current
+    if (!videoEl) return
+
+    if (videoEl.requestFullscreen) {
+      videoEl.requestFullscreen()
+    } else if ((videoEl as any).webkitEnterFullscreen) {
+      // iOS Safari
+      ; (videoEl as any).webkitEnterFullscreen()
+    } else if ((videoEl as any).webkitRequestFullscreen) {
+      ; (videoEl as any).webkitRequestFullscreen()
+    }
+  }
+
+  const lightboxSlides = video
+    ? [
+      {
+        type: 'video' as const,
+        sources: [
+          {
+            src: `${process.env.NEXT_PUBLIC_IMAGE_URL}/${video}`,
+            type: 'video/mp4',
+          },
+        ],
+      },
+      ...images.map((src) => ({ src: `${process.env.NEXT_PUBLIC_IMAGE_URL}/${src}` })),
+    ]
+    : images.map((src) => ({ src: `${process.env.NEXT_PUBLIC_IMAGE_URL}/${src}` }))
+  
+  const videoOffset = video ? 1 : 0
+
+
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  useEffect(() => {
+    const videoEl = videoRef.current
+    if (!videoEl) return
+
+    const handleFullscreenChange = () => {
+      const isFs = document.fullscreenElement === videoEl
+      setIsFullscreen(isFs)
+      videoEl.controls = isFs
+    }
+
+    const handleWebkitEnd = () => {
+      setIsFullscreen(false)
+      videoEl.controls = false
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    videoEl.addEventListener('webkitendfullscreen', handleWebkitEnd)
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+      videoEl.removeEventListener('webkitendfullscreen', handleWebkitEnd)
+    }
+  }, [])
 
   return (
     <Fragment>
       <Swiper
         className="w-full h-75 lg:h-106 overflow-hidden lg:mt-23"
-        onSlideChange={(swiper) => setImageCount(swiper.realIndex + 1)}
+        onSlideChange={(swiper) => {
+          setImageCount(swiper.realIndex + 1)
+          if (videoRef.current && !videoRef.current.paused) {
+            videoRef.current.pause()
+          }
+        }}
         modules={[Thumbs, Navigation]}
         thumbs={{ swiper: thumbsSwiper }}
         navigation
@@ -95,41 +151,45 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
         {/* Video varsa, ilk slayd kimi əlavə olunur */}
         {video && (
           <SwiperSlide>
-            <div className="relative w-full h-85 lg:h-115 overflow-hidden rounded-md bg-black">
+            <div
+              className="relative w-full h-85 lg:h-115 overflow-hidden rounded-md cursor-pointer"
+              onClick={() => {
+                if (videoRef.current?.paused) {
+                  videoRef.current.play()
+                } else {
+                  videoRef.current?.pause()
+                }
+              }}
+            >
               <video
-  ref={videoRef}
-  src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${video}`}
-  playsInline
-  disablePictureInPicture
-  controlsList="nodownload nofullscreen noremoteplayback"
-  className="aspect-video w-full object-cover h-full pointer-events-none"
-  style={{ touchAction: 'none' }}
-/>
-              {/* Öz play/pause düymən */}
+                ref={videoRef}
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${video}`}
+                playsInline
+                className={`w-full h-full object-cover ${isFullscreen ? '' : 'pointer-events-none'}`}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
+              />
+
+              {!isPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-black/50 rounded-full p-4">
+                    <svg className="size-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+
+              {/* Tam ekran / lightbox açan düymə */}
               <button
-  onClick={(e) => {
-    e.stopPropagation()
-    if (videoRef.current?.paused) {
-      videoRef.current.play()
-      setIsPlaying(true)
-    } else {
-      videoRef.current?.pause()
-      setIsPlaying(false)
-    }
-  }}
-  className="absolute inset-0 flex items-center justify-center"
-  style={{ touchAction: 'none' }}
->
-  <div
-    className={`bg-black/50 rounded-full p-4 transition-opacity ${
-      isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'
-    }`}
-  >
-    <svg className="size-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  </div>
-</button>
+                onClick={handleFullscreen}
+                className="absolute bottom-10 left-1/2 -translate-1/2 z-10 bg-black/50 text-white p-2 rounded-lg"
+              >
+                <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+                </svg>
+              </button>
             </div>
           </SwiperSlide>
         )}
@@ -139,7 +199,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
 
             <div
               className="relative w-full h-85 lg:h-115 overflow-hidden rounded-md cursor-pointer"
-              onClick={() => handleOpenLightbox(index)}
+              onClick={() => handleOpenLightbox(index + videoOffset)}
             >
               {/* Arxa fon - bulanıq */}
               <Image
@@ -190,10 +250,15 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
           {video && (
             <SwiperSlide className='flex'>
               <video
+                // ref={videoRef}
                 src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${video}`}
-                controls
                 playsInline
-                className="aspect-video w-full object-cover h-full"
+                disablePictureInPicture
+                disableRemotePlayback
+                className="w-full h-full object-cover pointer-events-none rounded-lg"
+                // onPlay={() => setIsPlaying(true)}
+                // onPause={() => setIsPlaying(false)}
+                // onEnded={() => setIsPlaying(false)}
               />
             </SwiperSlide>
           )}
@@ -204,7 +269,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
                 alt=""
                 fill
                 className="object-contain bg-black rounded-lg cursor-pointer"
-                onClick={() => handleOpenLightbox(index)}
+                onClick={() => handleOpenLightbox(index + videoOffset)}
               />
             </SwiperSlide>
           ))}
@@ -224,11 +289,35 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
           </div>
 
           <div className="grid grid-cols-2 gap-1 p-1">
+            {video && (
+              <div
+                className="relative w-full aspect-square cursor-pointer overflow-hidden bg-black flex items-center justify-center"
+                onClick={() => {
+                  handleOpenLightbox(0)
+                }}
+              >
+                <video
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${video}`}
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover pointer-events-none"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-black/50 rounded-full p-3">
+                    <svg className="size-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            )}
             {images.map((image, index) => (
               <div
                 key={index}
                 className="relative w-full aspect-square cursor-pointer overflow-hidden"
-                onClick={() => handleOpenLightbox(index)}
+                onClick={() => {
+                  handleOpenLightbox(index + videoOffset)
+                }}
               >
                 <Image
                   src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
@@ -242,13 +331,13 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
         </div>
       )}
 
+      
+
       <Lightbox
         open={open}
         close={() => setOpen(false)}
         index={lightboxIndex}
-        slides={images.map((src) => ({
-          src: `${process.env.NEXT_PUBLIC_IMAGE_URL}/${src}`,
-        }))}
+        slides={lightboxSlides}
         on={{
           view: ({ index }) => {
             setLightboxIndex(index)
@@ -265,7 +354,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
                     <Xmark className='size-6' onClick={() => setOpen(false)} />
                   </button>
                   <div>
-                    {lightboxIndex + 1} / {images.length}
+                    {lightboxIndex + 1} / {video ? images.length + 1 : images.length}
                   </div>
                   <button>
                     <Heart className='size-6' />
@@ -286,29 +375,36 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
               <div className='hidden lg:block'>
                 <div className='absolute bottom-5 left-0 w-full'>
                   <div className='mx-auto flex flex-row gap-2 items-center justify-center overflow-auto flex-nowrap max-w-200'>
-                    
-                    {
-                      images.map((image:string, index:number) => (
-                        <div
-                          key={index}
-                          onClick={() => setLightboxIndex(index)}
-                          className={`
-                            border rounded-lg
-                            w-18 shrink-0
-                            h-[50px]
-                            bg-center
-                            bg-cover
-                            bg-no-repeat
-                            cursor-pointer
-                            transition-opacity
-                            ${index === lightboxIndex ? 'opacity-100' : 'opacity-40 hover:opacity-70'}
-                          `}
-                          style={{
-                           backgroundImage: `url(${process.env.NEXT_PUBLIC_IMAGE_URL}/${image})`
-                          }}
-                        />
-                      ))
-                    }
+                    {video && (
+                      <div
+                        onClick={() => setLightboxIndex(0)}
+                        className={`
+                        border rounded-lg w-18 shrink-0 h-[50px]
+                        bg-black flex items-center justify-center
+                        cursor-pointer transition-opacity
+                        ${lightboxIndex === 0 ? 'opacity-100' : 'opacity-40 hover:opacity-70'}
+                      `}
+                      >
+                        <svg className="size-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    )}
+                    {images.map((image: string, index: number) => (
+                      <div
+                        key={index}
+                        onClick={() => setLightboxIndex(index + videoOffset)}
+                        className={`
+                        border rounded-lg w-18 shrink-0 h-[50px]
+                        bg-center bg-cover bg-no-repeat
+                        cursor-pointer transition-opacity
+                        ${index + videoOffset === lightboxIndex ? 'opacity-100' : 'opacity-40 hover:opacity-70'}
+                        `}
+                        style={{
+                          backgroundImage: `url(${process.env.NEXT_PUBLIC_IMAGE_URL}/${image})`
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
 
@@ -337,7 +433,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
           buttons: [],
         }}
 
-        plugins={[Zoom]}
+        plugins={[Zoom, Video]}
 
         zoom={{
           maxZoomPixelRatio: 3,

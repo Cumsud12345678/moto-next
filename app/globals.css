@@ -227,3 +227,8 @@ html {
   scrollbar-gutter: auto !important;
 }
 
+.yarl__video_container {
+  max-width: 900px;
+  max-height: 75vh;
+  margin: 0 auto;
+}
