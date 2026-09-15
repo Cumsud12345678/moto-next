@@ -39,13 +39,13 @@ const HomePage = async () => {
       </div>
 
       <div className='bg-[#ebedf3] px-3 pb-3 flex flex-row gap-3'>
-        <div className='bg-white p-3 py-4 rounded-xl w-full relative overflow-hidden'>
-          <span className='font-semibold text-lg text-red-500'>Ehtiyyat hisseleri</span>
+        <div className='bg-white pl-3 py-4 rounded-xl w-full relative overflow-hidden'>
+          <span className='font-semibold text-[15px] text-red-500'>Ehtiyyat hisseleri</span>
           <img src="/hisseler2.png" alt="" className='size-50 object-contain absolute left-3 -top-17 opacity-70' />
         </div>
-        <div className='bg-white p-3 py-4 rounded-xl w-full relative overflow-hidden'>
-          <span className='font-semibold text-lg text-red-500'>Qruplar</span>
-          <img src="/group.png" alt="" className='size-30 object-contain absolute right-3 -top-7 opacity-80' />
+        <div className='bg-white pl-3 py-4 rounded-xl w-full relative overflow-hidden'>
+          <span className='font-semibold text-[15px] text-red-500'>Qruplar</span>
+          <img src="/group.png" alt="" className='size-30 object-contain absolute -right-6 -top-7 opacity-80' />
         </div>
       </div>
 
