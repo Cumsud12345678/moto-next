@@ -41,7 +41,7 @@ const ProductCard = ({ product, onDelete }: Props) => {
     e.preventDefault()
     e.stopPropagation()
     // navigate to edit — router.push istifadə etmək istəsən useRouter əlavə et
-    window.location.href = `/elan-yerlesdir/${product._id}` // öz edit route-una uyğunlaşdır
+    window.location.href = `/edit/${product._id}` // öz edit route-una uyğunlaşdır
   }
 
   if (!product) return null
