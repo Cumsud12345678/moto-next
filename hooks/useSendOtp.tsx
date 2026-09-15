@@ -4,11 +4,11 @@ import { useMutation } from "@tanstack/react-query";
 
 interface SendOtpPayload {
   email: string,
-  name?: string
 }
 
 interface SendOtpResponse {
   success: boolean,
+  isOldUser: boolean
 }
 
 async function sendOtp(payload: SendOtpPayload): Promise<SendOtpResponse> {

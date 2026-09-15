@@ -420,7 +420,7 @@ const Filter = ({ initialMetadata }: Props) => {
       </div>
 
       <div className='flex lg:hidden flex-col gap-4'>
-        <div className='flex flex-col lg:hidden border p-3 gap-3'>
+        <div className='flex flex-col lg:hidden p-3 gap-3'>
           <div className='flex items-center justify-between gap-3'>
             <div onClick={() => setMakeModalOpen(true)} className='border p-2.5 px-3 w-full rounded-lg bg-white'>
               {make ? metadata.makes.find((item: Default) => item._id === make)?.label : 'Marka'}
@@ -436,7 +436,7 @@ const Filter = ({ initialMetadata }: Props) => {
               Filter
             </div>
           </div>
-          <div className='oflex whitespace-nowrap scrollbar-none overflow-auto gap-2 mask-[linear-gradient(to_right,black_85%,transparent)]'>
+          <div className='flex whitespace-nowrap scrollbar-none overflow-auto gap-2 mask-[linear-gradient(to_right,black_85%,transparent)]'>
             <ButtonGroup data={metadata.categories} state={category} setState={selectedMobileCategory} wrap={true} isNew={false} />
           </div>
         </div>

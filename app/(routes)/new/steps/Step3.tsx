@@ -75,9 +75,9 @@ const Step3 = ({setForm, isSubmitting, userData, phone, setPhone, name, setName,
           <div>
             <PlaceholderEffectInput state={email} setState={setEmail} label='Email' length={100} />
           </div>
-          <div>
+          {/* <div>
             <PlaceholderEffectInput state={name} setState={setName} label='Name' length={100} />
-          </div>
+          </div> */}
           <div>
             <button
               onClick={() => setForm()}

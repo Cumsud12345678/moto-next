@@ -1,15 +1,7 @@
 // redux/slices/authSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { api } from '@/lib/axios'
-
-interface User {
-  _id: string
-  name: string
-  email: string
-  avatar: string
-  role: string
-  isWarning: boolean
-}
+import { User } from '@/types/user'
 
 interface AuthState {
   user: User | null

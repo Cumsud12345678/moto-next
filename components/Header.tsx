@@ -14,6 +14,10 @@ import { menuNavs } from '@/constants/menuNavs';
 import Link from 'next/link';
 import { Menu } from '@/types/menu';
 import { usePathname } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { api } from '@/lib/axios';
+import { logout } from '@/redux/slices/userSlice';
 
 const Header = () => {
 
@@ -22,7 +26,7 @@ const Header = () => {
   const [visible, setVisible] = useState<boolean>(true)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
-  const isAuth = false
+  const user = useSelector((state: RootState) => state.user.user)
   const menuLinks = menuNavs
 
   const navs = links
@@ -68,8 +72,13 @@ const Header = () => {
     }
   }, [])
 
-  const handleLogout = () => {
-    console.log('aa')
+  const dispatch = useDispatch()
+
+  const handleLogout = async () => {
+    const res = await api.get('/api/auth/logout', { withCredentials: true })
+    if(res.data.success) {
+      dispatch(logout())
+    }
   }
 
   return (
@@ -182,7 +191,7 @@ const Header = () => {
  
 
                 {
-                  isAuth
+                  user
                     ?
                     <div onClick={handleLogout} className='bg-[#f5f5f5] p-2 rounded-2xl cursor-pointer border border-[#f5f5f5] hover:border-blue-500'>
                       <div>

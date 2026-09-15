@@ -20,6 +20,8 @@ import { RefreshCwIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createVideoUrl } from '@/lib/api/listings'
+import { useDispatch } from 'react-redux'
+import { setUser } from '@/redux/slices/userSlice'
 
 const API = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -40,6 +42,9 @@ const NewPage = () => {
   
   const [formStep, setFormStep] = useState<string>('start')
   const [userData, setUserData] = useState<User | undefined>(undefined)
+  const [isOldUser, setIsOldUser] = useState<boolean>(false)
+
+  const dispatch = useDispatch()
 
   const router = useRouter()
 
@@ -127,7 +132,7 @@ const NewPage = () => {
       return
     }
 
-    sendOtpMutation.mutate({ email, name }, {
+    sendOtpMutation.mutate({ email }, {
       onSuccess: (data) => {
         if (data.success) {
           toast.add({
@@ -135,6 +140,7 @@ const NewPage = () => {
             description: 'Kod gonderildi'
           })
           setFormStep('verify')
+          setIsOldUser(data.isOldUser)
         }
       },
       onError: () => {
@@ -145,9 +151,10 @@ const NewPage = () => {
 
   // ADDIM 2: OTP-ni yoxla, uğur olsa elanı göndər
   const handleVerify = () => {
-    verifyOtpMutation.mutate({ email, otp }, {
+    verifyOtpMutation.mutate({ email, name, otp }, {
       onSuccess: (data) => {
         if (data.success) {
+          dispatch(setUser(data.user))
           submitListing() // yalnız İNDİ elanı göndər
         }
       },
@@ -333,7 +340,22 @@ const NewPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Field>
+              {
+                !isOldUser
+                &&
+                  <Field>
+                    <div className="flex items-center justify-between">
+                      <FieldLabel htmlFor="otp-verification">
+                        Ad yazin
+                      </FieldLabel>
+                    </div>
+                    <div>
+                      <input value={name} onChange={(e) => setName(e.target.value)} type="text" className='p-3 bg-white w-full rounded border' placeholder='Ad yazin' />
+                    </div>
+                  </Field>
+              }
+              
+              <Field className='mt-4'>
                 <div className="flex items-center justify-between">
                   <FieldLabel htmlFor="otp-verification">
                     Verification code

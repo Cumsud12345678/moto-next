@@ -38,6 +38,17 @@ const HomePage = async () => {
         </Suspense>
       </div>
 
+      <div className='bg-[#ebedf3] px-3 pb-3 flex flex-row gap-3'>
+        <div className='bg-white p-3 py-4 rounded-xl w-full relative overflow-hidden'>
+          <span className='font-semibold text-lg text-red-500'>Ehtiyyat hisseleri</span>
+          <img src="/hisseler2.png" alt="" className='size-50 object-contain absolute left-3 -top-17 opacity-70' />
+        </div>
+        <div className='bg-white p-3 py-4 rounded-xl w-full relative overflow-hidden'>
+          <span className='font-semibold text-lg text-red-500'>Qruplar</span>
+          <img src="/group.png" alt="" className='size-30 object-contain absolute right-3 -top-7 opacity-80' />
+        </div>
+      </div>
+
       <div className='container mx-auto max-w-250 p-3 mb-20'>
         <ProductList data={products} />
       </div>

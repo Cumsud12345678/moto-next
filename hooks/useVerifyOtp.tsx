@@ -1,14 +1,17 @@
 'use client'
 import { api } from "@/lib/axios";
+import { User } from "@/types/user";
 import { useMutation } from "@tanstack/react-query";
 
 interface VerifyOtpPayload {
   email: string;
+  name?: string;
   otp: string;
 }
 
 interface VerifyOtpResponse {
   success: boolean;
+  user: User;
   userId: string;
 }
 
