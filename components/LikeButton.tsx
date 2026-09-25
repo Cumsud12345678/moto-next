@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Heart, HeartFill } from '@gravity-ui/icons'
 import { toggleLike } from '@/lib/api/listings'
+import { isGuestLiked, toggleGuestLike } from '@/lib/guestLikes'
 
 interface Props {
   listingId: string
@@ -11,6 +12,15 @@ interface Props {
 const LikeButton = ({ listingId, initialLiked }: Props) => {
   const [liked, setLiked] = useState(initialLiked)
   const [loading, setLoading] = useState(false)
+
+  // Server login olmayan istifadəçi üçün isLiked=false qaytarır,
+  // ona görə mount olanda cookie-ni yoxlayırıq
+  useEffect(() => {
+    if (!initialLiked && isGuestLiked(listingId)) {
+      setLiked(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listingId])
 
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()   // Link-in default naviqasiyasının qarşısını alır
@@ -25,9 +35,15 @@ const LikeButton = ({ listingId, initialLiked }: Props) => {
     try {
       const result = await toggleLike(listingId)
       setLiked(result.liked) // server-in real cavabı ilə sinxronlaşdır
-    } catch (err) {
-      setLiked(prevLiked) // xəta olsa geri qaytar
-      console.error('Like əməliyyatı uğursuz oldu:', err)
+    } catch (err: any) {
+      if (err?.response?.status === 401) {
+        // Qeydiyyatsız istifadəçi — cookie-yə yaz
+        const newLiked = toggleGuestLike(listingId)
+        setLiked(newLiked)
+      } else {
+        setLiked(prevLiked) // real xəta — geri qaytar
+        console.error('Like əməliyyatı uğursuz oldu:', err)
+      }
     } finally {
       setLoading(false)
     }
