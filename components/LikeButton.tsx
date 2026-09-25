@@ -24,7 +24,6 @@ const LikeButton = ({ listingId, initialLiked }: Props) => {
 
     try {
       const result = await toggleLike(listingId)
-      console.log(result.liked)
       setLiked(result.liked) // server-in real cavabı ilə sinxronlaşdır
     } catch (err) {
       setLiked(prevLiked) // xəta olsa geri qaytar

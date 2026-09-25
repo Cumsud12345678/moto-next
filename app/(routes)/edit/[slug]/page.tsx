@@ -4,7 +4,7 @@ import Dropzone from '@/components/Dropzone'
 import PlaceholderNumberInput from '@/components/inputs/numberType/PlaceholderNumberInput'
 import { toast } from '@/components/ui/toast'
 import { useImageDrop } from '@/hooks/useImageDrop'
-import { getListing, updateListing } from '@/lib/api/listings'
+import { authCreateVideoUrl, getListing, updateListing } from '@/lib/api/listings'
 import { ProductDescription } from '@/types/product'
 import { ArrowsExpand, Xmark } from '@gravity-ui/icons'
 import React, { useEffect, useRef, useState } from 'react'
@@ -50,7 +50,61 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
   const [images, setImages] = useState<ImageFile[]>([])
   const [description, setDescription] = useState<string>('')
 
+  const [oldVideo, setOldVideo] = useState<string>('')
+
   const [price, setPrice] = useState<number>(0)
+
+  // Yeni
+  const [video, setVideo] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>('')
+
+  const inputRef = useRef<HTMLInputElement>(null)
+  
+  const handleVideoClick = () => {
+    inputRef.current?.click()
+  }
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+
+    if (!file) return;
+
+    if (!file.type.startsWith('video')) {
+      toast.add({
+        type: 'warning',
+        description: 'Yalniz video qebul olunur'
+      })
+      return
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+      toast.add({
+        type: 'warning',
+        description: "Video maksimum 50 MB ola bilər",
+      })
+      return
+    }
+
+    if (videoPreview) {
+      URL.revokeObjectURL(videoPreview)
+    }
+
+    setVideo(file)
+
+    const previewUrl = URL.createObjectURL(file)
+    setVideoPreview(previewUrl)
+
+  }
+
+  const handleDeleteOldVidoe = () => {
+    setOldVideo('')
+  }
+
+  const handleDeleteVidoe = () => {
+    setVideo(null)
+    setVideoPreview(null)
+  }
+  // ------------------------------------------
 
   // Data fetching has to happen in an effect since the component itself must stay synchronous.
   useEffect(() => {
@@ -69,6 +123,7 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         setBarter(result.barter)
         setPower(result.power)
         setDistance(result.mileage)
+        setOldVideo(result.video)
         setPrice(result.price)
         setDescription(result.description)
 
@@ -118,12 +173,30 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     setOverIndex,
   })
 
-  console.log(images)
 
+  const submitListingUtilFunc = async () => {
+    if(video && data){
+      const { uploadUrl, key, listingId } = await authCreateVideoUrl(data._id)
+
+      // burda sekili r2 ye gonderirik
+      await fetch(uploadUrl, {
+        method: "PUT",
+        body: video,
+        headers: {
+          "Content-Type": video.type
+        }
+      })
+      
+      submitListing(key)
+      
+    }else {
+      submitListing(oldVideo)
+    }
+  }
 
   const [submitting, setSubmitting] = useState(false)
 
-  const submitListing = async () => {
+  const submitListing = async (videoKey: string) => {
     // DEBUG: hər şəklin id/key/url-nə bax ki, filter niyə yanlış nəticə verdiyini görək
     console.log('SUBMIT ANINDA IMAGES:', images.map((img) => ({
       id: img.id,
@@ -149,6 +222,7 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     formData.append('power', String(power))
     formData.append('mileage', String(distance))
     formData.append('description', description)
+    formData.append('video', videoKey)
 
     if (used !== null) formData.append('used', String(used))
     if (credit !== null) formData.append('credit', String(credit))
@@ -298,6 +372,61 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
               </div>
               <p className="text-md mt-4">Şəkillərin sırasını dəyişmək üçün sol yuxarı küncdəki tutacaqdan sürükləyin. Minimum 1, maksimum 10 şəkil</p>
 
+              <p>Video əlavə et</p>
+              {
+                oldVideo
+                  ?
+                  <div className='relative'>
+                    <button
+                      onClick={handleDeleteOldVidoe}
+                      className='absolute top-0 right-0 m-3 bg-red-500 p-2 rounded-full'
+                    >
+                      <Xmark className='size-5 text-white' />
+                    </button>
+                    <video
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${oldVideo}`}
+                      controls
+                      playsInline
+                      className="aspect-video w-full object-cover"
+                    />
+                  </div>
+                  :
+                  videoPreview
+                    ?
+                    <div className='relative'>
+                      <button
+                        onClick={handleDeleteVidoe}
+                        className='absolute top-0 right-0 m-3 bg-red-500 p-2 rounded-full'
+                      >
+                        <Xmark className='size-5 text-white' />
+                      </button>
+                      <video
+                        src={videoPreview}
+                        controls
+                        playsInline
+                        className="aspect-video w-full object-cover"
+                      />
+                    </div>
+                    :
+                    <div
+                      onClick={handleVideoClick}
+                      className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center"
+                    >
+
+                      <span className="text-sm text-gray-500">
+                        Kliklə və video seç
+                      </span>
+
+                      <input
+                        ref={inputRef}
+                        type="file"
+                        accept="video/*"
+                        hidden
+                        onChange={handleVideoChange}
+                      />
+                    </div>
+                  
+              }
             </div>
           </div>
 
@@ -310,7 +439,7 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
           </div>
 
           <button
-            onClick={submitListing}
+            onClick={submitListingUtilFunc}
             disabled={submitting}
             className="cursor-pointer rounded-xl bg-sky-500 px-6 py-3 text-white disabled:opacity-50"
           >

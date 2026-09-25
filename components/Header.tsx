@@ -156,12 +156,12 @@ const Header = () => {
               <div className='grid grid-col gap-3 text-black'>
 
                 {
-                  menuLinks.map((link: Menu) => {
+                  menuLinks.map((link: Menu, index) => {
                     const Icon = link.icon
                     return (
                       <Link 
                         href={link.url} 
-                        key={link.url} 
+                        key={index}
                         className={`
                           ${link.content && link.content === 'Çox yaxında...' ? 'bg-yellow-200' : 'bg-[#f5f5f5]'}
                           p-2 rounded-2xl cursor-pointer border border-[#f5f5f5] hover:border-blue-500`}

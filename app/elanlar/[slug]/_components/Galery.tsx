@@ -55,9 +55,6 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
     }
   }, [gridOpen])
 
-  console.log("IMAGE URL:", process.env.NEXT_PUBLIC_IMAGE_URL)
-  console.log("IMAGES:", images)
-
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)

@@ -20,8 +20,6 @@ export const useImageDrop = ({images, setImages, draggedIndex, setDraggedIndex, 
 
   const handleDrop = async (files: File[]) => {
 
-    console.log(files.length)
-
     if (images.length + files.length > 10) {
       toast.add({
         type: "warning",

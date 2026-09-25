@@ -282,7 +282,7 @@ const Step2 = ({
                   className="aspect-video w-full object-cover"
                 />
               </div>
-          }
+            }
           
 
         </div>

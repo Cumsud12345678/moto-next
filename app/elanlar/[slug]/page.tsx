@@ -51,8 +51,6 @@ const ElanlarPage = async ({params}: {params: Promise<{slug: string}>}) => {
     getSimilars(id)
   ])
 
-  console.log(similars)
-
   if(!data) {
     return (
       <div>

@@ -41,7 +41,6 @@ const SearchAndSelect = ({data, state, setState, label}: {data: Default[], state
       setValue('')
     }else {
       const a = data.find((item: Default) => item._id === state)
-      console.log(a)
       setValue(a?.label || '')
     }
   }, [state, data])

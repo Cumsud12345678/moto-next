@@ -129,7 +129,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
         </div>
       </div>
 
-      <Galery 
+      <Galery
         images={product.images}
         video={product.video}
         price={product.price}

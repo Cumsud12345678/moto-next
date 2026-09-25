@@ -56,10 +56,7 @@ const NewPage = () => {
           { withCredentials: true }
         )
 
-        console.log(res.data.data)
-        // if(res.data.data.length > 0) {
-          setUserData(res.data.data)
-        // }
+        setUserData(res.data.data)
       } catch (error) {
         console.error(error)
       }
@@ -167,7 +164,6 @@ const NewPage = () => {
 
   // ADDIM 3: elanı yarat
   const submitListing = async () => {
-
 
     const formData = new FormData()
 
@@ -323,9 +319,6 @@ const NewPage = () => {
             </div>
           </div>
       }
-
-      
-
 
       {
         formStep === 'verify'

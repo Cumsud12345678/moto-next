@@ -25,11 +25,14 @@ const ProductCard = ({product}: {product: CardType}) => {
     )
   }
 
-  console.log(product)
-
   return (
     <Link
       href={`/elanlar/${product.make.label}-${product.model.label}-${product._id}`}
+      onClick={() => {
+        navigator.sendBeacon(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/listings/click/${product._id}`
+        )
+      }}
       className={`rounded-lg overflow-hidden bg-white shadow ${product.isUrgent ? "border-orange-400" : ""} border-2`}
     >
       <div className='relative aspect-4/3 overflow-hidden'>

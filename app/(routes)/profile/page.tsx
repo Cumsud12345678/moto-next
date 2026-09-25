@@ -70,8 +70,6 @@ const ProfilePage = () => {
   const deactiveListings = data.filter((p) => p.status === 'inactive')
   const warningListings = data.filter((p) => p.status === 'rejected')
 
-  console.log(data)
-
   return (
     <div className="container mx-auto max-w-250">
       <div className="mt-15 p-3">

@@ -232,3 +232,12 @@ html {
   max-height: 75vh;
   margin: 0 auto;
 }
+
+.button {
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.button:hover {
+  background-color: #e1dede;
+}

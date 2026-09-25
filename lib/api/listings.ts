@@ -25,6 +25,11 @@ export async function createVideoUrl() {
   return res.data
 }
 
+export async function authCreateVideoUrl(listingId: string) {
+  const res = await api.get(`/api/listings/create/uploads/video/url/${listingId}`, { withCredentials: true })
+  return res.data
+}
+
 export async function getListing(listingId: string) {
   const res = await api.get(`/api/listings/${listingId}`, { withCredentials: true })
   return res.data.data

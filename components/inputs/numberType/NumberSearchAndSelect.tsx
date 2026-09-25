@@ -48,7 +48,6 @@ const NumberSearchAndSelect = ({data, state, setState, label}: NumberSearchAndSe
       setValue(0)
     }else {
       const a = data.find((item: number) => item === state)
-      console.log(a)
       setValue(a || 0)
     }
   }, [state, data])
