@@ -22,9 +22,10 @@ import {
 interface Props {
   product: CardType
   onDelete: (id: string) => void
+  onExpiredListingUpdate: (id: string) => void
 }
 
-const ProductCard = ({ product, onDelete }: Props) => {
+const DeactiveProductCard = ({ product, onDelete, onExpiredListingUpdate }: Props) => {
   const formatNumber = (value: number) => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   }
@@ -37,19 +38,11 @@ const ProductCard = ({ product, onDelete }: Props) => {
     setOpenAlertDelete(true)
   }
 
-  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    // navigate to edit — router.push istifadə etmək istəsən useRouter əlavə et
-    window.location.href = `/edit/${product._id}` // öz edit route-una uyğunlaşdır
-  }
-
   if (!product) return null
 
   return (
     <>
-      <Link
-        href={`/elanlar/${product.make.label}-${product.model.label}-${product._id}`}
+      <div
         className={`rounded-lg overflow-hidden bg-white shadow border-2 ${
           product.isUrgent ? "border-orange-400" : ""
         }`}
@@ -101,11 +94,11 @@ const ProductCard = ({ product, onDelete }: Props) => {
 
         <div className="flex flex-col sm:flex-row gap-2 p-2 pt-0">
           <button
-            onClick={handleEditClick}
+            onClick={() => onExpiredListingUpdate(product._id)}
             className='w-full flex items-center justify-center gap-3 bg-blue-500 text-white p-2 rounded-lg'
           >
             <PencilToSquare />
-            Düzəlt
+            Aktiv et
           </button>
 
           <button
@@ -116,7 +109,7 @@ const ProductCard = ({ product, onDelete }: Props) => {
             Sil
           </button>
         </div>
-      </Link>
+      </div>
 
       <AlertDialog open={openAlertDelete} onOpenChange={setOpenAlertDelete}>
         <AlertDialogContent size="sm">
@@ -147,4 +140,4 @@ const ProductCard = ({ product, onDelete }: Props) => {
   )
 }
 
-export default ProductCard
+export default DeactiveProductCard

@@ -404,13 +404,13 @@ const Filter = ({ initialMetadata }: Props) => {
               </button>
               <button
                 onClick={() => applyFilter()}
-                className="bg-blue-500 text-white p-2.5 rounded-lg cursor-pointer shadow"
+                className="bg-blue-500 text-white p-2.5 px-4 rounded-lg cursor-pointer shadow"
               >
                 Elanlari gosder
               </button>
               <button
                 onClick={() => setFilterOpen(prev => !prev)}
-                className="bg-blue-500 text-white p-2.5 rounded-lg cursor-pointer shrink-0 shadow flex items-center gap-2"
+                className="bg-blue-500 text-white p-2.5 px-4 rounded-lg cursor-pointer shrink-0 shadow flex items-center gap-2"
               >
                 Filter
               </button>
@@ -422,21 +422,21 @@ const Filter = ({ initialMetadata }: Props) => {
       <div className='flex lg:hidden flex-col gap-4'>
         <div className='flex flex-col lg:hidden p-3 gap-3'>
           <div className='flex items-center justify-between gap-3'>
-            <div onClick={() => setMakeModalOpen(true)} className='border p-2.5 px-3 w-full rounded-lg bg-white'>
+            <div onClick={() => setMakeModalOpen(true)} className='border p-2 px-3 w-full rounded-lg bg-white'>
               {make ? metadata.makes.find((item: Default) => item._id === make)?.label : 'Marka'}
             </div>
-            <div onClick={() => setModelModalOpen(true)} className='border p-2.5 px-3 w-full rounded-lg bg-white'>
+            <div onClick={() => setModelModalOpen(true)} className='border p-2 px-3 w-full rounded-lg bg-white'>
               {model ? metadata.models.find((item: Default) => item._id === model)?.label : 'Model'}
             </div>
             <div 
               onClick={() => window.location.hash = 'filter'}
-              className='border p-2.5 px-3 flex items-center text-white bg-blue-500 font-semibold justify-center gap-2 rounded-lg'
+              className='border p-2 px-3 flex items-center text-white bg-blue-500 font-semibold justify-center gap-2 rounded-lg'
             >
               <Funnel />
               Filter
             </div>
           </div>
-          <div className='flex whitespace-nowrap scrollbar-none overflow-auto gap-2 mask-[linear-gradient(to_right,black_85%,transparent)]'>
+          <div className='flex whitespace-nowrap scrollbar-none overflow-auto gap-2'>
             <ButtonGroup data={metadata.categories} state={category} setState={selectedMobileCategory} wrap={true} isNew={false} />
           </div>
         </div>

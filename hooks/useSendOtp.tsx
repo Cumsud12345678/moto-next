@@ -8,6 +8,7 @@ interface SendOtpPayload {
 
 interface SendOtpResponse {
   success: boolean,
+  message: string,
   isOldUser: boolean
 }
 

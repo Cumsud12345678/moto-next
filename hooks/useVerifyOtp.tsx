@@ -10,9 +10,10 @@ interface VerifyOtpPayload {
 }
 
 interface VerifyOtpResponse {
-  success: boolean;
-  user: User;
-  userId: string;
+  success: boolean
+  message: string
+  user: User
+  userId: string
 }
 
 async function verifyOtp(payload: VerifyOtpPayload): Promise<VerifyOtpResponse> {

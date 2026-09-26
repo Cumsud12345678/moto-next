@@ -3,7 +3,8 @@ import { api } from "@/lib/axios"
 import { useMutation } from "@tanstack/react-query"
 
 interface CreateEventResponse {
-  success: boolean,
+  success: boolean
+  message: string
   data: { _id: string }
 }
 

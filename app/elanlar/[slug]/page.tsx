@@ -5,6 +5,7 @@ import { api } from '@/lib/axios'
 import { ProductCard, ProductDescription } from '@/types/product'
 import { cookies } from 'next/headers'
 import ProductList from '@/components/ProductList'
+import Link from 'next/link'
 
 async function getProduct(id: string): Promise<ProductDescription | null> {
   try {
@@ -51,10 +52,15 @@ const ElanlarPage = async ({params}: {params: Promise<{slug: string}>}) => {
     getSimilars(id)
   ])
 
-  if(!data) {
+  if(data == null) {
     return (
-      <div>
-
+      <div className='w-full h-screen flex items-center justify-center flex-col'>
+        <span>Elan tapılmadı</span>
+        <button className='p-2 px-3 border-2 mt-3 rounded-lg bg-orange-500 text-white'>
+          <Link href={'/'}>
+            Ana səyfəyə qayıt
+          </Link>
+        </button>
       </div>
     )
   }

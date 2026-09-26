@@ -237,11 +237,11 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
       // NOT: `@/lib/api/listings` modulunda `updateListing(slug, formData)` funksiyası
       // olmalıdır və PUT /api/listings/:listingId endpoint-inə multipart/form-data
       // sorğusu göndərməlidir. Adı fərqlidirsə, buradakı import/çağırışı ona uyğunlaşdır.
-      await updateListing(slug, formData)
+      const data = await updateListing(slug, formData)
 
       toast.add({
         type: 'success',
-        description: 'Elan uğurla yeniləndi',
+        description: data.message,
       })
     } catch (err) {
       toast.add({

@@ -198,7 +198,7 @@ const Header = () => {
                         <div className='flex items-center justify-between'>
                           <div className='flex items-center'>
                             <div className='bg-white rounded-full p-2'>
-                              <ArrowRightFromSquare className='text-muted' />
+                              <ArrowRightFromSquare className='' />
                             </div>
                             <span className='ml-2'>Çıxış</span>
                           </div>

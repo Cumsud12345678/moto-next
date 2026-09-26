@@ -51,9 +51,9 @@ const CustomDrawer = ({open, setOpen, state, setState, data, label}: CustomDrawe
         <DrawerHeader>
           <DrawerTitle>{label}</DrawerTitle>
         </DrawerHeader>
-        <div className="p-4 flex flex-col gap-4 text-[15px]">
+        <div className="p-4 flex flex-col gap-3 text-[15px] overflow-auto">
           <div>
-            <input value={value} onChange={(e) => setValue(e.target.value)} type="text" name="" id="" className='border w-full p-2.5 px-3 bg-gray-100 rounded-lg' placeholder='Axtar...' />
+            <input value={value} onChange={(e) => setValue(e.target.value)} type="text" name="" id="" className='border w-full p-3 bg-gray-100 rounded-lg' placeholder='Axtar...' />
           </div>
 
           {

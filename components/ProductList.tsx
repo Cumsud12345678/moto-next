@@ -85,6 +85,15 @@ const ProductList = ({ data }: ProductListProps) => {
     }
   }, [page, loading, hasMore])
 
+  if(products.length === 0) {
+    return (
+      <div className="flex flex-col w-full items-center justify-center">
+        <p className="w-full text-xl text-gray-500">Təəssüf ki, axtarışınız əsasında heç nə tapılmadı.</p>
+        <img src="/empty.png" alt="" className="size-50" />
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 align-items-center">
@@ -101,15 +110,6 @@ const ProductList = ({ data }: ProductListProps) => {
         ref={loadMoreRef}
         className="h-10"
       />
-
-      {/* Loading skeleton */}
-      {/* {loading && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <ProductSkeleton key={index} />
-          ))}
-        </div>
-      )} */}
     </>
   )
 }

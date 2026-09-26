@@ -46,20 +46,20 @@ export default function Footer({ makes }: FooterProps) {
       {
         (pathname !== '/new' && pathname !== '/auth')
         &&
-        <div className='bg-[#f1f3f7]'>
+        <div className='bg-[#ebedf3]'>
           <div className='container max-w-250 mx-auto px-3'>
-            <div className='flex flex-row items-center justify-between border-y-gray-400 border-y border-red-50 py-3'>
-              <span>Reklam yerlesdirin</span>
+            <div className='flex flex-col md:flex-row lg:items-center justify-between border-y-gray-400 border-y border-red-50 py-3 gap-2'>
+              <span>Reklam yerləşdirin</span>
               <div className='flex gap-3 text-[14px] items-center'>
                 <a href="">
-                  <img src="./tiktok.png" alt="" className='size-6' />
+                  <img src="/tiktok.png" alt="" className='size-6' />
                 </a>
                 <a href="">
-                  <img src="./instagram.png" alt="" className='size-7' />
+                  <img src="/instagram.png" alt="" className='size-7' />
                 </a>
                 <a href="">
                   <div className='flex items-center gap-2'>
-                    <img src="./email.png" alt="" className='size-6' />
+                    <img src="/email.png" alt="" className='size-6' />
                     <span>isayevcumu@gmail.com</span>
                   </div>
                 </a>
@@ -86,15 +86,12 @@ export default function Footer({ makes }: FooterProps) {
         ${visible ? 'translate-y-0' : 'translate-y-full'}
       `}>
 
-        
-
-
         <div
           className="
-        lg:hidden
-        mx-2.5 mb-2.5
-        rounded-3xl border border-gray-200 bg-white
-        shadow-md px-1.5 py-2.5"
+          lg:hidden
+          mx-2.5 mb-2.5
+          rounded-3xl border border-gray-200 bg-white
+          shadow-md px-1.5 py-2.5"
         >
           <div className="flex w-full items-center justify-between flex-nowrap">
             {navItems.map((item: Nav) => {

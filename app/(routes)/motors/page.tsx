@@ -3,6 +3,8 @@ import Filter from '../(home)/_components/Filter';
 import { Suspense } from 'react';
 import { getMetadata } from '@/lib/api/metadata';
 import { cookies } from 'next/headers';
+import Ads from '../(home)/_components/Ads';
+import { api } from '@/lib/axios';
 // import { getFilteredListings } from '@/lib/api/listings';
 
 type Props = {
@@ -11,6 +13,35 @@ type Props = {
     model?: string,
     category?: string
   }>
+}
+
+type Adsense = {
+  _id: string
+  logo: string
+  link: string
+  position: 'mobile' | 'deskop_left' | 'deskop_right'
+  isHome: boolean
+  isDetails: boolean
+  clickCount: number
+  adsenseExpiresAt: string
+  ownerName: string
+  ownerPhone: string
+}
+
+async function getAdsense(): Promise<Adsense[]> {
+  try {
+    const cookieStore = await cookies()
+
+    const res = await api.get('/api/adsense', {
+      headers: {
+        Cookie: cookieStore.toString()
+      }
+    });
+    return res.data.data;
+  } catch (err) {
+    console.error('Failed to fetch products:', err);
+    return [];
+  }
 }
 
 export async function getFilteredListings(params: Record<string, string>) {
@@ -41,8 +72,9 @@ const MotoPage = async ({searchParams}: Props) => {
   // const data = products
   const data = await getFilteredListings(params)
   const metadata = await getMetadata()
+  const adsenseData = await getAdsense()
 
-  console.log(data)
+  const adsenseMobile = adsenseData.filter(ads => ads.position === 'mobile')
 
   if(!data) {
     return (
@@ -60,8 +92,14 @@ const MotoPage = async ({searchParams}: Props) => {
           <Filter initialMetadata={metadata} />
         </Suspense>
       </div>
+
+      {
+        adsenseMobile.length !== 0
+        &&
+        <Ads data={adsenseMobile} />
+      }
      
-      <div className='container mx-auto max-w-250 h-1000 p-4'>
+      <div className='container mx-auto max-w-250 p-4'>
         <ProductList data={data} />
       </div>
 

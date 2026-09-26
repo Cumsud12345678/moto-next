@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog"
 import { Default } from '@/types/metadata'
 import Image from 'next/image'
+import { Check, Xmark } from '@gravity-ui/icons'
 
 
 interface CustomDrawerProps {
@@ -40,19 +41,24 @@ const DialogModal = ({open, setOpen, state, setState, data, label}: CustomDrawer
       onOpenChange={setOpen}
     >
       <DialogContent
+      showCloseButton={false}
         className='w-full h-full max-w-none sm:w-[90vw] rounded-none sm:h-[90vh] sm:max-w-3xl flex flex-col bg-white p-0'
       >
-        <DialogHeader className='h-auto px-3 mt-5 text-2xl'>
+        <DialogHeader className='h-auto px-3 mt-3 text-xl shrink-0 flex flex-row items-center justify-between'>
           {label}
+          <Xmark
+            className='size-6 mt-2'
+            onClick={() => setOpen(false)}
+          />
         </DialogHeader>
 
-        <div className='flex p-3 flex-col'>
+        <div className='flex p-3 flex-col overflow-auto'>
 
-          <input value={value} onChange={(e) => setValue(e.target.value)} type="text" name="" id="" className='border w-full p-2 px-3 bg-gray-200 rounded-lg' placeholder='Axtar...' />
+          <input value={value} onChange={(e) => setValue(e.target.value)} type="text" name="" id="" className='border w-full p-3 bg-gray-200 rounded-lg' placeholder='Axtar...' />
 
           <div className='mt-4'>
             <h3>Populyar</h3>
-            <div className='flex flex-col gap-3 mt-2'>
+            <div className='flex flex-col mt-2'>
               {
                 newData.map((item: Default) => {
                   const active = item._id === state
@@ -61,7 +67,7 @@ const DialogModal = ({open, setOpen, state, setState, data, label}: CustomDrawer
                     <div
                       key={item._id}
                       onClick={() => handleSelect(item._id)}
-                      className='border flex items-center justify-between p-3 bg-[#f5f5f5] rounded-lg'
+                      className='flex items-center justify-between py-3 border-b'
                     >
                       <div className='flex items-center gap-2'>
                         {
@@ -73,7 +79,7 @@ const DialogModal = ({open, setOpen, state, setState, data, label}: CustomDrawer
 
                       {
                         active
-                        && <span>secili</span>
+                        && <Check className='size-5 text-green-500' />
                       }
                     </div>
                   )

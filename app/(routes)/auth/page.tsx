@@ -33,7 +33,7 @@ const AuthPage = () => {
         if (data.success) {
           toast.add({
             type: 'success',
-            description: 'Kod gonderildi'
+            description: data.message
           })
           setLoginStartLoading(false)
           setIsOldUser(data.isOldUser)
@@ -54,6 +54,10 @@ const AuthPage = () => {
     verifyOtpMutation.mutate({ email, name, otp }, {
       onSuccess: (data) => {
         if (data.success) {
+          toast.add({
+            type: 'success',
+            description: data.message
+          })
           dispatch(setUser(data.user))
           router.push('/')
         }

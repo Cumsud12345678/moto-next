@@ -219,7 +219,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
               </div>
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Yeni?</span>
-                <span>{product.used}</span>
+                <span>{product.used ? 'Bəli' : 'Xeyr'}</span>
               </div>
               <div className="grid grid-cols-2">
                 <span className="text-gray-500">Barter var?</span>

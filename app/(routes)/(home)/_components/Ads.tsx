@@ -22,7 +22,7 @@ const Ads = ({data}: {data: Adsense[]}) => {
   const [selected, setSelected] = useState(null)
 
   return (
-    <div className='lg:hidden block relative w-full h-25 p-3'>
+    <div className='lg:hidden block relative w-full h-28 p-3'>
       {
         data.map((ads: Adsense) => (
           <div 

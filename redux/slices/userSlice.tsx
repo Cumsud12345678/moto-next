@@ -16,7 +16,7 @@ const initialState: AuthState = {
 }
 
 export const fetchMe = createAsyncThunk('auth/fetchMe', async () => {
-  const res = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, { withCredentials: true })
+  const res = await api.get(`/api/auth/me`, { withCredentials: true })
   return res.data.data // undefined ola bilər (login olmayıbsa)
 })
 

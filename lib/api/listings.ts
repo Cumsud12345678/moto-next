@@ -47,3 +47,7 @@ export async function updateListing(listingId: string, formData: FormData) {
   return res.data
 }
  
+export async function expiredListingUpdate(listingId: string) {
+  const res = await api.get(`/api/listings/expired/listing/update/${listingId}`, { withCredentials: true })
+  return res.data
+}

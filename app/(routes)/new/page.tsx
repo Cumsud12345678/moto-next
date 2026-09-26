@@ -134,7 +134,7 @@ const NewPage = () => {
         if (data.success) {
           toast.add({
             type: 'success',
-            description: 'Kod gonderildi'
+            description: data.message
           })
           setFormStep('verify')
           setIsOldUser(data.isOldUser)
@@ -216,8 +216,8 @@ const NewPage = () => {
     equipment.forEach((eq) => formData.append('equipment', eq))
 
     createEventMutation.mutate(formData, {
-      onSuccess: () => {
-        toast.add({ type: 'success', description: 'Elan uğurla yaradıldı.' })
+      onSuccess: (data) => {
+        toast.add({ type: 'success', description: data.message })
         router.push('/')
       },
       onError: () => {
