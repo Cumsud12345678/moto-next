@@ -1,13 +1,13 @@
 // page.tsx — Server Component, dəyişməz qalır
-import { api } from '@/lib/axios';
 import { cookies } from 'next/headers';
 import { ProductCard as CardType } from '@/types/product'
 import BookmarkList from './_components/BookmarkList'
+import { serverApi } from '@/lib/axios-server';
 
 async function getProducts(): Promise<CardType[]> {
   try {
     const cookieStore = await cookies()
-    const res = await api.get('/api/listings/likes', {
+    const res = await serverApi.get('/api/listings/likes', {
       headers: { Cookie: cookieStore.toString() }
     });
     return res.data.data;

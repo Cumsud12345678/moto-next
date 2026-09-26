@@ -30,7 +30,7 @@ const ProductCard = ({product}: {product: CardType}) => {
       href={`/elanlar/${product.make.label}-${product.model.label}-${product._id}`}
       onClick={() => {
         navigator.sendBeacon(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/listings/click/${product._id}`
+          `${process.env.API_URL}/api/listings/click/${product._id}`
         )
       }}
       className={`rounded-lg overflow-hidden bg-white shadow ${product.isUrgent ? "border-orange-400" : ""} border-2`}

@@ -1,12 +1,12 @@
 import ProductList from '@/components/ProductList';
 import Filter from './_components/Filter';
 import { Suspense } from 'react'
-import { api } from '@/lib/axios';
 import { ProductCard } from '@/types/product';
 import { Metadata } from '@/types/metadata';
 import { getMetadata } from '@/lib/api/metadata';
 import { cookies } from 'next/headers';
 import Ads from './_components/Ads';
+import { serverApi } from '@/lib/axios-server';
 // import { getListings } from '@/lib/api/listings';
 
 type Adsense = {
@@ -27,7 +27,7 @@ async function getProducts(): Promise<ProductCard[]> {
   try {
     const cookieStore = await cookies()
 
-    const res = await api.get('/api/listings', {
+    const res = await serverApi.get('/api/listings', {
       headers: {
         Cookie: cookieStore.toString()
       }
@@ -43,7 +43,7 @@ async function getAdsense(): Promise<Adsense[]> {
   try {
     const cookieStore = await cookies()
 
-    const res = await api.get('/api/adsense', {
+    const res = await serverApi.get('/api/adsense', {
       headers: {
         Cookie: cookieStore.toString()
       }

@@ -1,5 +1,5 @@
 export async function getMetadata() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/metadata`, {
+  const res = await fetch(`${process.env.API_URL}/api/metadata`, {
     next: { revalidate: 3600 }
   })
   

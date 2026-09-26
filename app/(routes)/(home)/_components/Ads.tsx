@@ -29,7 +29,7 @@ const Ads = ({data}: {data: Adsense[]}) => {
             key={ads._id}
             onClick={() => {
               navigator.sendBeacon(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/adsense/click/${ads._id}`
+                `${process.env.API_URL}/api/adsense/click/${ads._id}`
               )
             }}
             className='block h-full w-full text-center'

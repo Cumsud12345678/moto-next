@@ -23,7 +23,7 @@ import { createVideoUrl } from '@/lib/api/listings'
 import { useDispatch } from 'react-redux'
 import { setUser } from '@/redux/slices/userSlice'
 
-const API = process.env.NEXT_PUBLIC_API_URL!;
+const API = process.env.API_URL!;
 
 interface User {
   _id: string,

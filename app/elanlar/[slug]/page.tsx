@@ -1,17 +1,17 @@
 import React from 'react'
 import DetailsLeft from './_components/DetailsLeft'
 import DetailsRight from './_components/DetailsRight'
-import { api } from '@/lib/axios'
 import { ProductCard, ProductDescription } from '@/types/product'
 import { cookies } from 'next/headers'
 import ProductList from '@/components/ProductList'
 import Link from 'next/link'
+import { serverApi } from '@/lib/axios-server'
 
 async function getProduct(id: string): Promise<ProductDescription | null> {
   try {
     const cookieStore = await cookies()
 
-    const res = await api.get(`/api/listings/${id}`, {
+    const res = await serverApi.get(`/api/listings/${id}`, {
       headers: {
         Cookie: cookieStore.toString()
     }});
@@ -27,7 +27,7 @@ async function getSimilars(id: string): Promise<ProductCard[] | []> {
   try {
     const cookieStore = await cookies()
 
-    const res = await api.get(`/api/listings/${id}/similar`, {
+    const res = await serverApi.get(`/api/listings/${id}/similar`, {
       headers: {
         Cookie: cookieStore.toString()
     }})

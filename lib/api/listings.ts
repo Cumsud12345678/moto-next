@@ -2,7 +2,7 @@ import { api } from "../axios"
 
 export async function toggleLike(listingId: string) {
   const res = await api.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/listings/${listingId}/like`,
+    `${process.env.API_URL}/api/listings/${listingId}/like`,
     {},
     { withCredentials: true }
   )

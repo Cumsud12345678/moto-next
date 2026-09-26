@@ -33,7 +33,7 @@ const ProductList = ({ data }: ProductListProps) => {
       const nextPage = page + 1
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/listings?page=${nextPage}&limit=20`,
+        `${process.env.API_URL}/api/listings?page=${nextPage}&limit=20`,
         {
           credentials: "include",
         }

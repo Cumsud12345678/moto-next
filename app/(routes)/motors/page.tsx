@@ -4,8 +4,7 @@ import { Suspense } from 'react';
 import { getMetadata } from '@/lib/api/metadata';
 import { cookies } from 'next/headers';
 import Ads from '../(home)/_components/Ads';
-import { api } from '@/lib/axios';
-// import { getFilteredListings } from '@/lib/api/listings';
+import { serverApi } from '@/lib/axios-server';
 
 type Props = {
   searchParams: Promise<{
@@ -32,7 +31,7 @@ async function getAdsense(): Promise<Adsense[]> {
   try {
     const cookieStore = await cookies()
 
-    const res = await api.get('/api/adsense', {
+    const res = await serverApi.get('/api/adsense', {
       headers: {
         Cookie: cookieStore.toString()
       }
@@ -48,7 +47,7 @@ export async function getFilteredListings(params: Record<string, string>) {
   const query = new URLSearchParams(params).toString()
   const cookieStore = await cookies()
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/listings/filter?${query}`,
+    `${process.env.API_URL}/api/listings/filter?${query}`,
     {
       cache: 'no-store',
       headers: {
