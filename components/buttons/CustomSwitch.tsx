@@ -9,7 +9,7 @@ export default function CustomSwitch({checked, setChecked}: {checked: boolean | 
       className={`
         relative flex h-6 w-11 shrink-0 cursor-pointer items-center
         rounded-full p-1 transition-colors duration-200
-        ${checked ? "bg-sky-500" : "bg-gray-300"}
+        ${checked ? "bg-orange-500" : "bg-gray-300"}
       `}
     >
       <span

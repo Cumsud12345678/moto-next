@@ -44,26 +44,39 @@ export default function Footer({ makes }: FooterProps) {
     <Fragment>
 
       {
-        pathname !== '/new'
+        (pathname !== '/new' && pathname !== '/auth')
         &&
-        <div className='container max-w-250 mx-auto bg-gray-200 px-3'>
-          <div className='flex flex-row items-center justify-between border-b border-red-50 py-2'>
-            <span>Reklam yerlesdirin</span>
-            <div className='flex gap-3 text-[14px]'>
-              <span>TikTok</span>
-              <span>motoelan@support.az</span>
+        <div className='bg-[#f1f3f7]'>
+          <div className='container max-w-250 mx-auto px-3'>
+            <div className='flex flex-row items-center justify-between border-y-gray-400 border-y border-red-50 py-3'>
+              <span>Reklam yerlesdirin</span>
+              <div className='flex gap-3 text-[14px] items-center'>
+                <a href="">
+                  <img src="./tiktok.png" alt="" className='size-6' />
+                </a>
+                <a href="">
+                  <img src="./instagram.png" alt="" className='size-7' />
+                </a>
+                <a href="">
+                  <div className='flex items-center gap-2'>
+                    <img src="./email.png" alt="" className='size-6' />
+                    <span>isayevcumu@gmail.com</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-2'>
+              {
+                makes.map(make => (
+                  <Link key={make._id} href={`/motors?make=${make._id}`} className='py-1'>
+                    <span className='text-[15px] text-gray-500 hover:text-orange-500'>{make.label}</span>
+                  </Link>
+                ))
+              }
             </div>
           </div>
-          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-            {
-              makes.map(make => (
-                <Link key={make._id} href={`/motors?make=${make._id}`} className='py-2'>
-                  <span>{make.label}</span>
-                </Link>
-              ))
-            }
-          </div>
         </div>
+        
       }
 
       <footer

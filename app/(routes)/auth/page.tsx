@@ -70,7 +70,7 @@ const AuthPage = () => {
         formStep === 'start'
         ?
           <div className='fixed top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 p-4 w-full'>
-            <div className='flex p-8 flex-col bg-white shadow-lg rounded-xl border-2'>
+            <div className='flex p-8 flex-col bg-white shadow-lg rounded-xl border-2 max-w-100 mx-auto'>
               <h3 className='text-2xl font-semibold mx-auto'>Login</h3>
               <div>
                 <div className='my-3'>

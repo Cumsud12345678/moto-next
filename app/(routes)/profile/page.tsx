@@ -9,6 +9,7 @@ import ProductCard from './_components/ProductCard'
 import { ProductCard as CardType } from '@/types/product'
 import { getMyListings, deleteListing } from '@/lib/api/listings'
 import { toast } from '@/components/ui/toast'
+import { EditProfile } from './_components/EditProfile'
 
 const ProfilePage = () => {
   // ============ BÜTÜN HOOK-LAR BURADA, ŞƏRTSİZ ============
@@ -61,6 +62,15 @@ const ProfilePage = () => {
     // }
   }
 
+  const [name, setName] = useState<string>('')
+  const [editOpen, setEditOpen] = useState<boolean>(false)
+
+
+  useEffect(() => {
+    if(!user) return;
+    setName(user.name)
+  }, [user])
+
   // ============ İNDİ ERKƏN RETURN ETMƏK OLAR — BÜTÜN HOOK-LAR ARTIQ ÇAĞIRILIB ============
   if (authLoading || !user) {
     return <div className="text-center mt-20">Yüklənir...</div>
@@ -85,7 +95,7 @@ const ProfilePage = () => {
               />
             </div>
             <div className='flex flex-col'>
-              <span>{user.name}</span>
+              <span>{name}</span>
               <span>{user.email}</span>
             </div>
           </div>
@@ -94,7 +104,7 @@ const ProfilePage = () => {
             <button>
               <BellFill className='size-6' />
             </button>
-            <button>
+            <button onClick={() => setEditOpen(true)}>
               <PencilToSquare className='size-6' />
             </button>
           </div>
@@ -137,6 +147,15 @@ const ProfilePage = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+
+        <EditProfile 
+          open={editOpen}
+          setOpen={setEditOpen}
+          id={user._id}
+          name={name}
+          setName={setName}
+        />
 
       </div>
     </div>

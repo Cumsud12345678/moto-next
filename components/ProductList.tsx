@@ -16,6 +16,14 @@ const ProductList = ({ data }: ProductListProps) => {
 
   const loadMoreRef = useRef<HTMLDivElement>(null)
 
+  // `data` props dəyişəndə (filtr/URL dəyişəndə server yeni data göndərəndə)
+  // daxili state-i yenilə və infinite-scroll-u sıfırla.
+  useEffect(() => {
+    setProducts(data)
+    setPage(1)
+    setHasMore(true)
+  }, [data])
+
   const loadMore = async () => {
     if (loading || !hasMore) return
 

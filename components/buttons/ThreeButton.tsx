@@ -25,7 +25,7 @@ const ThreeButton = ({data, state, setState}: ThreeButtonProps) => {
             <button 
               key={index}
               className={`
-                px-4 py-2 cursor-pointer w-full
+                px-4 py-3 cursor-pointer w-full
                 ${active ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}
                 ${index == 0 ? 'border rounded-l-sm' : ''}
                 ${index == 1 ? 'border-y' : ''}

@@ -48,8 +48,8 @@ const ButtonGroup = ({data, state, setState, wrap=false, isNew=false}: ButtonGro
             <button 
               key={item._id}
               className={`
-                p-2.5 px-4 cursor-pointer rounded-3xl border-2
-                ${active ? 'bg-green-200 text-blaxk border-green-500' : hash ? 'bg-white' : 'bg-white hover:bg-gray-200'}
+                p-3 px-4 cursor-pointer rounded-3xl border-2
+                ${active ? 'bg-orange-500 text-white' : hash ? 'bg-white' : 'bg-white hover:bg-gray-200'}
               `}
               onClick={() => setState(item._id)}
             >

@@ -42,6 +42,8 @@ const MotoPage = async ({searchParams}: Props) => {
   const data = await getFilteredListings(params)
   const metadata = await getMetadata()
 
+  console.log(data)
+
   if(!data) {
     return (
       <div>

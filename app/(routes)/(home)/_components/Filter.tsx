@@ -390,7 +390,7 @@ const Filter = ({ initialMetadata }: Props) => {
           {/* SƏNİN 2-Cİ SƏTRİN */}
           <div className="flex items-center justify-between gap-4 z-20">
 
-            <div className='flex items-center justify-between py-2 bg-white p-3 rounded-lg flex-1'>
+            <div className='flex items-center justify-between py-3 bg-white p-3 rounded-lg flex-1'>
               Sened?
               <CustomSwitch checked={document} setChecked={setDocument} />
             </div>
