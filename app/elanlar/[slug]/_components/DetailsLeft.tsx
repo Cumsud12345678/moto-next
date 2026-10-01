@@ -97,7 +97,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
               }
             </button>
             <ArrowUpRightFromSquare className="size-6" />
-            <EllipsisVertical className="size-6" />
+            {/* <EllipsisVertical className="size-6" /> */}
           </div>
         </div>
       </div>
@@ -120,9 +120,9 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
                 <button>
                   <ArrowUpRightFromSquare className="size-6" />
                 </button>
-                <button>
+                {/* <button>
                   <EllipsisVertical className="size-6" />
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
@@ -149,25 +149,33 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
             <p className='whitespace-nowrap'>Yeni elan</p>
           </div>
 
-          <div className='shrink-0 border flex items-center p-2 pr-4 gap-2 bg-gray-200 rounded-xl'>
-            <img src='/is_barter.svg' alt="" className='size-10' />
-            <p className='whitespace-nowrap'>Barter</p>
-          </div>
-
+          {
+            product.barter
+            &&
+            <div className='shrink-0 border flex items-center p-2 pr-4 gap-2 bg-gray-200 rounded-xl'>
+              <img src='/is_barter.svg' alt="" className='size-10' />
+              <p className='whitespace-nowrap'>Barter</p>
+            </div>
+          }
+          
           <div className='shrink-0 border flex items-center p-2 pr-4 gap-2 bg-gray-200 rounded-xl'>
             <img src='/is_qualified.svg' alt="" className='size-10' />
-            <p className='whitespace-nowrap'>Keyfiyyetli elan</p>
+            <p className='whitespace-nowrap'>Keyfiyyətli elan</p>
           </div>
 
-          <div className='shrink-0 border flex items-center p-2 pr-4 gap-2 bg-gray-200 rounded-xl'>
-            <img src='/document-16.svg' alt="" className='size-10' />
-            <p className='whitespace-nowrap'>Senedli</p>
-          </div>
-
+          {
+            product.document
+            &&
+            <div className='shrink-0 border flex items-center p-2 pr-4 gap-2 bg-gray-200 rounded-xl'>
+              <img src='/document-16.svg' alt="" className='size-10' />
+              <p className='whitespace-nowrap'>Sənədli</p>
+            </div>
+          }
+          
         </div>
 
         <div className='border-t my-1 pt-3'>
-          <h4 className='text-xl font-semibold'>Xusiyyetler</h4>
+          <h4 className='text-xl font-semibold'>Xüsusiyyətlər</h4>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-2 text-md mt-3">
             <div className="flex flex-col gap-2 w-full">
@@ -231,7 +239,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
         </div>
 
         <div className='py-3 border-t'>
-          <h3 className='text-xl'>Tesvir</h3>
+          <h3 className='text-lg'>Təsvir</h3>
           <p className='mt-2'>{product.description}</p>
         </div>
 
@@ -273,7 +281,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
 
           <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
             <TriangleExclamation />
-            <AlertTitle>Diqqet</AlertTitle>
+            <AlertTitle>Diqqət</AlertTitle>
             <AlertDescription className=''>
               Motosikletə baxış keçirmədən öncə beh göndərməyin.
             </AlertDescription>

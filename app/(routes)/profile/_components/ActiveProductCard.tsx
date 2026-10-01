@@ -18,13 +18,46 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
+
+import * as React from "react"
+// import { toast } from "sonner"
+
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+  FieldTitle,
+} from "@/components/ui/field"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { api } from '@/lib/axios'
+import { toast } from '@/components/ui/toast'
 
 interface Props {
   product: CardType
+  giftCount: number,
+  setGiftCount: React.Dispatch<React.SetStateAction<number>>
   onDelete: (id: string) => void
+  onUrgent: (id: string) => void
 }
 
-const ActiveProductCard = ({ product, onDelete }: Props) => {
+const ActiveProductCard = ({ product, giftCount, setGiftCount, onDelete, onUrgent }: Props) => {
+
   const formatNumber = (value: number) => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   }
@@ -42,6 +75,45 @@ const ActiveProductCard = ({ product, onDelete }: Props) => {
     e.stopPropagation()
     // navigate to edit — router.push istifadə etmək istəsən useRouter əlavə et
     window.location.href = `/edit/${product._id}` // öz edit route-una uyğunlaşdır
+  }
+
+
+  const [open, setOpen] = React.useState(false)
+  const [deliveryTime, setDeliveryTime] = React.useState("asap")
+  const isMobile = useIsMobile()
+
+  const deliveryTimes = [
+    {
+      value: "asap",
+      id: "delivery-asap",
+      label: "1 gün",
+      description: "1 azn",
+      ...(giftCount && { badge: "Pulsuz" }),
+    },
+    // {
+    //   value: "5-00",
+    //   id: "delivery-5-00",
+    //   label: "3 gün",
+    //   description: "2 azn",
+    // },
+    // {
+    //   value: "5-30",
+    //   id: "delivery-5-30",
+    //   label: "7 gün",
+    //   description: "5 azn",
+    // },
+    // {
+    //   value: "6-00",
+    //   id: "delivery-6-00",
+    //   label: "15 gün",
+    //   description: "9 azn",
+    // }
+  ]
+
+  const handlePremiumClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setOpen(true)
   }
 
   if (!product) return null
@@ -99,23 +171,37 @@ const ActiveProductCard = ({ product, onDelete }: Props) => {
           <p className='text-[14px] text-gray-400 truncate'>{product.region.label}</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2 p-2 pt-0">
-          <button
-            onClick={handleEditClick}
-            className='w-full flex items-center justify-center gap-3 bg-blue-500 text-white p-2 rounded-lg'
-          >
-            <PencilToSquare />
-            Düzəlt
-          </button>
+        <div className='flex flex-col p-2 gap-2'>
+          <div className="flex flex-col sm:flex-row gap-2 pt-0">
+            <button
+              onClick={handleEditClick}
+              className='w-full flex items-center justify-center gap-3 bg-blue-500 text-white p-2 rounded-lg'
+            >
+              <PencilToSquare />
+              Düzəlt
+            </button>
 
-          <button
-            onClick={handleDeleteClick}
-            className='w-full flex items-center justify-center gap-3 bg-red-500 text-white p-2 rounded-lg'
-          >
-            <TrashBin />
-            Sil
-          </button>
+            <button
+              onClick={handleDeleteClick}
+              className='w-full flex items-center justify-center gap-3 bg-red-500 text-white p-2 rounded-lg'
+            >
+              <TrashBin />
+              Sil
+            </button>
+          </div>
+          {
+            (giftCount > 0 && !product.isUrgent)
+            &&
+            <button
+              onClick={handlePremiumClick}
+              className='w-full flex items-center justify-center gap-3 bg-green-500 text-white p-2 rounded-lg'
+            >
+              Pulsuz premium et
+            </button>
+          }
+          
         </div>
+        
       </Link>
 
       <AlertDialog open={openAlertDelete} onOpenChange={setOpenAlertDelete}>
@@ -143,6 +229,54 @@ const ActiveProductCard = ({ product, onDelete }: Props) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+
+      <Drawer
+        open={open}
+        onOpenChange={setOpen}
+        showSwipeHandle={isMobile}
+        swipeDirection={isMobile ? "down" : "right"}
+      >
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Pick a delivery time</DrawerTitle>
+            <DrawerDescription>
+              We&apos;ll prepare your order as soon as possible.
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="flex-1 scroll-fade overflow-y-auto p-4">
+            <RadioGroup
+              value={deliveryTime}
+              onValueChange={setDeliveryTime}
+              className="gap-2"
+            >
+              {deliveryTimes.map((time) => (
+                <FieldLabel key={time.value} htmlFor={time.id}>
+                  <Field orientation="horizontal">
+                    <FieldContent>
+                      <FieldTitle className="flex items-center gap-2">
+                        {time.label}
+                        {time.badge ? (
+                          <Badge variant="destructive">{time.badge}</Badge>
+                        ) : null}
+                      </FieldTitle>
+                      <FieldDescription>{time.description}</FieldDescription>
+                    </FieldContent>
+                    <RadioGroupItem value={time.value} id={time.id} />
+                  </Field>
+                </FieldLabel>
+              ))}
+            </RadioGroup>
+          </div>
+          <DrawerFooter>
+            <Button onClick={() => onUrgent(product._id)} className="h-[34px]">
+              Tətbiq et
+            </Button>
+            <DrawerClose render={<Button variant="outline">Bağla</Button>} />
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
     </>
   )
 }

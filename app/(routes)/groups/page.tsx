@@ -4,6 +4,10 @@ import { api } from '@/lib/axios'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+import {ChevronRight} from '@gravity-ui/icons';
+
 interface Group {
   logo: string,
   title: string,
@@ -40,22 +44,31 @@ const GropusPage = () => {
   if(!data) return 'loading';
 
   return (
-    <div className='container mx-auto max-w-250 my-30'>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
+    <div className='container mx-auto max-w-250 my-14 p-3'>
+      <h3 className='text-xl'>WhatsApp Qrupları</h3>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-2'>
 
         {
           data.map((group: Group) => (
-            <div key={group.link} className='flex flex-row items-center justify-between'>
+            <a 
+              href={group.link}
+              target='_blank'
+              key={group.link} 
+              className='flex flex-row items-center justify-between border p-2 px-3 bg-white rounded-lg'
+            >
               <div className='flex flex-row items-center gap-2'>
                 <div>
-                  <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${group.logo}`} alt="" width={30} height={30} />
+                  <Avatar size='lg'>
+                    <AvatarImage src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${group.logo}`} />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
                 </div>
                 <h4>{group.title}</h4>
               </div>
               <div>
-                bax
+                <ChevronRight />
               </div>
-            </div>
+            </a>
           ))
         }
         

@@ -4,5 +4,6 @@ export interface User {
   email: string
   avatar: string
   role: string
+  giftPremiumCount: number
   isWarning: boolean
 }

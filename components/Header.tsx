@@ -176,7 +176,7 @@ const Header = () => {
                                 link.content
                                 ? <div className='flex flex-col ml-2'>
                                     <span className='text-xs'>{link.title}</span>
-                                    <span className='font-semibold'>{link.content}</span>
+                                    <span className='font-semibold break-all'>{link.content}</span>
                                   </div>
                                 :<span className='ml-2'>{link.title}</span>
                               }
