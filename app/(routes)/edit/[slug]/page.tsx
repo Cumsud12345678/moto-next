@@ -265,7 +265,7 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
   return (
     <div>
       <div className="flex flex-col w-full mt-10 lg:mt-30 lg:container mx-auto lg:max-w-187.5">
-        <div className="lg:rounded-3xl lg:p-15 lg:bg-white flex flex-col lg:gap-8 gap-2 bg-[#f5f5f5]">
+        <div className="lg:rounded-3xl lg:p-15 lg:bg-white flex flex-col lg:gap-8 gap-2 bg-[#f5f5f5] mb-20">
 
           <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">
             <div>
@@ -321,7 +321,7 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
           {/* Sekil */}
           <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">
             <div>
-              <h3 className="text-xl mb-3">Şəkillər *</h3>
+              <h3 className="text-xl mb-3">Şəkillər və Video *</h3>
               <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {images.map((img, index) => (
                   <div
@@ -370,63 +370,66 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                 </div>
 
               </div>
-              <p className="text-md mt-4">Şəkillərin sırasını dəyişmək üçün sol yuxarı küncdəki tutacaqdan sürükləyin. Minimum 1, maksimum 10 şəkil</p>
+              <p className="text-md mt-3">Şəkillərin sırasını dəyişmək üçün sol yuxarı küncdəki tutacaqdan sürükləyin. Minimum 1, maksimum 10 şəkil</p>
 
-              <p>Video əlavə et</p>
-              {
-                oldVideo
-                  ?
-                  <div className='relative'>
-                    <button
-                      onClick={handleDeleteOldVidoe}
-                      className='absolute top-0 right-0 m-3 bg-red-500 p-2 rounded-full'
-                    >
-                      <Xmark className='size-5 text-white' />
-                    </button>
-                    <video
-                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${oldVideo}`}
-                      controls
-                      playsInline
-                      className="aspect-video w-full object-cover"
-                    />
-                  </div>
-                  :
-                  videoPreview
+              <div className='mt-5'>
+                <p>Video əlavə et</p>
+                {
+                  oldVideo
                     ?
                     <div className='relative'>
                       <button
-                        onClick={handleDeleteVidoe}
+                        onClick={handleDeleteOldVidoe}
                         className='absolute top-0 right-0 m-3 bg-red-500 p-2 rounded-full'
                       >
                         <Xmark className='size-5 text-white' />
                       </button>
                       <video
-                        src={videoPreview}
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${oldVideo}`}
                         controls
                         playsInline
                         className="aspect-video w-full object-cover"
                       />
                     </div>
                     :
-                    <div
-                      onClick={handleVideoClick}
-                      className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center"
-                    >
+                    videoPreview
+                      ?
+                      <div className='relative'>
+                        <button
+                          onClick={handleDeleteVidoe}
+                          className='absolute top-0 right-0 m-3 bg-red-500 p-2 rounded-full'
+                        >
+                          <Xmark className='size-5 text-white' />
+                        </button>
+                        <video
+                          src={videoPreview}
+                          controls
+                          playsInline
+                          className="aspect-video w-full object-cover"
+                        />
+                      </div>
+                      :
+                      <div
+                        onClick={handleVideoClick}
+                        className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center"
+                      >
 
-                      <span className="text-sm text-gray-500">
-                        Kliklə və video seç
-                      </span>
+                        <span className="text-sm text-gray-500">
+                          Kliklə və video seç
+                        </span>
 
-                      <input
-                        ref={inputRef}
-                        type="file"
-                        accept="video/*"
-                        hidden
-                        onChange={handleVideoChange}
-                      />
-                    </div>
-                  
-              }
+                        <input
+                          ref={inputRef}
+                          type="file"
+                          accept="video/*"
+                          hidden
+                          onChange={handleVideoChange}
+                        />
+                      </div>
+
+                }
+              </div>
+              
             </div>
           </div>
 

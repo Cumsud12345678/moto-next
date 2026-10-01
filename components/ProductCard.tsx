@@ -25,6 +25,8 @@ const ProductCard = ({product}: {product: CardType}) => {
     )
   }
 
+  console.log(product)
+
   return (
     <Link
       href={`/elanlar/${product.make.label}-${product.model.label}-${product._id}`}

@@ -36,7 +36,7 @@ export async function getListing(listingId: string) {
 }
 
 export async function updateListing(listingId: string, formData: FormData) {
-  const res = await api.put(`api/listings/${listingId}`, formData, {
+  const res = await api.put(`/api/listings/${listingId}`, formData, {
     withCredentials: true,
     headers: {
       // axios instance-in default 'application/json' header-i FormData ilə toqquşur —
