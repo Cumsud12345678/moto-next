@@ -265,7 +265,7 @@ const NewPage = () => {
         formStep === 'start'
         &&
           <div className="flex flex-col w-full mt-10 lg:mt-30 lg:container mx-auto lg:max-w-187.5">
-            <div className="lg:rounded-3xl lg:p-15 lg:bg-white flex flex-col lg:gap-8 gap-2 bg-[#f5f5f5]">
+            <div className="lg:rounded-3xl lg:p-15 lg:bg-white flex flex-col lg:gap-8 gap-2 bg-[#f5f5f5] mb-20">
 
               <Fragment>
                 <div className="flex items-center justify-center p-4 bg-white mt-3 lg:mt-0">
