@@ -34,8 +34,8 @@ const FilterModal = ({open, data}: FilterModalProps) => {
     setModel,
     used,
     setUsed,
-    city,
-    setCity,
+    region,
+    setRegion,
     
     minPrice,
     setMinPrice,
@@ -79,8 +79,8 @@ const FilterModal = ({open, data}: FilterModalProps) => {
     color,
     setColor,
 
-    equipment,
-    addEquipment,
+    // equipment,
+    // addEquipment,
 
     setElement,
     document,
@@ -109,7 +109,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
 
   const [makeModalOpen, setMakeModalOpen] = useState<boolean>(false)
   const [modelModalOpen, setModelModalOpen] = useState<boolean>(false)
-  const [cityModalOpen, setCityModalOpen] = useState<boolean>(false)
+  const [regionModalOpen, setRegionModalOpen] = useState<boolean>(false)
 
   const selectedMake = (id: string) => {
     setMake(id)
@@ -123,9 +123,9 @@ const FilterModal = ({open, data}: FilterModalProps) => {
     setModelModalOpen(false)
   }
 
-  const selectedCity = (id: string) => {
-    setCity(id)
-    setCityModalOpen(false)
+  const selectedRegion = (id: string) => {
+    setRegion(id)
+    setRegionModalOpen(false)
   }
 
   if(!metadata) {
@@ -172,7 +172,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
                       <span className='text-gray-400 text-[13px] absolute top-2'>Marka</span>
                       <span className='text-[17px] mt-4'>{metadata?.makes.find((item: Default) => item._id === make)?.label}</span>
                     </div>
-                     : <span className='text-[17px]'>Butun markalar</span>
+                     : <span className='text-[17px]'>Bütün markalar</span>
                   }
                 </span>
                 <button>
@@ -193,9 +193,9 @@ const FilterModal = ({open, data}: FilterModalProps) => {
                     ? 
                     <div className='flex flex-col'>
                       <span className='text-gray-400 text-[13px] absolute top-2'>Model</span>
-                      <span className='text-[17px] mt-4'>{model ? metadata?.models.find((item: Default) => item._id === model)?.label : 'Butun modeller'}</span>
+                      <span className='text-[17px] mt-4'>{model ? metadata?.models.find((item: Default) => item._id === model)?.label : 'Bütün modeller'}</span>
                     </div>
-                     : <span className='text-[17px]'>Butun modeller</span>
+                     : <span className='text-[17px]'>Bütün modeller</span>
                   }
                 </span>
                 <button>
@@ -208,23 +208,23 @@ const FilterModal = ({open, data}: FilterModalProps) => {
               </div>
               <div className='flex items-center justify-between border-b relative'>
                 <span 
-                  onClick={() => setCityModalOpen(true)} 
+                  onClick={() => setRegionModalOpen(true)} 
                   className='h-14 w-full flex items-center'
                 >
                   {
-                    city 
+                    region 
                     ? 
                     <div className='flex flex-col'>
                       <span className='text-gray-400 text-[13px] absolute top-2'>Region</span>
-                      <span className='text-[17px] mt-4'>{city ? metadata?.cities.find((item: Default) => item._id === city)?.label : 'Butun regionlar'}</span>
+                      <span className='text-[17px] mt-4'>{region ? metadata?.cities.find((item: Default) => item._id === region)?.label : 'Bütün regionlar'}</span>
                     </div>
-                     : <span className='text-[17px]' onClick={() => setCityModalOpen(true)}>Butun regionlar</span>
+                     : <span className='text-[17px]' onClick={() => setRegionModalOpen(true)}>Bütün regionlar</span>
                   }
                 </span>
                 <button>
                   {
-                    city 
-                    ? <Xmark onClick={() => setCity('')} />
+                    region 
+                    ? <Xmark onClick={() => setRegion('')} />
                     : <ChevronRight />
                   }
                 </button>
@@ -237,7 +237,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Qiymet</h3>
+            <h3 className='text-xl'>Qiymət</h3>
             <div>
               <TwoInputGroup 
                 stateMin={minPrice} 
@@ -248,7 +248,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
               />
             </div>
             <div className='flex items-center justify-between border-b py-2'>
-              Senedli
+              Sənədli
               <CustomSwitch checked={document} setChecked={setDocument} />
             </div>
             <div className='flex items-center justify-between border-b py-2'>
@@ -266,20 +266,20 @@ const FilterModal = ({open, data}: FilterModalProps) => {
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Ban novu</h3>
+            <h3 className='text-xl'>Ban növü</h3>
             <ButtonGroup data={metadata.categories} state={category} setState={setCategory} wrap={false} isNew={false} />
           </div>
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Muherrik</h3>
+            <h3 className='text-xl'>Mühərrik</h3>
             <ButtonGroup data={metadata.fuelTypes} state={fuelType} setState={setFuelType} wrap={false} isNew={false} />
           </div>
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Suretler qutusu</h3>
+            <h3 className='text-xl'>Sürətlər qutusu</h3>
             <ButtonGroup data={metadata.transmissions} state={transmission} setState={setTransmission} wrap={false} isNew={false} />
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Hecm</h3>
+            <h3 className='text-xl'>Həcm</h3>
             <div className='flex flex-col'>
               <div className='flex items-center gap-3'>
                 <span className='text-[17px]'>min.</span>
@@ -325,7 +325,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Muherrikin gucu</h3>
+            <h3 className='text-xl'>Mühərrikin gücü</h3>
             <div>
               <TwoInputGroup 
                 stateMin={minPower} 
@@ -338,7 +338,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Buraxilis ili</h3>
+            <h3 className='text-xl'>Buraxılış ili</h3>
             <div className='flex flex-col'>
               <div className='flex items-center gap-3'>
                 <span className='text-[17px]'>min.</span>
@@ -384,7 +384,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Yuruyush</h3>
+            <h3 className='text-xl'>Yürüyüş</h3>
             <div>
               <TwoInputGroup 
                 stateMin={minDistance} 
@@ -397,14 +397,14 @@ const FilterModal = ({open, data}: FilterModalProps) => {
           </div>
 
           <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
-            <h3 className='text-xl'>Reng</h3>
+            <h3 className='text-xl'>Rəng</h3>
             <ButtonGroup data={metadata.colors} state={color} setState={setColor} wrap={false} isNew={false} />
           </div>
 
-          <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
+          {/* <div className='p-3 rounded-lg flex flex-col gap-2 bg-white'>
             <h3 className='text-xl'>Techizat</h3>
             <CheckboxButtons data={metadata.equipments} ids={equipment} onClick={addEquipment} />
-          </div>
+          </div> */}
 
         </div>
 
@@ -434,10 +434,10 @@ const FilterModal = ({open, data}: FilterModalProps) => {
         />
 
         <DialogModal
-          open={cityModalOpen}
-          setOpen={setCityModalOpen}
-          state={city}
-          setState={selectedCity}
+          open={regionModalOpen}
+          setOpen={setRegionModalOpen}
+          state={region}
+          setState={selectedRegion}
           data={metadata.cities}
           label='Region'
         />

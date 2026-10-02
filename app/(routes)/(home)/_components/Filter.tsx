@@ -46,8 +46,8 @@ const Filter = ({ initialMetadata }: Props) => {
     setModel,
     used,
     setUsed,
-    city,
-    setCity,
+    region,
+    setRegion,
 
     minPrice,
     setMinPrice,
@@ -91,9 +91,9 @@ const Filter = ({ initialMetadata }: Props) => {
     color,
     setColor,
 
-    equipment,
-    setEquipment,
-    addEquipment,
+    // equipment,
+    // setEquipment,
+    // addEquipment,
 
     document,
     setDocument,
@@ -212,7 +212,7 @@ const Filter = ({ initialMetadata }: Props) => {
     if (modelId) params.set('model', modelId);
     if (categoryId) params.set('category', categoryId);
     if (typeof used !== 'object') params.set('used', used ? '1' : '0');
-    if (city) params.set('city', city);
+    if (region) params.set('region', region);
 
     if (minPrice) params.set('minPrice', String(minPrice));
     if (maxPrice) params.set('maxPrice', String(maxPrice));
@@ -237,7 +237,7 @@ const Filter = ({ initialMetadata }: Props) => {
     if (minPower) params.set('minPower', String(minPower));
     if (maxPower) params.set('maxPower', String(maxPower));
 
-    if (equipment.length) params.set('equipment', equipment.join(','));
+    // if (equipment.length) params.set('equipment', equipment.join(','));
 
     router.push(`/motors?${params.toString()}`)
   }
@@ -248,7 +248,7 @@ const Filter = ({ initialMetadata }: Props) => {
       setMake(searchParams.get('make') || '')
       setModel(searchParams.get('model') || '')
       setCategory(searchParams.get('category') || '')
-      setCity(searchParams.get('city') || '')
+      setRegion(searchParams.get('region') || '')
 
       setMinPrice(Number(searchParams.get('minPrice')) || 0)
       setMaxPrice(Number(searchParams.get('maxPrice')) || 0)
@@ -276,12 +276,41 @@ const Filter = ({ initialMetadata }: Props) => {
       setMinPower(Number(searchParams.get('minPower')) || 0)
       setMaxPower(Number(searchParams.get('maxPower')) || 0)
 
-      const equipmentParam = searchParams.get('equipment')
-      setEquipment(equipmentParam ? equipmentParam.split(',') : [])
+      // const equipmentParam = searchParams.get('equipment')
+      // setEquipment(equipmentParam ? equipmentParam.split(',') : [])
     }
   }, [pathname])
 
-  if(metadata) {
+
+  const resetFilterStates = () => {
+    setMake('')
+    setModel('')
+    setCategory('')
+    setRegion('')
+    setMinPrice(0)
+    setMaxPrice(0)
+    setUsed(null)
+    setCredit(false)
+    setBarter(false)
+    setDocument(false)
+    setFuelType('')
+    setTransmission('')
+    setColor('')
+    setMinVolume(0)
+    setMaxVolume(0)
+    setMinDistance(0)
+    setMaxDistance(0)
+    setMinYear(0)
+    setMaxYear(0)
+    setMinPower(0)
+    setMaxPower(0)
+    // setEquipment([])
+  }
+
+
+  if(!metadata) {
+    return null
+  }
   
   return (
     <div className="container mx-auto max-w-255">
@@ -292,7 +321,7 @@ const Filter = ({ initialMetadata }: Props) => {
           <SearchAndSelect data={metadata.makes} state={make} setState={setMake} label="Marka" />
           <SearchAndSelect data={filteredModels} state={model} setState={setModel} label="Model" />
           <ThreeButton data={usedTypes} state={used} setState={setUsed} />
-          <SearchAndSelect data={metadata.cities} state={city} setState={setCity} label="Weher" />
+          <SearchAndSelect data={metadata.cities} state={region} setState={setRegion} label="Region" />
         </div>
 
         {/* 2-Cİ SƏTİR */}
@@ -379,10 +408,10 @@ const Filter = ({ initialMetadata }: Props) => {
                 </div>
               </div>
 
-              <div className='rounded-lg flex flex-col gap-2 pb-5'>
+              {/* <div className='rounded-lg flex flex-col gap-2 pb-5'>
                 <h3 className='text-xl'>Techizat</h3>
                 <CheckboxButtons data={metadata.equipments} ids={equipment} onClick={addEquipment} />
-              </div>
+              </div> */}
 
             </div>
           </div>
@@ -398,6 +427,7 @@ const Filter = ({ initialMetadata }: Props) => {
 
             <div className="flex gap-4 shrink-0">
               <button
+                onClick={resetFilterStates}
                 className="flex items-center text-orange-400 text-lg"
               >
                 Sifirla
@@ -412,7 +442,7 @@ const Filter = ({ initialMetadata }: Props) => {
                 onClick={() => setFilterOpen(prev => !prev)}
                 className="bg-blue-500 text-white p-2.5 px-4 rounded-lg cursor-pointer shrink-0 shadow flex items-center gap-2"
               >
-                Filter
+                Daha çox
               </button>
             </div>
           </div>
@@ -449,7 +479,6 @@ const Filter = ({ initialMetadata }: Props) => {
     </div>
   
   )
-  }
 }
 
 export default Filter

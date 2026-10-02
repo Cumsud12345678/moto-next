@@ -6,15 +6,16 @@ import { ProductCard as CardType } from "@/types/product"
 
 interface ProductListProps {
   data: CardType[]
+  infinite?: boolean // default true -> home üçün
 }
 
 const PAGE_SIZE = 20
 
-const ProductList = ({ data }: ProductListProps) => {
+const ProductList = ({ data, infinite = true }: ProductListProps) => {
   const [products, setProducts] = useState<CardType[]>(data)
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [hasMore, setHasMore] = useState(true)
+  const [hasMore, setHasMore] = useState(infinite && data.length >= PAGE_SIZE)
 
   const loadMoreRef = useRef<HTMLDivElement>(null)
 
@@ -22,11 +23,11 @@ const ProductList = ({ data }: ProductListProps) => {
   useEffect(() => {
     setProducts(data)
     setPage(1)
-    setHasMore(data.length >= PAGE_SIZE)
-  }, [data])
+    setHasMore(infinite && data.length >= PAGE_SIZE)
+  }, [data, infinite])
 
   const loadMore = useCallback(async () => {
-    if (loading || !hasMore) return
+    if (!infinite || loading || !hasMore) return
 
     setLoading(true)
 
@@ -74,7 +75,7 @@ const ProductList = ({ data }: ProductListProps) => {
     } finally {
       setLoading(false)
     }
-  }, [page, loading, hasMore])
+  }, [page, loading, hasMore, infinite])
 
   useEffect(() => {
     const element = loadMoreRef.current
@@ -119,30 +120,18 @@ const ProductList = ({ data }: ProductListProps) => {
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 items-center">
         {products.map(product => (
-          <ProductCard
-            key={product._id}
-            product={product}
-          />
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
 
-      {/* Infinite scroll trigger */}
-      <div
-        ref={loadMoreRef}
-        className="h-20 flex items-center justify-center"
-      >
-        {loading && (
-          <p className="text-sm text-gray-500">
-            Yüklənir...
-          </p>
-        )}
-
-        {!loading && !hasMore && products.length > 0 && (
-          <p className="text-sm text-gray-400">
-            Bütün elanlar göstərildi
-          </p>
-        )}
-      </div>
+      {infinite && (
+        <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+          {loading && <p className="text-sm text-gray-500">Yüklənir...</p>}
+          {!loading && !hasMore && products.length > 0 && (
+            <p className="text-sm text-gray-400">Bütün elanlar göstərildi</p>
+          )}
+        </div>
+      )}
     </>
   )
 }

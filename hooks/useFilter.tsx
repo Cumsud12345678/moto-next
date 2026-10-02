@@ -5,7 +5,7 @@ export const useFilter = () => {
 
   const [make, setMake] = useState<string>('')
   const [model, setModel] = useState<string>('')
-  const [city, setCity] = useState<string>('')
+  const [region, setRegion] = useState<string>('')
   const [category, setCategory] = useState<string>('')
 
   const [used, setUsed] = useState<boolean | null>(null)
@@ -27,17 +27,17 @@ export const useFilter = () => {
   const [minPower, setMinPower] = useState<number>(0)
   const [maxPower, setMaxPower] = useState<number>(0)
   const [color, setColor] = useState<string>('')
-  const [equipment, setEquipment] = useState<Array<string>>([])
+  // const [equipment, setEquipment] = useState<Array<string>>([])
   const years = Array.from({ length: 2026-1950 },(_, index) => 2026 - index)
   const volumes = Array.from({ length: 3000/50 + 1 }, (_, index) => (index + 1) * 50)
-  const addEquipment = (id: string) => {
-    const shalter = equipment.find((eq: string) => eq === id)
-    if(shalter) {
-      setEquipment(equipment.filter((eq: string) => eq !== id))
-    }else {
-      setEquipment([...equipment, id])
-    }
-  }
+  // const addEquipment = (id: string) => {
+  //   const shalter = equipment.find((eq: string) => eq === id)
+  //   if(shalter) {
+  //     setEquipment(equipment.filter((eq: string) => eq !== id))
+  //   }else {
+  //     setEquipment([...equipment, id])
+  //   }
+  // }
   const setElement = (key: React.Dispatch<React.SetStateAction<string>>, value: string) => {
     key(value)
   }
@@ -52,8 +52,8 @@ export const useFilter = () => {
     used,
     setUsed,
 
-    city,
-    setCity,
+    region,
+    setRegion,
 
     document,
     setDocument,
@@ -103,9 +103,9 @@ export const useFilter = () => {
     color,
     setColor,
 
-    equipment,
-    setEquipment,
-    addEquipment,
+    // equipment,
+    // setEquipment,
+    // addEquipment,
 
     setElement,
   }
