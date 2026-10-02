@@ -65,8 +65,8 @@ const Step2 = ({
     equipment,
     addEquipment,
 
-    city,
-    setCity,
+    region,
+    setRegion,
 
   } = filterState
 
@@ -302,7 +302,7 @@ const Step2 = ({
       <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-5 bg-white p-5">
         <h3 className="text-xl">Şəhər və Qiymət</h3>
         <div>
-          <SearchAndSelect data={metadata.cities} state={city} setState={setCity} label='Region' />
+          <SearchAndSelect data={metadata.cities} state={region} setState={setRegion} label='Region' />
         </div>
 
         <div>

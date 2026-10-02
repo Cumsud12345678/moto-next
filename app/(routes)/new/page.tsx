@@ -72,7 +72,7 @@ const NewPage = () => {
     model,
     setModel,
     used,
-    city,
+    region,
     credit,
     barter,
     fuelType,
@@ -204,7 +204,7 @@ const NewPage = () => {
     formData.append('power', String(power))
     formData.append('mileage', String(distance))
     formData.append('description', description)
-    formData.append('region', city) // diqqət #6-ya bax
+    formData.append('region', region) // diqqət #6-ya bax
     formData.append('phone', phone.replace(/\s/g, '')) // diqqət #5-ə bax
 
     if (used !== null) formData.append('used', String(used))
