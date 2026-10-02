@@ -1,7 +1,4 @@
-// _components/Ads.tsx
-
 'use client'
-
 import { api } from '@/lib/axios'
 import { useState } from 'react'
 

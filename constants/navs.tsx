@@ -6,17 +6,17 @@ import {PersonFill} from '@gravity-ui/icons';
 
 export const navs: Nav[] = [
   {
-    text: "Ana sehife",
+    text: "Ana səhifə",
     icon: HouseFill,
     path: '/'
   },
   {
-    text: "Secilmisler",
+    text: "Seçilmişlər",
     icon: Heart,
     path: '/bookmarks'
   },
   {
-    text: "Elave et",
+    text: "Əlavə et",
     icon: Plus,
     path: '/new',
     special: true

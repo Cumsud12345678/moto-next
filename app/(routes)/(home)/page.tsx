@@ -7,6 +7,7 @@ import { getMetadata } from '@/lib/api/metadata';
 import { cookies } from 'next/headers';
 import Ads from './_components/Ads';
 import { serverApi } from '@/lib/axios-server';
+import HeaderTab from './_components/HeaderTab';
 // import { getListings } from '@/lib/api/listings';
 
 type Adsense = {
@@ -78,14 +79,7 @@ const HomePage = async () => {
       </div> */}
 
       <div className='bg-[#ebedf3] px-3 pb-3 flex flex-row gap-3 lg:hidden'>
-        <div className='bg-white pl-3 py-4 rounded-xl w-full relative overflow-hidden'>
-          <span className='font-semibold text-[15px] text-red-500'>Ehtiyyat hisseleri</span>
-          <img src="/hisseler2.png" alt="" className='size-50 object-contain absolute left-3 -top-17 opacity-70' />
-        </div>
-        <div className='bg-white pl-3 py-4 rounded-xl w-full relative overflow-hidden'>
-          <span className='font-semibold text-[15px] text-red-500'>Qruplar</span>
-          <img src="/group.png" alt="" className='size-30 object-contain absolute -right-6 -top-7 opacity-80' />
-        </div>
+        <HeaderTab />
       </div>
 
       {

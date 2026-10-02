@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { api } from '@/lib/axios';
 import { logout } from '@/redux/slices/userSlice';
+import { toast } from './ui/toast';
 
 const Header = () => {
 
@@ -136,8 +137,6 @@ const Header = () => {
         }
       </div>
 
-
-
       {/* Munyu */}
       <Drawer swipeDirection='left' open={modalOpen} onOpenChange={setModalOpen}>
         <DrawerContent className='z-70'>
@@ -159,8 +158,15 @@ const Header = () => {
                   menuLinks.map((link: Menu, index) => {
                     const Icon = link.icon
                     return (
-                      <Link 
-                        href={link.url} 
+                      <Link
+                        onClick={() => {
+                          if(link.active){
+                            setModalOpen(false)
+                          }else {
+                            toast.add({type: "warning", description: link.toastMessage})
+                          }
+                        }}
+                        href={link.url ? link.url : '#'}
                         key={index}
                         className={`
                           ${link.content && link.content === 'Çox yaxında...' ? 'bg-yellow-200' : 'bg-[#f5f5f5]'}
