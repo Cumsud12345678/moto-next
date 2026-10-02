@@ -16,6 +16,7 @@ import CustomSwitch from '@/components/buttons/CustomSwitch'
 import ButtonGroup from '@/components/buttons/ButtonGroup'
 import CheckboxButtons from '@/components/buttons/CheckboxButtons'
 import { useMetadata } from '@/hooks/useMetadata'
+import { useRouter } from 'next/navigation'
 
 
 interface FilterModalProps {
@@ -26,6 +27,7 @@ interface FilterModalProps {
 const FilterModal = ({open, data}: FilterModalProps) => {
   
   const metadataHook = useMetadata()
+  const router = useRouter()
 
   const {
     make,
@@ -126,6 +128,46 @@ const FilterModal = ({open, data}: FilterModalProps) => {
   const selectedRegion = (id: string) => {
     setRegion(id)
     setRegionModalOpen(false)
+  }
+
+
+  const applyFilter = () => {
+    const params = new URLSearchParams()
+
+    if (make) params.set('make', make);
+    if (model) params.set('model', model);
+    if (category) params.set('category', category);
+    if (typeof used !== 'object') params.set('used', used ? '1' : '0');
+    if (region) params.set('region', region);
+
+    if (minPrice) params.set('minPrice', String(minPrice));
+    if (maxPrice) params.set('maxPrice', String(maxPrice));
+
+    if (document) params.set('document', '1');
+    if (credit) params.set('credit', '1');
+    if (barter) params.set('barter', '1');
+
+    if (fuelType) params.set('fuelType', fuelType);
+    if (transmission) params.set('transmission', transmission);
+    if (color) params.set('color', color);
+
+    if (minVolume) params.set('minVolume', String(minVolume));
+    if (maxVolume) params.set('maxVolume', String(maxVolume));
+
+    if (minDistance) params.set('minDistance', String(minDistance));
+    if (maxDistance) params.set('maxDistance', String(maxDistance));
+
+    if (minYear) params.set('minYear', String(minYear));
+    if (maxYear) params.set('maxYear', String(maxYear));
+
+    if (minPower) params.set('minPower', String(minPower));
+    if (maxPower) params.set('maxPower', String(maxPower));
+
+    // if (equipment.length) params.set('equipment', equipment.join(','));
+
+    // window.history.back()
+
+    router.push(`/motors?${params.toString()}`)
   }
 
   if(!metadata) {
@@ -410,7 +452,7 @@ const FilterModal = ({open, data}: FilterModalProps) => {
 
         {/* Şəffaf konteyner - yalnız padding üçün, arxası görünür */}
         <div className='shrink-0 px-3 pb-3'>
-          <button className='bg-green-500 p-3 w-full rounded-lg text-white shadow-lg'>
+          <button onClick={applyFilter} className='bg-green-500 p-3 w-full rounded-lg text-white shadow-lg'>
             Axtar
           </button>
         </div>

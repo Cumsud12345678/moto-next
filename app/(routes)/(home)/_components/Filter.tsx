@@ -12,19 +12,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import TwoInputGroup from './TwoInputGroup'
 import CustomSwitch from '@/components/buttons/CustomSwitch'
 import TwoSearchAndSelect from '@/components/inputs/numberType/TwoSearchAndSelect'
-import CheckboxButtons from '@/components/buttons/CheckboxButtons'
-import { useMetadata } from '@/hooks/useMetadata'
-import { api } from '@/lib/axios'
-
-
-async function getProducts() {
-  const res = await api.get(
-    '/api/listings',
-    { withCredentials: true }
-  )
-}
-
-getProducts()
 
 interface Props {
   initialMetadata: Metadata
@@ -90,10 +77,6 @@ const Filter = ({ initialMetadata }: Props) => {
 
     color,
     setColor,
-
-    // equipment,
-    // setEquipment,
-    // addEquipment,
 
     document,
     setDocument,
@@ -167,21 +150,9 @@ const Filter = ({ initialMetadata }: Props) => {
 
   const openFilter = hash == '#filter' && isMobile
 
-
   useEffect(() => {
-    const updateHash = () => {
-      setHash(window.location.hash)
-    }
-
-    updateHash()
-
-    window.addEventListener('hashchange', updateHash)
-
-    return () => {
-      window.removeEventListener('hashchange', updateHash)
-    }
-    
-  }, [])
+    setHash(window.location.hash)
+  }, [pathname, searchParams])
 
   const selectedMobileMake = (id: string) => {
     setMake(id)
