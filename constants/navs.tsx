@@ -19,11 +19,13 @@ export const navs: Nav[] = [
     text: "Əlavə et",
     icon: Plus,
     path: '/new',
-    special: true
+    special: true,
+    message: 'Video elan'
   },
   {
     text: "Profil",
     icon: PersonFill,
-    path: '/profile'
+    path: '/profile',
+    message: 'Pulsuz vip'
   }
 ]

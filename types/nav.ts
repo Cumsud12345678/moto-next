@@ -4,5 +4,6 @@ export interface Nav {
   text: string,
   icon: ComponentType<SVGProps<SVGSVGElement>>,
   path: string,
-  special?: boolean
+  special?: boolean,
+  message?: string
 }

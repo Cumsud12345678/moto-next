@@ -113,11 +113,18 @@ export default function Footer({ makes }: FooterProps) {
                   <div
                     className={`
                     flex h-10.5 w-10.5 items-center justify-center
-                    rounded-full transition-colors
+                    rounded-full transition-colors relative
                     ${iconColorClasses}
                   `}
                   >
                     <Icon className='size-6' />
+                    {
+                      item.message
+                      &&
+                      <div className='absolute text-[8px] -top-2 -right-5 bg-orange-500 p-1 rounded-full whitespace-nowrap'>
+                        <span className='text-white font-semibold'>{item.message}</span>
+                      </div>
+                    }
                   </div>
 
                   <span

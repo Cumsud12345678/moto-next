@@ -78,7 +78,7 @@ const HomePage = async () => {
 
       </div> */}
 
-      <div className='bg-[#ebedf3] px-3 pb-3 flex flex-row gap-3 lg:hidden'>
+      <div className='bg-[#ebedf3] px-3 pb-3 flex flex-row gap-3 lg:hidden relative'>
         <HeaderTab />
       </div>
 
