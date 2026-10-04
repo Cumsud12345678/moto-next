@@ -215,52 +215,29 @@ const NewPage = () => {
 
   // ADDIM 3: elanı yarat
   const submitListing = async () => {
-
     const formData = new FormData()
 
-    try {
-      if (video) {
+    // Video varsa əvvəlcə onu yükləyirik (yalnız bir dəfə)
+    if (video) {
+      try {
         const { uploadUrl, key, listingId } = await createVideoUrl()
+
         const res = await fetch(uploadUrl, {
           method: 'PUT',
           body: video,
           headers: { 'Content-Type': video.type },
         })
         if (!res.ok) throw new Error('video upload failed')
-        formData.append('listingId', listingId)
-        formData.append('video', key)
-      }
-    } catch {
-      toast.add({ type: 'error', description: 'Video yüklənmədi.', priority: 'high' })
-      setLoading(false)
-      return
-    }
 
-    let uploadedVideoKey: string | null = null
-    let uploadedListingId: string | null = null
-
-    // Video varsa once onu upload edirik
-    if(video) {
-      const { uploadUrl, key, listingId } = await createVideoUrl()
-      uploadedListingId = listingId
-      uploadedVideoKey = key
-
-      // burda sekili r2 ye gonderirik
-      await fetch(uploadUrl, {
-        method: "PUT",
-        body: video,
-        headers: {
-          "Content-Type": video.type
-        }
-      })
-
-      if(uploadedListingId && uploadedVideoKey) {
-        formData.append('listingId', uploadedListingId)
-        formData.append('video', uploadedVideoKey)
+        formData.set('listingId', listingId)
+        formData.set('video', key)
+      } catch {
+        toast.add({ type: 'error', description: 'Video yüklənmədi.', priority: 'high' })
+        setLoading(false)
+        return
       }
     }
 
-    
     formData.append('price', String(price))
     formData.append('make', make)
     formData.append('model', model)
@@ -273,8 +250,8 @@ const NewPage = () => {
     formData.append('power', String(power))
     formData.append('mileage', String(distance))
     formData.append('description', description)
-    formData.append('region', region) // diqqət #6-ya bax
-    formData.append('phone', phone.replace(/\s/g, '')) // diqqət #5-ə bax
+    formData.append('region', region)
+    formData.append('phone', phone.replace(/\s/g, ''))
 
     if (used !== null) formData.append('used', String(used))
     if (credit !== null) formData.append('credit', String(credit))
