@@ -170,9 +170,14 @@ const Step2 = ({
         <div>
           <PlaceholderNumberInput state={power} setState={setPower} label='Guc a.g.' length={30} />
         </div>
-        <div>
-          <PlaceholderNumberInput state={distance} setState={setDistance} label='Yuruyush km.' length={30} />
-        </div>
+        {
+          !used
+          &&
+          <div>
+            <PlaceholderNumberInput state={distance} setState={setDistance} label='Yuruyush km.' length={30} />
+          </div>
+        }
+        
       </div>
 
       <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">

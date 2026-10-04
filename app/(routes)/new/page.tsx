@@ -121,10 +121,57 @@ const NewPage = () => {
   const verifyOtpMutation = useVerifyOtp()
   const createEventMutation = useCreateEvent()
 
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const warn = (description: string) => {
+    toast.add({ type: 'warning', description })
+    return false
+  }
+
+  const validateListing = (): boolean => {
+    const currentYear = new Date().getFullYear()
+
+    if (!make) return warn('Marka seçin')
+    if (!model) return warn('Model seçin')
+
+    if (!minYear || minYear < 1900 || minYear > currentYear)
+      return warn(`İl 1900 ilə ${currentYear} arasında olmalıdır`)
+
+    if (!minVolume || minVolume <= 0) return warn('Həcmi seçin')
+    if (!category) return warn('Ban növünü seçin')
+    if (!color) return warn('Rəngi seçin')
+    if (!fuelType) return warn('Mühərrik növünü seçin')
+    if (!transmission) return warn('Sürətlər qutusunu seçin')
+
+    if (power <= 0) return warn('Güc daxil edin')
+    if (!used && distance <= 0) return warn('Yürüş daxil edin')
+
+    if (description.length > 1000)
+      return warn('Məlumat maksimum 1000 simvol ola bilər')
+
+    if (images.length < 1) return warn('Ən azı 1 şəkil əlavə edin')
+    if (images.length > 10) return warn('Maksimum 10 şəkil əlavə edə bilərsiniz')
+
+    if (!region) return warn('Şəhər seçin')
+    if (!price || price <= 0) return warn('Qiymət 0-dan böyük olmalıdır')
+
+    const rawPhone = phone.replace(/\s/g, '')
+    if (rawPhone.length !== 9) return warn('Telefon nömrəsi 9 rəqəmdən ibarət olmalıdır')
+
+    if (!userData) {
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+      if (!emailOk) return warn('Düzgün email daxil edin')
+    }
+
+    return true
+  }
+
   // ADDIM 1: email+name+phone göndər, OTP istə (yalnız userData yoxdursa lazımdır)
   const handleSendOtp = () => {
+    if (!validateListing()) return
+    setLoading(true)
+
     if (userData) {
-      // İstifadəçi artıq login-dir — OTP-yə ehtiyac yoxdur, birbaşa elanı göndər
       submitListing()
       return
     }
@@ -132,27 +179,31 @@ const NewPage = () => {
     sendOtpMutation.mutate({ email }, {
       onSuccess: (data) => {
         if (data.success) {
-          toast.add({
-            type: 'success',
-            description: data.message
-          })
+          toast.add({ type: 'success', description: data.message })
           setFormStep('verify')
           setIsOldUser(data.isOldUser)
         }
+        setLoading(false)
       },
       onError: () => {
         toast.add({ type: 'error', description: 'Kod göndərilmədi.', priority: 'high' })
+        setLoading(false) // əvvəl yox idi, düymə donub qalırdı
       },
     })
   }
 
   // ADDIM 2: OTP-ni yoxla, uğur olsa elanı göndər
   const handleVerify = () => {
+    if (!isOldUser && name.trim().length < 2) return warn('Adınızı daxil edin')
+    if (otp.length < 6) return warn('6 rəqəmli kodu tam daxil edin')
+
     verifyOtpMutation.mutate({ email, name, otp }, {
       onSuccess: (data) => {
         if (data.success) {
           dispatch(setUser(data.user))
-          submitListing() // yalnız İNDİ elanı göndər
+          submitListing()
+        } else {
+          toast.add({ type: 'error', description: data.message ?? 'Kod yanlışdır.', priority: 'high' })
         }
       },
       onError: () => {
@@ -166,6 +217,24 @@ const NewPage = () => {
   const submitListing = async () => {
 
     const formData = new FormData()
+
+    try {
+      if (video) {
+        const { uploadUrl, key, listingId } = await createVideoUrl()
+        const res = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: video,
+          headers: { 'Content-Type': video.type },
+        })
+        if (!res.ok) throw new Error('video upload failed')
+        formData.append('listingId', listingId)
+        formData.append('video', key)
+      }
+    } catch {
+      toast.add({ type: 'error', description: 'Video yüklənmədi.', priority: 'high' })
+      setLoading(false)
+      return
+    }
 
     let uploadedVideoKey: string | null = null
     let uploadedListingId: string | null = null
@@ -218,10 +287,12 @@ const NewPage = () => {
     createEventMutation.mutate(formData, {
       onSuccess: (data) => {
         toast.add({ type: 'success', description: data.message })
+        setLoading(false)
         router.push('/')
       },
       onError: () => {
         toast.add({ type: 'error', description: 'Elan yaradıla bilmədi.', priority: 'high' })
+        setLoading(false)
       },
     })
   }
@@ -301,7 +372,7 @@ const NewPage = () => {
 
                     <Step3
                       setForm={handleSendOtp}          // 'setFormAndLogin' əvəzinə
-                      isSubmitting={sendOtpMutation.isPending}
+                      isSubmitting={loading}
                       userData={userData}
                       phone={phone}
                       setPhone={setPhone}
@@ -329,7 +400,7 @@ const NewPage = () => {
               <CardTitle>Verify your login</CardTitle>
               <CardDescription>
                 Enter the verification code we sent to your email address:{" "}
-                <span className="font-medium">m@example.com</span>.
+                <span className="font-medium">{email}</span>.
               </CardDescription>
             </CardHeader>
             <CardContent>

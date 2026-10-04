@@ -92,7 +92,7 @@ const Header = () => {
       `}
     >
 
-      <div className='flex flex-row items-center justify-between lg:p-3 p-2 px-3 container mx-auto max-w-250'>
+      <div className='flex flex-row items-center justify-between lg:p-2 lg:pt-4 p-2 px-3 container mx-auto max-w-250'>
         <button onClick={() => setModalOpen(!modalOpen)} className='p-1'>
           <Bars />
         </button>
@@ -116,7 +116,7 @@ const Header = () => {
                   key={nav.path}
                   href={nav.path}
                   className={`
-                    btn mx-4 relative !overflow-visible
+                    btn mx-4 relative overflow-visible!
                     ${(active && nav.path !== '/new') && 'bg-orange-400 text-white'} 
                     ${nav.path === '/new' && 'bg-green-500 text-white'}
                   `} 
@@ -131,12 +131,12 @@ const Header = () => {
                   {/* </button> */}
 
                   {
-                      nav.message
-                      &&
-                      <div className='absolute text-[8px] -top-2 -right-5 bg-orange-500 p-1 rounded-full whitespace-nowrap'>
-                        <span className='text-white font-semibold'>{nav.message}</span>
-                      </div>
-                    }
+                    nav.message
+                    &&
+                    <div className='absolute text-[10px] -top-2 -right-7 bg-orange-500 p-0.5 px-1.5 rounded-full whitespace-nowrap'>
+                      <span className='text-white font-semibold'>{nav.message}</span>
+                    </div>
+                  }
                 </Link>
                 
               )

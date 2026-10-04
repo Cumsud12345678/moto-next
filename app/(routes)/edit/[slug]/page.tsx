@@ -174,40 +174,55 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
   })
 
 
-  const submitListingUtilFunc = async () => {
-    if(video && data){
-      const { uploadUrl, key, listingId } = await authCreateVideoUrl(data._id)
+  const warn = (description: string) => {
+    toast.add({ type: 'warning', description })
+    return false
+  }
 
-      // burda sekili r2 ye gonderirik
-      await fetch(uploadUrl, {
-        method: "PUT",
-        body: video,
-        headers: {
-          "Content-Type": video.type
-        }
-      })
-      
-      submitListing(key)
-      
-    }else {
-      submitListing(oldVideo)
+  const validateListing = (): boolean => {
+    if (!price || price <= 0) return warn('Qiymət 0-dan böyük olmalıdır')
+
+    if (power <= 0) return warn('Güc 0 ola bilməz')
+    if (!used && distance <= 0) return warn('Yürüş 0 ola bilməz')
+
+    if (description.length > 1000)
+      return warn('Məlumat maksimum 1000 simvol ola bilər')
+
+    if (images.length < 1) return warn('Ən azı 1 şəkil olmalıdır')
+    if (images.length > 10) return warn('Maksimum 10 şəkil ola bilər')
+
+    return true
+  }
+
+  const submitListingUtilFunc = async () => {
+    if (!validateListing()) return
+
+    if (video && data) {
+      try {
+        setSubmitting(true)
+        const { uploadUrl, key } = await authCreateVideoUrl(data._id)
+
+        const res = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: video,
+          headers: { 'Content-Type': video.type },
+        })
+        if (!res.ok) throw new Error('video upload failed')
+
+        await submitListing(key)
+      } catch {
+        toast.add({ type: 'error', description: 'Video yüklənmədi.', priority: 'high' })
+        setSubmitting(false)
+      }
+    } else {
+      await submitListing(oldVideo)
     }
   }
 
   const [submitting, setSubmitting] = useState(false)
 
   const submitListing = async (videoKey: string) => {
-    // DEBUG: hər şəklin id/key/url-nə bax ki, filter niyə yanlış nəticə verdiyini görək
-    console.log('SUBMIT ANINDA IMAGES:', images.map((img) => ({
-      id: img.id,
-      key: img.key,
-      hasKey: !!img.key,
-      urlStart: img.url?.slice(0, 25),
-    })))
 
-    // Köhnə (DB-dən gələn) şəkillərin hamısında `key` var — yenilərində yoxdur.
-    // Filtri resolved URL-ə görə yox, məhz bu `key`-in mövcudluğuna görə aparırıq,
-    // çünki backend keepImageKeys-i R2-dəki raw key ilə müqayisə edir (resolved URL ilə yox).
     const keepImageKeys = images
       .filter((img) => !!img.key)
       .map((img) => img.key as string)
@@ -234,19 +249,14 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
 
     try {
       setSubmitting(true)
-      // NOT: `@/lib/api/listings` modulunda `updateListing(slug, formData)` funksiyası
-      // olmalıdır və PUT /api/listings/:listingId endpoint-inə multipart/form-data
-      // sorğusu göndərməlidir. Adı fərqlidirsə, buradakı import/çağırışı ona uyğunlaşdır.
       const data = await updateListing(slug, formData)
 
+      toast.add({ type: 'success', description: data.message })
+    } catch (err: any) {
       toast.add({
-        type: 'success',
-        description: data.message,
-      })
-    } catch (err) {
-      toast.add({
-        type: 'warning',
-        description: 'Elan yenilənərkən xəta baş verdi',
+        type: 'error',
+        description: err?.response?.data?.message ?? 'Elan yenilənərkən xəta baş verdi',
+        priority: 'high',
       })
     } finally {
       setSubmitting(false)
@@ -296,9 +306,13 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             <div>
               <PlaceholderNumberInput state={power} setState={setPower} label='Guc a.g.' length={30} />
             </div>
-            <div>
-              <PlaceholderNumberInput state={distance} setState={setDistance} label='Yuruyush km.' length={30} />
-            </div>
+            {
+              !used
+              &&
+              <div>
+                <PlaceholderNumberInput state={distance} setState={setDistance} label='Yuruyush km.' length={30} />
+              </div>
+            }
           </div>
 
           <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">

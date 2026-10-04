@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 import ProductList from '@/components/ProductList'
 import Link from 'next/link'
 import { serverApi } from '@/lib/axios-server'
+import type { Metadata } from "next";
 
 async function getProduct(id: string): Promise<ProductDescription | null> {
   try {
@@ -39,7 +40,104 @@ async function getSimilars(id: string): Promise<ProductCard[] | []> {
   }
 }
 
-const ElanlarPage = async ({params}: {params: Promise<{slug: string}>}) => {
+interface PageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  const id = slug.split("-").pop();
+
+  if (!id) {
+    return {
+      title: "Elan tapılmadı | Motoelan",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const product = await getProduct(id);
+
+  if (!product) {
+    return {
+      title: "Elan tapılmadı | Motoelan",
+      description: "Axtardığınız motosiklet elanı tapılmadı.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const make = product.make?.label || "";
+  const model = product.model?.label || "";
+
+  const title = `${make} ${model} — ${product.price} AZN | Motoelan`;
+
+  const description =
+    product.description
+      ?.replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 160) ||
+    `${make} ${model} motosiklet elanı. ${product.price} AZN.`;
+
+  const image = product.images?.[0];
+
+  const url = `https://motoelan.com/elanlar/${slug}`;
+
+  return {
+    title,
+    description,
+
+    alternates: {
+      canonical: url,
+    },
+
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "Motoelan",
+      locale: "az_AZ",
+      type: "website",
+
+      ...(image && {
+        images: [
+          {
+            url: `https://pub-8758a577ec5346e18f2b76891ba616b3.r2.dev/${image}`,
+            width: 1200,
+            height: 630,
+            alt: `${make} ${model}`,
+          },
+        ],
+      }),
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+
+      ...(image && {
+        images: [image],
+      }),
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+const ElanlarPage = async ({params}: PageProps) => {
 
   const {slug} = await params
   const id: string | undefined = slug.split("-").pop()

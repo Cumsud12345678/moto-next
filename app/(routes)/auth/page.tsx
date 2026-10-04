@@ -28,6 +28,8 @@ const AuthPage = () => {
   const verifyOtpMutation = useVerifyOtp()
 
   const handleSendOtp = () => {
+    if(!email) return toast.add({ type: "warning", description: 'Emailinizi daxil edin' });
+    setLoginStartLoading(true)
     sendOtpMutation.mutate({ email }, {
       onSuccess: (data) => {
         if (data.success) {
@@ -42,6 +44,7 @@ const AuthPage = () => {
       },
       onError: () => {
         toast.add({ type: 'error', description: 'Kod göndərilmədi.', priority: 'high' })
+        setLoginStartLoading(false)
       }
     })
   }
@@ -51,6 +54,9 @@ const AuthPage = () => {
 
   // ADDIM 2: OTP-ni yoxla, uğur olsa elanı göndər
   const handleVerify = () => {
+    if(!email) return toast.add({ type: "warning", description: 'Emailinizi daxil edin' });
+    if(!isOldUser && !name) return toast.add({ type: "warning", description: 'Adınızı daxil edin' })
+    if(otp.length !== 6) return toast.add({ type: "warning", description: 'Kodu daxil edin' });
     verifyOtpMutation.mutate({ email, name, otp }, {
       onSuccess: (data) => {
         if (data.success) {
@@ -85,14 +91,14 @@ const AuthPage = () => {
                   <button
                     disabled={loginStartLoading}
                     onClick={handleSendOtp}
-                    className={`bg-blue-500 text-white p-2 w-full rounded-lg ${loginStartLoading && 'opacity-70'}`}
+                    className={`text-white p-2 w-full rounded-lg ${loginStartLoading ? 'bg-blue-300' : 'bg-blue-500'}`}
                   >
                     {
                       loginStartLoading
                         ?
-                        'Kod gonderilir...'
+                        'Kod göndərilir...'
                         :
-                        'Kod gonder'
+                        'Kod göndər'
                     }
                   </button>
                 </div>

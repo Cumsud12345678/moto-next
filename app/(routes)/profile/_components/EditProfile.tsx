@@ -48,7 +48,7 @@ export function EditProfile({ open, setOpen, id, name, setName }: EditProfilePro
   }, [name])
 
   const handleSetForm = async () => {
-    
+    if(!nameValue) return toast.add({ type: "warning", description: 'Adınızı daxil edin' })
     toast.promise(
       setForm(nameValue, id),
       {

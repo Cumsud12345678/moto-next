@@ -58,9 +58,9 @@ const Step3 = ({setForm, isSubmitting, userData, phone, setPhone, name, setName,
             <button
               onClick={() => setForm()}
               disabled={isSubmitting}
-              className="w-full p-4 rounded-xl bg-blue-500 text-white cursor-pointer"
+              className={`w-full p-4 rounded-xl  text-white cursor-pointer ${isSubmitting ? 'bg-blue-300' : 'bg-blue-500'}`}
             >
-              {isSubmitting ? 'Göndərilir...' : 'Gonder'}
+              {isSubmitting ? 'Göndərilir...' : 'Göndər'}
             </button>
           </div>
         }
@@ -71,7 +71,7 @@ const Step3 = ({setForm, isSubmitting, userData, phone, setPhone, name, setName,
         !userData
         &&
         <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-5 bg-white p-5">
-          <h3 className="text-xl">Email ve ad</h3>
+          <h3 className="text-xl">Email</h3>
           <div>
             <PlaceholderEffectInput state={email} setState={setEmail} label='Email' length={100} />
           </div>
@@ -79,12 +79,15 @@ const Step3 = ({setForm, isSubmitting, userData, phone, setPhone, name, setName,
             <PlaceholderEffectInput state={name} setState={setName} label='Name' length={100} />
           </div> */}
           <div>
-            <button
-              onClick={() => setForm()}
-              className="w-full p-4 rounded-xl bg-blue-500 text-white cursor-pointer"
-            >
-              Gonder
-            </button>
+            <div>
+              <button
+                onClick={() => setForm()}
+                disabled={isSubmitting}
+                className={`w-full p-4 rounded-xl  text-white cursor-pointer ${isSubmitting ? 'bg-blue-300' : 'bg-blue-500'}`}
+              >
+                {isSubmitting ? 'Göndərilir...' : 'Göndər'}
+              </button>
+            </div>
           </div>
         </div>
       }
