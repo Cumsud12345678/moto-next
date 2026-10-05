@@ -49,6 +49,12 @@ const GropusPage = () => {
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-2'>
 
         {
+          data.length === 0
+          ?
+          <div>
+            Məlumat tapılmadı
+          </div>
+          :
           data.map((group: Group) => (
             <a 
               href={group.link}

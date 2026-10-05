@@ -111,7 +111,7 @@ export async function generateMetadata({
       ...(image && {
         images: [
           {
-            url: `https://pub-8758a577ec5346e18f2b76891ba616b3.r2.dev/${image}`,
+            url: `${process.env.IMAGE_URL}/${image}`,
             width: 1200,
             height: 630,
             alt: `${make} ${model}`,
@@ -164,13 +164,13 @@ const ElanlarPage = async ({params}: PageProps) => {
   }
 
   return (
-    <div className='container mx-auto max-w-250 pb-40'>
+    <div className='container mx-auto max-w-250 pb-0'>
       <div className='flex flex-col lg:flex-row lg:p-4 lg:bg-white gap-5'>
         <DetailsLeft data={data} />
-        <DetailsRight price={data.price} name={data.seller.name} city={data.region.label} />
+        <DetailsRight data={data} />
       </div>
 
-      <div className='p-3'>
+      <div className='p-0 mt-3'>
         <ProductList data={similars} />
       </div>
 

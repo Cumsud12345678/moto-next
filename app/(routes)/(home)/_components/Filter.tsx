@@ -12,6 +12,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import TwoInputGroup from './TwoInputGroup'
 import CustomSwitch from '@/components/buttons/CustomSwitch'
 import TwoSearchAndSelect from '@/components/inputs/numberType/TwoSearchAndSelect'
+import { toast } from '@/components/ui/toast'
 
 interface Props {
   initialMetadata: Metadata
@@ -290,7 +291,16 @@ const Filter = ({ initialMetadata }: Props) => {
         {/* 1-Cİ SƏTİR — HƏMİŞƏ SABİT */}
         <div className="flex items-center justify-between gap-5">
           <SearchAndSelect data={metadata.makes} state={make} setState={setMake} label="Marka" />
-          <SearchAndSelect data={filteredModels} state={model} setState={setModel} label="Model" />
+          {
+            make
+            ?
+            <SearchAndSelect data={filteredModels} state={model} setState={setModel} label="Model" />
+            :
+            <div className='border bg-gray-100 p-3 pr-42 rounded'>
+              Model
+            </div>
+          }
+          
           <ThreeButton data={usedTypes} state={used} setState={setUsed} />
           <SearchAndSelect data={metadata.cities} state={region} setState={setRegion} label="Region" />
         </div>
@@ -399,15 +409,15 @@ const Filter = ({ initialMetadata }: Props) => {
             <div className="flex gap-4 shrink-0">
               <button
                 onClick={resetFilterStates}
-                className="flex items-center text-orange-400 text-lg"
+                className="flex items-center text-white text-lg bg-red-500 rounded-lg px-4.5"
               >
-                Sifirla
+                Sıfırla
               </button>
               <button
                 onClick={() => applyFilter()}
-                className="bg-blue-500 text-white p-2.5 px-4 rounded-lg cursor-pointer shadow"
+                className="bg-orange-500 text-white p-2.5 px-4 rounded-lg cursor-pointer shadow"
               >
-                Elanlari gosder
+                Elanları gösdər
               </button>
               <button
                 onClick={() => setFilterOpen(prev => !prev)}
@@ -426,7 +436,13 @@ const Filter = ({ initialMetadata }: Props) => {
             <div onClick={() => setMakeModalOpen(true)} className='border p-2 px-3 w-full rounded-lg bg-white'>
               {make ? metadata.makes.find((item: Default) => item._id === make)?.label : 'Marka'}
             </div>
-            <div onClick={() => setModelModalOpen(true)} className='border p-2 px-3 w-full rounded-lg bg-white'>
+            <div 
+              onClick={() => {
+                if(!make) return toast.add({ type: 'warning', description: 'İlk öncə marka seçin' });
+                setModelModalOpen(true)
+              }} 
+              className='border p-2 px-3 w-full rounded-lg bg-white'
+            >
               {model ? metadata.models.find((item: Default) => item._id === model)?.label : 'Model'}
             </div>
             <div 

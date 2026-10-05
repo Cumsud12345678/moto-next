@@ -32,7 +32,7 @@ export default function CheckboxButtons ({data, ids, onClick}: CheckboxButtonsPr
               key={item._id}
               className={`
                 p-2.5 px-4 cursor-pointer rounded-3xl border-2
-                ${active ? 'bg-green-200 text-black border-green-500' : 'border bg-white hover:bg-gray-200'}
+                ${active ? 'bg-orange-500 text-white' : 'border bg-white hover:bg-gray-200'}
               `}
               onClick={() => onClick(item._id)}
             >

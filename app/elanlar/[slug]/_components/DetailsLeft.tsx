@@ -30,13 +30,16 @@ import Galery from './Galery'
 import Header from '@/components/Header'
 import { useRouter } from 'next/navigation'
 import { ProductDescription } from '@/types/product'
+import { toggleLike } from '@/lib/api/listings'
+import { toggleGuestLike } from '@/lib/guestLikes'
 
 const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
 
   const [scrolled, setScrolled] = useState(false)
   const [product, setProduct] = useState<ProductDescription | null>(data)
+  const [liked, setLiked] = useState(data?.isLiked)
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,16 +54,52 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   }
 
-  const handleLike = () => {
-    setProduct(prev => {
-      if(!prev) return prev;
-      
-      return {
-        ...prev,
-        isLiked: !prev.isLiked
+  const handleLike = async () => {
+    if (loading) return // ikiqat klikin qarşısını al
+    if (!product) return;
+
+    setLoading(true)
+    const prevLiked = liked
+    setLiked(!prevLiked) // optimistic update
+
+    try {
+      const result = await toggleLike(product._id)
+      setLiked(result.liked) // server-in real cavabı ilə sinxronlaşdır
+    } catch (err: any) {
+      if (err?.response?.status === 401) {
+        // Qeydiyyatsız istifadəçi — cookie-yə yaz
+        const newLiked = toggleGuestLike(product._id)
+        setLiked(newLiked)
+      } else {
+        setLiked(prevLiked) // real xəta — geri qaytar
+        console.error('Like əməliyyatı uğursuz oldu:', err)
       }
-    })
+    } finally {
+      setLoading(false)
+    }
   }
+
+  const handleShare = async () => {
+    const url = window.location.href;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `${data?.make} ${data?.model} - ${data?.price} AZN`,
+          text: `${data?.make} ${data?.model} motosiklet elanı — Motoelan`,
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert("Link kopyalandı");
+      }
+    } catch (error) {
+      // İstifadəçi paylaşma pəncərəsini bağlayıbsa
+      if ((error as Error).name !== "AbortError") {
+        console.error("Share error:", error);
+      }
+    }
+  };
 
   if(!product) {
     return(
@@ -89,14 +128,17 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
             <ChevronLeft className="size-6" />
           </button>
           <div className="flex gap-3">
-            <button onClick={() => handleLike()}>
+            <button onClick={handleLike}>
               {
-                product.isLiked
+                liked
                 ? <HeartFill className='size-6 text-red-500' />
                 : <Heart className='size-6' />
               }
             </button>
-            <ArrowUpRightFromSquare className="size-6" />
+            <ArrowUpRightFromSquare 
+              onClick={handleShare}
+              className="size-6" 
+            />
             {/* <EllipsisVertical className="size-6" /> */}
           </div>
         </div>
@@ -114,9 +156,13 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
               </div>
 
               <div className="flex gap-3">
-                <button>
-                  <Heart className='size-6' />
-                </button>
+                {/* <button onClick={handleLike}>
+                  {
+                    liked
+                    ? <HeartFill className='size-6 text-red-500' />
+                    : <Heart className='size-6' />
+                  }
+                </button> */}
                 <button>
                   <ArrowUpRightFromSquare className="size-6" />
                 </button>
