@@ -33,10 +33,10 @@ import { ProductDescription } from '@/types/product'
 import { toggleLike } from '@/lib/api/listings'
 import { toggleGuestLike } from '@/lib/guestLikes'
 
-const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
+const DetailsLeft = ({ data }: { data: ProductDescription }) => {
 
   const [scrolled, setScrolled] = useState(false)
-  const [product, setProduct] = useState<ProductDescription | null>(data)
+  const [product, setProduct] = useState<ProductDescription>(data)
   const [liked, setLiked] = useState(data?.isLiked)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -56,7 +56,6 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
 
   const handleLike = async () => {
     if (loading) return // ikiqat klikin qarşısını al
-    if (!product) return;
 
     setLoading(true)
     const prevLiked = liked
@@ -85,8 +84,8 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: `${data?.make} ${data?.model} - ${data?.price} AZN`,
-          text: `${data?.make} ${data?.model} motosiklet elanı — Motoelan`,
+          title: `${product.make.label} ${product.model.label} - ${product.price} AZN`,
+          text: `${product.make.label} ${product.model.label} motosiklet elanı — Motoelan`,
           url,
         });
       } else {
@@ -101,13 +100,9 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
     }
   };
 
-  if(!product) {
-    return(
-      <div>
-
-      </div>
-    )
-  }
+  const formattedTelPhone = `+994${product.phone}`
+  const formattedViewPhone = `+994 ${String(product.phone).slice(0, 2)} ${String(product.phone).slice(2, 5)} ${String(product.phone).slice(5, 7)} ${String(product.phone).slice(7, 9)}`
+  const text = 'Salam. motoelan.com da paylaşdığınız elanla əlaqədar yazıram.'
 
   return (
     <div className="w-full overflow-x-hidden">
@@ -119,7 +114,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
         ${
           scrolled
             ? 'bg-white/90 backdrop-blur-md border-b text-black'
-            : 'bg-gradient-to-b from-black/40 to-transparent text-white'
+            : 'bg-linear-to-b from-black/40 to-transparent text-white'
         }
       `}
       >
@@ -164,7 +159,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
                   }
                 </button> */}
                 <button>
-                  <ArrowUpRightFromSquare className="size-6" />
+                  <ArrowUpRightFromSquare onClick={handleShare} className="size-6" />
                 </button>
                 {/* <button>
                   <EllipsisVertical className="size-6" />
@@ -183,6 +178,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
         model={product.model.label}
         volume={product.volume}
         year={product.year}
+        phone={product.phone}
       />
 
       <div className='p-3 bg-white'>
@@ -314,13 +310,13 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
           </div>
 
           <a
-            href={`tel:+994519478134`}
+            href={`tel:${formattedTelPhone}`}
             target="_blank"
             rel="noopener noreferrer" className="flex items-center justify-between p-3 bg-[#2DA562] text-white rounded-lg my-3 gap-2"
           >
             <div className="flex items-center">
               <Handset className='size-5 mr-2' />
-              <h5 className="p-0 m-0">+994 51 947 81 34</h5>
+              <h5 className="p-0 m-0">{formattedViewPhone}</h5>
             </div>
             <h5 className="m-0">Zəng et</h5>
           </a>
@@ -341,7 +337,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
           <Fragment>
             <button className="w-full bg-blue-500 rounded-xl text-white shadow">
               <a
-                href={`tel:+994519478134`}
+                href={`tel:${formattedTelPhone}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full h-full flex items-center justify-center p-3"
@@ -353,7 +349,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription | null }) => {
 
             <button className="w-full bg-[#2DA562] rounded-xl text-white shadow">
               <a
-                href={`https://wa.me/`}
+                href={`https://wa.me/${product.phone}?text=${text}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full h-full flex items-center justify-center p-3"

@@ -7,6 +7,7 @@ import ProductList from '@/components/ProductList'
 import Link from 'next/link'
 import { serverApi } from '@/lib/axios-server'
 import type { Metadata } from "next";
+import { notFound } from 'next/navigation'
 
 async function getProduct(id: string): Promise<ProductDescription | null> {
   try {
@@ -150,18 +151,20 @@ const ElanlarPage = async ({params}: PageProps) => {
     getSimilars(id)
   ])
 
-  if(data == null) {
-    return (
-      <div className='w-full h-screen flex items-center justify-center flex-col'>
-        <span>Elan tapılmadı</span>
-        <button className='p-2 px-3 border-2 mt-3 rounded-lg bg-orange-500 text-white'>
-          <Link href={'/'}>
-            Ana səyfəyə qayıt
-          </Link>
-        </button>
-      </div>
-    )
-  }
+  // if(data == null) {
+  //   return (
+  //     <div className='w-full h-screen flex items-center justify-center flex-col'>
+  //       <span>Elan tapılmadı</span>
+  //       <button className='p-2 px-3 border-2 mt-3 rounded-lg bg-orange-500 text-white'>
+  //         <Link href={'/'}>
+  //           Ana səyfəyə qayıt
+  //         </Link>
+  //       </button>
+  //     </div>
+  //   )
+  // }
+
+  if (!data) notFound();
 
   return (
     <div className='container mx-auto max-w-250 pb-0'>
@@ -170,7 +173,7 @@ const ElanlarPage = async ({params}: PageProps) => {
         <DetailsRight data={data} />
       </div>
 
-      <div className='p-0 mt-3'>
+      <div className='p-3 mt-3'>
         <ProductList data={similars} />
       </div>
 

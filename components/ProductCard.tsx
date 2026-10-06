@@ -41,19 +41,11 @@ const ProductCard = ({product}: {product: CardType}) => {
         {
           product.isUrgent &&
           <div className='absolute p-0.5 px-1.5 bg-orange-400 text-white top-0 left-0 z-40 rounded-br-lg overflow-hidden shine-effect text-sm'>
-            Tecili satilir
+            Təcili satılır
           </div>
         }
 
-        {/* <div onClick={(e: React.MouseEvent<HTMLDivElement>) => handleLike(e)}>
-          {
-            data.isLiked
-            ? <HeartFill className='absolute top-0 right-0 z-10 size-6 m-2 text-red-600' />
-            : <Heart className='absolute top-0 right-0 z-10 size-6 m-2 text-white'/> 
-          }
-        </div> */}
         <LikeButton listingId={product._id} initialLiked={product.isLiked} />
-        
         
         <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${product.images[0]}`} alt='' fill className='object-cover hover:scale-105 transition-transform duration-300'/>
         <div className='absolute bottom-0 right-0 m-2 flex gap-1 z-10'>
@@ -83,13 +75,13 @@ const ProductCard = ({product}: {product: CardType}) => {
         
       </div>
       <div className={`p-2 relative overflow-hidden ${product.isUrgent && 'shine-effect'}`}>
-        <div className="">
+        <div>
           <span className="text-xl text-green-500 font-bold">
             {formatNumber(product.price)} ₼
           </span>
         </div>
         <p className='text-[16px] truncate'>{product.make.label} {product.model.label}</p>
-        <p className='truncate text-[15px]'>{product.year}, {product.volume} sm³, {formatNumber(product.mileage)}</p>
+        <p className='text-[15px] truncate'>{product.year}, {product.volume} sm³, {formatNumber(product.mileage)}</p>
         <p className='text-[14px] text-gray-400 truncate'>{product.region.label}, {product.createdAt}</p>
       </div>
 

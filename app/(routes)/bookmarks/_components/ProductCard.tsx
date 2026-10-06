@@ -53,7 +53,7 @@ const ProductCard = ({ product, onUnlike }: Props) => {
       <div className='relative aspect-4/3 overflow-hidden'>
         {product.isUrgent && (
           <div className='absolute p-0.5 px-1.5 bg-orange-400 text-white top-0 left-0 z-40 rounded-br-lg overflow-hidden shine-effect text-sm'>
-            Tecili satilir
+            Təcili satılır
           </div>
         )}
 
@@ -89,9 +89,9 @@ const ProductCard = ({ product, onUnlike }: Props) => {
             {formatNumber(product.price)} ₼
           </span>
         </div>
-        <p className='font-semibold text-[16px]'>{product.make.label} {product.model.label}</p>
-        <p className='truncate text-[15px]'>{product.year}, {product.volume} sm³, {formatNumber(product.mileage)}</p>
-        <p className='text-[14px] text-gray-400 truncate'>{product.region.label}, Bu gun</p>
+        <p className='text-[16px] truncate'>{product.make.label} {product.model.label}</p>
+        <p className='text-[15px] truncate'>{product.year}, {product.volume} sm³, {formatNumber(product.mileage)}</p>
+        <p className='text-[14px] text-gray-400 truncate'>{product.region.label}, {product.createdAt}</p>
       </div>
     </Link>
   )

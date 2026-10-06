@@ -117,9 +117,6 @@ const Filter = ({ initialMetadata }: Props) => {
     }
   }, [make, metadata])
 
-
-  const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false)
-
   const [makeModalOpen, setMakeModalOpen] = useState<boolean>(false)
   const [modelModalOpen, setModelModalOpen] = useState<boolean>(false)
 

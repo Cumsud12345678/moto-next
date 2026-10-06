@@ -7,23 +7,14 @@ import { ProductDescription } from '@/types/product'
 import { ArrowUpRightFromSquare, Handset, Heart, HeartFill, TriangleExclamation } from '@gravity-ui/icons'
 import React, { useState } from 'react'
 
-// interface DetailsRightProps {
-//   make: string,
-//   model: string,
-//   price: number,
-//   name: string,
-//   city: string,
-// }
+const DetailsRight = ({ data }: { data: ProductDescription }) => {
 
-const DetailsRight = ({ data }: { data: ProductDescription | null }) => {
-
-  const [product, setProduct] = useState<ProductDescription | null>(data)
-  const [liked, setLiked] = useState(data?.isLiked)
+  const [product, setProduct] = useState<ProductDescription>(data)
+  const [liked, setLiked] = useState(data.isLiked)
   const [loading, setLoading] = useState(false)
 
   const handleLike = async () => {
     if (loading) return // ikiqat klikin qarşısını al
-    if (!product) return;
 
     setLoading(true)
     const prevLiked = liked
@@ -52,8 +43,8 @@ const DetailsRight = ({ data }: { data: ProductDescription | null }) => {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: `${data?.make.label} ${data?.model.label} - ${data?.price} AZN`,
-          text: `${data?.make.label} ${data?.model.label} motosiklet elanı — Motoelan`,
+          title: `${product.make.label} ${product.model.label} - ${product.price} AZN`,
+          text: `${product.make.label} ${product.model.label} motosiklet elanı — Motoelan`,
           url,
         });
       } else {
@@ -68,13 +59,8 @@ const DetailsRight = ({ data }: { data: ProductDescription | null }) => {
     }
   };
 
-  if(!product) {
-    return(
-      <div>
-
-      </div>
-    )
-  }
+  const formattedTelPhone = `+994${product.phone}`
+  const formattedViewPhone = `+994 ${String(product.phone).slice(0, 2)} ${String(product.phone).slice(2, 5)} ${String(product.phone).slice(5, 7)} ${String(product.phone).slice(7, 9)}`
 
   return (
     <div className="hidden lg:block lg:w-130 min-w-0">
@@ -98,7 +84,7 @@ const DetailsRight = ({ data }: { data: ProductDescription | null }) => {
             /> */}
 
             <div className="mx-2 flex flex-col">
-              <span className="text-[18px] font-bold">{data?.seller.name}</span>
+              <span className="text-[18px] font-bold">{product.seller.name}</span>
               <span>{product.region.label}</span>
             </div>
           </div>
@@ -126,18 +112,18 @@ const DetailsRight = ({ data }: { data: ProductDescription | null }) => {
           </div> */}
 
           <a
-            href={`tel:+994519478134`}
+            href={`tel:${formattedTelPhone}`}
             target="_blank"
             className="my-3 flex items-center gap-2 rounded-lg bg-[#2da562] p-3 text-white cursor-pointer">
             <Handset />
             <h4 className="m-0 p-0 text-xl font-semibold">
-              +994 51 947 81 34
+              {formattedViewPhone}
             </h4>
           </a>
 
           <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
             <TriangleExclamation />
-            <AlertTitle>Diqqet</AlertTitle>
+            <AlertTitle>Diqqət</AlertTitle>
             <AlertDescription className=''>
               Motosikletə baxış keçirmədən öncə beh göndərməyin.
             </AlertDescription>

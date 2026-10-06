@@ -25,10 +25,11 @@ interface GaleryProps {
   make: string
   model: string
   volume: number
-  year: number
+  year: number,
+  phone: number
 }
 
-const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) => {
+const Galery = ({images, video, price, make, model, volume, year, phone}: GaleryProps) => {
 
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null)
   const [imageCount, setImageCount] = useState<number>(1)
@@ -36,7 +37,43 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
   const [open, setOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  const [gridOpen, setGridOpen] = useState(false)
+  const [hash, setHash] = useState<string>('')
+  const [isMobile, setIsMobile] = useState<boolean>(false)
+
+  useEffect(() => {
+    const updateHash = () => setHash(window.location.hash)
+    updateHash()
+    window.addEventListener('hashchange', updateHash)
+    return () => window.removeEventListener('hashchange', updateHash)
+  }, [])
+
+  useEffect(() => {
+    const checkSize = () => {
+      const mobile = window.innerWidth <= 1000
+      setIsMobile(mobile)
+
+      if (!mobile && window.location.hash === '#gallery') {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+        setHash('')
+      }
+    }
+
+    checkSize()
+    window.addEventListener('resize', checkSize)
+    return () => window.removeEventListener('resize', checkSize)
+  }, [])
+
+  const openGallery = hash == '#gallery' && isMobile
+
+  useEffect(() => {
+    if(openGallery) {
+      document.body.style.overflow = 'hidden';
+    }else {
+      document.body.style.overflow = '';
+    }
+  }, [openGallery])
+
+  // const [gridOpen, setGridOpen] = useState(false)
 
   const handleOpenLightbox = (index: number) => {
     setLightboxIndex(index)
@@ -47,15 +84,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   }
 
-  useEffect(() => {
-    if(gridOpen) {
-      document.body.style.overflow = 'hidden';
-    }else {
-      document.body.style.overflow = '';
-    }
-  }, [gridOpen])
-
-
+  
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
@@ -120,6 +149,9 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
     }
   }, [])
 
+  const formattedTelPhone = `+994${phone}`
+  const formattedViewPhone = `+994 ${String(phone).slice(0, 2)} ${String(phone).slice(2, 5)} ${String(phone).slice(5, 7)} ${String(phone).slice(7, 9)}`
+
   return (
     <Fragment>
       <Swiper
@@ -139,7 +171,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
           {imageCount} / {video ? images.length + 1 : images.length}
         </div>
         <div
-          onClick={() => setGridOpen(true)}
+          onClick={() => window.location.hash = 'gallery'}
           className="absolute z-10 bg-black text-white p-1 px-2 rounded-lg right-0 bottom-0 m-3 text-sm cursor-pointer block lg:hidden"
         >
           Bütün şəkillər
@@ -218,7 +250,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
               <div
                 className="
                   w-full
-                  h-[330px]
+                  h-82.5
                   bg-center
                   bg-cover
                   bg-no-repeat
@@ -274,13 +306,19 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
       </div>
 
       {/* Bütün şəkillər - 2 sütunlu qalereya görünüşü */}
-      {gridOpen && (
-        <div className="fixed inset-0 z-[60] bg-black overflow-y-auto">
+      {openGallery && (
+        <div className="fixed inset-0 z-60 bg-black overflow-y-auto">
           <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-black/80 backdrop-blur-sm text-white">
             <h3 className="text-lg font-semibold">
               Bütün şəkillər ({images.length})
             </h3>
-            <button onClick={() => setGridOpen(false)}>
+            <button 
+              onClick={() =>  {
+                if (openGallery) {
+                  window.history.back()
+                }}
+              }
+            >
               <Xmark className="size-6" />
             </button>
           </div>
@@ -363,9 +401,13 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
                     <p className='text-xl'>{formatNumber(price)} AZN</p>
                     <p className='text-[17px] truncate'>{make} {model}, {formatNumber(volume)} sm³, {year} il</p>
                   </div>
-                  <div className='bg-green-500 p-2 rounded-full'>
+                  <a 
+                    href={`tel:${formattedTelPhone}`}
+                    target='_blank'
+                    className='bg-green-500 p-2 rounded-full'
+                  >
                     <Handset className='size-7' />
-                  </div>
+                  </a>
                 </div>
               </div>
 
@@ -376,7 +418,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
                       <div
                         onClick={() => setLightboxIndex(0)}
                         className={`
-                        border rounded-lg w-18 shrink-0 h-[50px]
+                        border rounded-lg w-18 shrink-0 h-12.5
                         bg-black flex items-center justify-center
                         cursor-pointer transition-opacity
                         ${lightboxIndex === 0 ? 'opacity-100' : 'opacity-40 hover:opacity-70'}
@@ -392,7 +434,7 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
                         key={index}
                         onClick={() => setLightboxIndex(index + videoOffset)}
                         className={`
-                        border rounded-lg w-18 shrink-0 h-[50px]
+                        border rounded-lg w-18 shrink-0 h-12.5
                         bg-center bg-cover bg-no-repeat
                         cursor-pointer transition-opacity
                         ${index + videoOffset === lightboxIndex ? 'opacity-100' : 'opacity-40 hover:opacity-70'}
@@ -412,10 +454,14 @@ const Galery = ({images, video, price, make, model, volume, year}: GaleryProps) 
                     <h3 className='text-xl'>{price} ₼</h3>
                   </div>
                   <div className='flex items-center gap-6'>
-                    <div className='p-2 px-6 bg-green-500 flex items-center text-white gap-3 rounded-lg'>
+                    <a 
+                      href={`tel:${formattedTelPhone}`}
+                      target='_blank'
+                      className='p-2 px-6 bg-green-500 flex items-center text-white gap-3 rounded-lg'
+                    >
                       <Handset className='size-5' />
                       Zeng et
-                    </div>
+                    </a>
                     <button onClick={() => setOpen(false)}>
                       <Xmark className='size-7' />
                     </button>
