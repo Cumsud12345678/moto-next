@@ -14,8 +14,8 @@ export default function ShareButton({ title }: ShareButtonProps) {
       if (navigator.share) {
         await navigator.share({
           title,
-          text: `${title} — Motoelan`,
-          url,
+          // text: `${title} — Motoelan`,
+          // url,
         });
       } else {
         await navigator.clipboard.writeText(url);
