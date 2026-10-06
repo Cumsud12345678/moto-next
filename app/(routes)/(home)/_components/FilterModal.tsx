@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,7 @@ import ButtonGroup from '@/components/buttons/ButtonGroup'
 import CheckboxButtons from '@/components/buttons/CheckboxButtons'
 import { useMetadata } from '@/hooks/useMetadata'
 import { useRouter } from 'next/navigation'
+import { Spinner } from '@/components/ui/spinner'
 
 
 interface FilterModalProps {
@@ -130,8 +131,10 @@ const FilterModal = ({open, data}: FilterModalProps) => {
     setRegionModalOpen(false)
   }
 
+  const [isPending, startTransition] = useTransition()
 
   const applyFilter = () => {
+    if (isPending) return;
     const params = new URLSearchParams()
 
     if (make) params.set('make', make);
@@ -167,7 +170,9 @@ const FilterModal = ({open, data}: FilterModalProps) => {
 
     // window.history.back()
 
-    router.push(`/motors?${params.toString()}`)
+    startTransition(() => {
+      router.push(`/motors?${params.toString()}`)
+    })
   }
 
   if(!metadata) {
@@ -452,8 +457,18 @@ const FilterModal = ({open, data}: FilterModalProps) => {
 
         {/* Şəffaf konteyner - yalnız padding üçün, arxası görünür */}
         <div className='shrink-0 px-3 pb-3'>
-          <button onClick={applyFilter} className='bg-green-500 p-3 w-full rounded-lg text-white shadow-lg'>
-            Axtar
+          <button
+            onClick={applyFilter}
+            disabled={isPending}
+            className={`p-3 w-full rounded-lg text-white shadow-lg ${isPending ? 'bg-green-300' : 'bg-green-500'}`}
+          >
+            {isPending ? (
+              <div className='flex justify-center items-center'>
+                <Spinner />
+              </div>
+            ) : (
+              'Axtar'
+            )}
           </button>
         </div>
 

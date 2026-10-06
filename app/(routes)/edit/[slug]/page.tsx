@@ -274,7 +274,7 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
 
   return (
     <div>
-      <div className="flex flex-col w-full mt-10 lg:mt-30 lg:container mx-auto lg:max-w-187.5">
+      <div className="flex flex-col w-full mt-14 lg:mt-30 lg:container mx-auto lg:max-w-187.5">
         <div className="lg:rounded-3xl lg:p-15 lg:bg-white flex flex-col lg:gap-8 gap-2 bg-[#f5f5f5] mb-20">
 
           <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">
@@ -455,13 +455,16 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             </div>
           </div>
 
-          <button
-            onClick={submitListingUtilFunc}
-            disabled={submitting}
-            className="cursor-pointer rounded-xl bg-sky-500 px-6 py-3 text-white disabled:opacity-50"
-          >
-            {submitting ? 'Göndərilir...' : 'Yadda saxla'}
-          </button>
+          <div className='p-3 lg:p-0'>
+            <button
+              onClick={submitListingUtilFunc}
+              disabled={submitting}
+              className="cursor-pointer rounded-xl bg-sky-500 px-6 py-3 text-white disabled:opacity-50 w-full"
+            >
+              {submitting ? 'Göndərilir...' : 'Yadda saxla'}
+            </button>
+          </div>
+          
 
         </div>
       </div>

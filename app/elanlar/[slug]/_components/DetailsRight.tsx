@@ -44,8 +44,8 @@ const DetailsRight = ({ data }: { data: ProductDescription }) => {
       if (navigator.share) {
         await navigator.share({
           title: `${product.make.label} ${product.model.label} - ${product.price} AZN`,
-          // text: `${product.make.label} ${product.model.label} motosiklet elanı — Motoelan`,
-          // url,
+          text: `${product.make.label} ${product.model.label} motosiklet elanı — Motoelan`,
+          url,
         });
       } else {
         await navigator.clipboard.writeText(url);
