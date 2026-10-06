@@ -93,6 +93,10 @@ export async function generateMetadata({
 
   const url = `https://motoelan.com/elanlar/${slug}`;
 
+  const imageUrl = image
+  ? `${process.env.IMAGE_URL}/${image}`   // IMAGE_URL = https://... olmalıdır
+  : undefined;
+
   return {
     title,
     description,
@@ -109,10 +113,10 @@ export async function generateMetadata({
       locale: "az_AZ",
       type: "website",
 
-      ...(image && {
+      ...(imageUrl && {
         images: [
           {
-            url: `${process.env.IMAGE_URL}/${image}`,
+            url: imageUrl,
             width: 1200,
             height: 630,
             alt: `${make} ${model}`,
@@ -125,10 +129,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-
-      ...(image && {
-        images: [image],
-      }),
+      ...(imageUrl && { images: [imageUrl] }), 
     },
 
     robots: {
