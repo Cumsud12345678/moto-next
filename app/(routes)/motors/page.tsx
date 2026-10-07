@@ -5,7 +5,7 @@ import { getMetadata } from '@/lib/api/metadata';
 import { cookies } from 'next/headers';
 import Ads from '../(home)/_components/Ads';
 import { serverApi } from '@/lib/axios-server';
-import ListingPagination from './_components/ListingPagination';
+import ListingPagination from '@/components/ListingPagination';
 
 const LIMIT = 20
 

@@ -239,10 +239,10 @@ const ActiveProductCard = ({ product, giftCount, setGiftCount, onDelete, onUrgen
       >
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>Pick a delivery time</DrawerTitle>
-            <DrawerDescription>
+            <DrawerTitle>Elanı premium et</DrawerTitle>
+            {/* <DrawerDescription>
               We&apos;ll prepare your order as soon as possible.
-            </DrawerDescription>
+            </DrawerDescription> */}
           </DrawerHeader>
           <div className="flex-1 scroll-fade overflow-y-auto p-4">
             <RadioGroup
@@ -272,7 +272,7 @@ const ActiveProductCard = ({ product, giftCount, setGiftCount, onDelete, onUrgen
             <Button onClick={() => onUrgent(product._id)} className="h-[34px]">
               Tətbiq et
             </Button>
-            <DrawerClose render={<Button variant="outline">Bağla</Button>} />
+            <DrawerClose render={<Button variant="outline">Ləğv et</Button>} />
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

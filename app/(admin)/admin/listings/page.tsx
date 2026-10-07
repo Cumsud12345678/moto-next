@@ -2,7 +2,7 @@
 import { api } from "@/lib/axios"
 import { columns, Listing } from "./columns"
 import { DataTable } from "../components/data-table"
-import { useEffect, useState } from "react"
+import { Suspense, useCallback, useEffect, useState } from "react"
 import EditDialog from "./edit-dialog"
 
 import {
@@ -15,37 +15,62 @@ import {
   AlertDialogHeader,
   AlertDialogMedia,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
 import { TrashBin } from "@gravity-ui/icons"
 import PlaceholderEffectInput from "@/components/inputs/PlaceholderEffectInput"
 import { toast } from "@/components/ui/toast"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { UrgentDialog } from "./urgent-dialog"
-import Galery from "@/app/elanlar/[slug]/_components/Galery"
 import { GalleryDialog } from "./gallery-dialog"
+// Yolu öz layihənizə uyğun dəyişin (ListingPagination.tsx harada saxlayırsınızsa)
+import ListingPagination from "@/components/ListingPagination"
 
-export default function ListingsPage() {
+const PAGE_SIZE = 10
+
+function ListingsContent() {
 
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // URL-dəki ?page=2 dəyəri
+  const currentPage = Math.max(parseInt(searchParams.get('page') ?? '1', 10) || 1, 1)
 
   const [data, setData] = useState<Listing[]>([])
-  const [loading, setLoading] = useState(true)
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true) // yalnız ilk yüklənmədə true olur
+
+  const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1)
+
+  const getData = useCallback(async () => {
+    try {
+      const res = await api.get('/api/admin/listings', {
+        params: { page: currentPage, limit: PAGE_SIZE },
+        withCredentials: true
+      })
+      setData(res.data.data)
+      setTotal(res.data.total)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }, [currentPage])
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await api.get('/api/admin/listings', { withCredentials: true })
-        setData(res.data.data)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
-    }
     getData()
-  }, [])
+  }, [getData])
+
+  // Səhifə say azalıbsa (məs. son elan silinib), son səhifəyə qayıt
+  useEffect(() => {
+    if (loading || total === 0 || currentPage <= totalPages) return
+
+    const params = new URLSearchParams(searchParams.toString())
+    if (totalPages <= 1) params.delete('page')
+    else params.set('page', String(totalPages))
+    const qs = params.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname)
+  }, [loading, total, currentPage, totalPages, searchParams, pathname, router])
 
 
   const [deletedOpen, setDeletedOpen] = useState<boolean>(false)
@@ -75,7 +100,9 @@ export default function ListingsPage() {
       {
         loading: 'Elan silinir',
         success: () => {
-          setData(prev => prev.filter(a => a._id !== deleteListingData?._id))
+          // Lokal filter əvəzinə serverdən yenidən çəkirik ki,
+          // səhifə dolu qalsın və total düzgün olsun
+          getData()
           return 'Elan silindi'
         },
         error: () => {
@@ -140,7 +167,8 @@ export default function ListingsPage() {
           </button>
         </div>
       </div>
-      
+
+      <p className="text-sm text-gray-500 mb-2">Cəmi: {total}</p>
 
       <DataTable
         columns={columns}
@@ -148,30 +176,31 @@ export default function ListingsPage() {
         meta={{ onEdit: handleEdit, onDelete: handleDelete, onGallery: handleGallery, onUrgent: handleUrgent }}
       />
 
+      <ListingPagination currentPage={currentPage} totalPages={totalPages} />
 
-      <EditDialog 
-        open={open} 
-        setOpen={setOpen} 
-        data={data} 
+      <EditDialog
+        open={open}
+        setOpen={setOpen}
+        data={data}
         setData={setData}
         listing={editListingData}
       />
 
       <UrgentDialog
-        open={openUrgent} 
-        setOpen={setOpenUrgent} 
-        data={data} 
+        open={openUrgent}
+        setOpen={setOpenUrgent}
+        data={data}
         setData={setData}
         listing={urgentListingData}
       />
 
       <GalleryDialog
-        open={galleryOpen} 
-        setOpen={setGalleryOpen} 
+        open={galleryOpen}
+        setOpen={setGalleryOpen}
         listing={galleryListing}
       />
 
-     
+
       <AlertDialog open={deletedOpen} onOpenChange={setDeletedOpen}>
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
@@ -192,5 +221,14 @@ export default function ListingsPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  )
+}
+
+// useSearchParams istifadə edən komponent Suspense daxilində olmalıdır (build xətası olmasın deyə)
+export default function ListingsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ListingsContent />
+    </Suspense>
   )
 }

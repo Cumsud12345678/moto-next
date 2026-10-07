@@ -2,7 +2,7 @@
 import { api } from "@/lib/axios"
 import { columns, User } from "./columns"
 import { DataTable } from "../components/data-table"
-import { useEffect, useState } from "react"
+import { Suspense, useCallback, useEffect, useState } from "react"
 import EditDialog from "./edit-dialog"
 
 import {
@@ -15,34 +15,60 @@ import {
   AlertDialogHeader,
   AlertDialogMedia,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
 import { TrashBin } from "@gravity-ui/icons"
 import PlaceholderEffectInput from "@/components/inputs/PlaceholderEffectInput"
 import { toast } from "@/components/ui/toast"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+// Yolu öz layihənizə uyğun dəyişin (ListingPagination.tsx harada saxlayırsınızsa)
+import ListingPagination from "@/components/ListingPagination"
 
-export default function UsersPage() {
+const PAGE_SIZE = 10
+
+function UsersContent() {
 
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // URL-dəki ?page=2 dəyəri
+  const currentPage = Math.max(parseInt(searchParams.get('page') ?? '1', 10) || 1, 1)
 
   const [data, setData] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true) // yalnız ilk yüklənmədə true olur
+
+  const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1)
+
+  const getData = useCallback(async () => {
+    try {
+      const res = await api.get('/api/admin/users', {
+        params: { page: currentPage, limit: PAGE_SIZE },
+        withCredentials: true
+      })
+      setData(res.data.data)
+      setTotal(res.data.total)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }, [currentPage])
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await api.get('/api/admin/users', { withCredentials: true })
-        setData(res.data.data)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
-    }
     getData()
-  }, [])
+  }, [getData])
+
+  // Səhifə say azalıbsa (məs. son istifadəçi silinib), son səhifəyə qayıt
+  useEffect(() => {
+    if (loading || total === 0 || currentPage <= totalPages) return
+
+    const params = new URLSearchParams(searchParams.toString())
+    if (totalPages <= 1) params.delete('page')
+    else params.set('page', String(totalPages))
+    const qs = params.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname)
+  }, [loading, total, currentPage, totalPages, searchParams, pathname, router])
 
 
   const [deletedOpen, setDeletedOpen] = useState<boolean>(false)
@@ -72,7 +98,9 @@ export default function UsersPage() {
       {
         loading: 'User silinir',
         success: () => {
-          setData(prev => prev.filter(a => a._id !== deleteUserData?._id))
+          // Lokal filter əvəzinə serverdən yenidən çəkirik ki,
+          // səhifə dolu qalsın və total düzgün olsun
+          getData()
           return 'User silindi'
         },
         error: () => {
@@ -95,7 +123,7 @@ export default function UsersPage() {
 
   const [searchId, setSearchId] = useState<string>('')
   const [searchEmail, setSearchEmail] = useState<string>('')
-  
+
 
   const handleSearchSubmit = () => {
 
@@ -125,7 +153,8 @@ export default function UsersPage() {
           </button>
         </div>
       </div>
-      
+
+      <p className="text-sm text-gray-500 mb-2">Cəmi: {total}</p>
 
       <DataTable
         columns={columns}
@@ -133,11 +162,12 @@ export default function UsersPage() {
         meta={{ onEdit: handleEdit, onDelete: handleDelete }}
       />
 
+      <ListingPagination currentPage={currentPage} totalPages={totalPages} />
 
-      <EditDialog 
-        open={open} 
-        setOpen={setOpen} 
-        data={data} 
+      <EditDialog
+        open={open}
+        setOpen={setOpen}
+        data={data}
         setData={setData}
         user={editUserData}
       />
@@ -162,5 +192,14 @@ export default function UsersPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  )
+}
+
+// useSearchParams istifadə edən komponent Suspense daxilində olmalıdır (build xətası olmasın deyə)
+export default function UsersPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UsersContent />
+    </Suspense>
   )
 }

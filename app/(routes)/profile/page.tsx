@@ -2,7 +2,7 @@
 import { RootState } from '@/redux/store'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { BellFill, PencilToSquare } from '@gravity-ui/icons'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ProductCard as CardType } from '@/types/product'
@@ -15,6 +15,7 @@ import ActiveProductCard from './_components/ActiveProductCard'
 import DeactiveProductCard from './_components/DeactiveProductCard'
 import RejectedProductCard from './_components/RejectedProductCard'
 import { api } from '@/lib/axios'
+import { decGiftCount } from '@/redux/slices/userSlice'
 
 
 async function urgentListing(userId: string, listingId: string) {
@@ -26,6 +27,7 @@ const ProfilePage = () => {
   // ============ BÜTÜN HOOK-LAR BURADA, ŞƏRTSİZ ============
   const user = useSelector((state: RootState) => state.user.user)
   const authLoading = useSelector((state: RootState) => state.user.loading)
+  const dispatch = useDispatch()
 
   const [data, setData] = useState<CardType[]>([])
   const [totalNotViewMsg, setTotalNotViewMsg] = useState<number>(0)
@@ -96,6 +98,16 @@ const ProfilePage = () => {
     )
   }
 
+  const [name, setName] = useState<string>('')
+  const [giftCount, setGiftCount] = useState<number>(0)
+  const [editOpen, setEditOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    if(!user) return;
+    setName(user.name)
+    setGiftCount(user.giftPremiumCount)
+  }, [user])
+
   const handleConfirmUrgent = async (listingId: string) => {
     if(!user) return;
 
@@ -113,6 +125,8 @@ const ProfilePage = () => {
       {
         loading: 'Elan premium edilir...',
         success: (data) => {
+          // setGiftCount(giftCount - 1)
+          dispatch(decGiftCount())
           return data.message
         },
         error: (err) => {
@@ -123,15 +137,7 @@ const ProfilePage = () => {
     )
   }
 
-  const [name, setName] = useState<string>('')
-  const [giftCount, setGiftCount] = useState<number>(0)
-  const [editOpen, setEditOpen] = useState<boolean>(false)
-
-  useEffect(() => {
-    if(!user) return;
-    setName(user.name)
-    setGiftCount(user.giftPremiumCount)
-  }, [user])
+  
 
 
   const [messageOpen, setMessageOpen] = useState<boolean>(false)

@@ -29,6 +29,10 @@ const authSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = action.payload
+    },
+    decGiftCount: (state) => {
+      if(!state.user) return;
+      state.user.giftPremiumCount = state.user.giftPremiumCount - 1
     }
   },
   extraReducers: (builder) => {
@@ -49,5 +53,5 @@ const authSlice = createSlice({
   }
 })
 
-export const { logout, setUser } = authSlice.actions
+export const { logout, setUser, decGiftCount } = authSlice.actions
 export default authSlice.reducer
