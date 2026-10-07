@@ -70,15 +70,14 @@ export function EditProfile({ open, setOpen, id, name, setName }: EditProfilePro
       <form>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
+            <DialogTitle>Profili redaktə et</DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
+              Profilinizdə dəyişiklikləri burada edin. Bitirdikdən sonra "Yadda saxla" düyməsinə klikləyin.
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <Label htmlFor="name-1">Name</Label>
+              <Label htmlFor="name-1">Ad</Label>
               <Input 
                 value={nameValue}
                 onChange={(e) => setNameValue(e.target.value)}
@@ -88,11 +87,11 @@ export function EditProfile({ open, setOpen, id, name, setName }: EditProfilePro
             </Field>
           </FieldGroup>
           <DialogFooter>
-            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+            <DialogClose render={<Button variant="outline">Ləğv et</Button>} />
             <Button 
               onClick={handleSetForm}
               type="submit"
-            >Save changes</Button>
+            >Yadda saxla</Button>
           </DialogFooter>
         </DialogContent>
       </form>

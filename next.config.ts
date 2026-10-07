@@ -35,6 +35,11 @@ const nextConfig: NextConfig = {
         hostname: 'pub-8758a577ec5346e18f2b76891ba616b3.r2.dev',
         pathname: '/adsense/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'pub-8758a577ec5346e18f2b76891ba616b3.r2.dev',
+        pathname: '/metadata/makes/**',
+      },
     ],
   },
 };

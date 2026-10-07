@@ -124,7 +124,7 @@ const SearchAndSelect = ({data, state, setState, label}: {data: Default[], state
                   <div>
                     {
                       item.logo &&
-                      <img src={`${item.logo}`} className="w-7 inline mr-2" />
+                      <img src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.logo}`} className="w-7 inline mr-2" />
                     }
                     <span style={{ fontSize: '14px' }}>{item.label}</span>
                   </div>

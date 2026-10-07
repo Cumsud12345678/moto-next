@@ -142,7 +142,7 @@ const Step2 = ({
     <Fragment>
       <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-8 bg-white p-5">
         <div>
-          <h3 className="text-xl mb-3">Ayarlar *</h3>
+          <h3 className="text-xl mb-3">Vəziyyəti *</h3>
           <div className='grid grid-cols-2 pt-3 gap-3'>
             <div className='flex items-center justify-between w-full pr-5 border-r-3'>
               <span>Yeni?</span>
@@ -157,7 +157,7 @@ const Step2 = ({
               <CustomSwitch checked={credit} setChecked={setCredit} />
             </div>
             <div className='flex items-center justify-between w-full pl-5'>
-              <span>Senedli?</span>
+              <span>Sənədli?</span>
               <CustomSwitch checked={document} setChecked={setDocument} />
             </div>
           </div>
@@ -166,7 +166,7 @@ const Step2 = ({
 
 
       <div className="lg:p-10 lg:border rounded-3xl flex flex-col gap-4 bg-white p-5">
-        <h3 className="text-xl">Güc və Yürüş</h3>
+        <h3 className="text-xl">Güc {used ? '*' : 'və Yürüş *'}</h3>
         <div>
           <PlaceholderNumberInput state={power} setState={setPower} label='Guc a.g.' length={30} />
         </div>
@@ -252,7 +252,7 @@ const Step2 = ({
         
 
           <div className='mt-5'>
-            <p>Video əlavə et</p>
+            <p className='text-lg'>Video əlavə et</p>
             {
               !videoPreview
                 ?

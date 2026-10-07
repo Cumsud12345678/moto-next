@@ -79,7 +79,7 @@ export default function InputAndListString({ state, setState, label, length=20, 
             newData?.map((item: Default, index) => (
               <div key={index} onClick={() => handleChangeList(item._id, item.label)} className="cursor-pointer flex gap-2 items-center hover:bg-gray-200 p-2 border-b">
                 {item.logo &&
-                  <Image src={item.logo} width={30} height={30} alt={item.label} />
+                  <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.logo}`} width={30} height={30} alt={item.label} />
                 }
                 <span style={{ fontSize: '16px' }}>{item.label}</span>
               </div>

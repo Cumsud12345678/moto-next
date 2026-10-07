@@ -36,11 +36,11 @@ export const menuNavs: Menu[] = [
     content: '+994519478134',
     active: true
   },
-  {
-    title: 'E-poçt ünvanı',
-    icon: Envelope,
-    url: 'mailto:isayevcumu@gmail.com',
-    content: 'isayevcumu@gmail.com',
-    active: true
-  },
+  // {
+  //   title: 'E-poçt ünvanı',
+  //   icon: Envelope,
+  //   url: 'mailto:isayevcumu@gmail.com',
+  //   content: 'isayevcumu@gmail.com',
+  //   active: true
+  // },
 ]

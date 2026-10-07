@@ -87,13 +87,13 @@ const Step1 = ({filterState, metadata, models}: {filterState: ReturnType<typeof 
 
         {
           minYear !== 0 &&
-          <InputAndListNumber state={minVolume} setState={setMinVolume} label='hecm' length={20} data={volumes} />
+          <InputAndListNumber state={minVolume} setState={setMinVolume} label='həcm' length={20} data={volumes} />
         }
 
         {
           minYear !== 0 &&
           <div>
-            <h3>Ban novu</h3>
+            <h3>Ban növü</h3>
             <ButtonGroup data={metadata.categories} state={category} setState={setCategory} wrap={false} isNew />
           </div>
         }
@@ -101,7 +101,7 @@ const Step1 = ({filterState, metadata, models}: {filterState: ReturnType<typeof 
         {
           category &&
           <div className='pt-2'>
-            <h3 className='mb-2'>Reng</h3>
+            <h3 className='mb-2'>Rəng</h3>
             <ButtonGroup data={metadata.colors} state={color} setState={setColor} wrap={false} isNew />
           </div>
         }
@@ -109,7 +109,7 @@ const Step1 = ({filterState, metadata, models}: {filterState: ReturnType<typeof 
         {
           color &&
           <div className='pt-4'>
-            <h3 className='mb-2'>Muherrik</h3>
+            <h3 className='mb-2'>Mühərrik</h3>
             <ButtonGroup data={metadata.transmissions} state={transmission} setState={setTransmission} wrap={false} isNew />
           </div>
         }
@@ -117,7 +117,7 @@ const Step1 = ({filterState, metadata, models}: {filterState: ReturnType<typeof 
         {
           transmission &&
           <div className='pt-4'>
-            <h3 className='mb-2'>Suretler qutusu</h3>
+            <h3 className='mb-2'>Sürətlər qutusu</h3>
             <ButtonGroup data={metadata.fuelTypes} state={fuelType} setState={setFuelType} wrap={false} isNew />
           </div>
         }

@@ -374,9 +374,9 @@ const NewPage = () => {
         <div className='fixed top-1/2 w-full -translate-y-1/2'>
           <Card className="mx-auto max-w-md my-auto">
             <CardHeader>
-              <CardTitle>Verify your login</CardTitle>
+              <CardTitle className='text-xl'>Girişinizi təsdiqləyin</CardTitle>
               <CardDescription>
-                Enter the verification code we sent to your email address:{" "}
+                {email} E-poçt ünvanınıza göndərdiyimiz təsdiq kodunu daxil edin.
                 <span className="font-medium">{email}</span>.
               </CardDescription>
             </CardHeader>
@@ -387,11 +387,11 @@ const NewPage = () => {
                   <Field>
                     <div className="flex items-center justify-between">
                       <FieldLabel htmlFor="otp-verification">
-                        Ad yazin
+                        Ad yazın
                       </FieldLabel>
                     </div>
                     <div>
-                      <input value={name} onChange={(e) => setName(e.target.value)} type="text" className='p-3 bg-white w-full rounded border' placeholder='Ad yazin' />
+                      <input value={name} onChange={(e) => setName(e.target.value)} type="text" className='p-3 bg-white w-full rounded-lg border' placeholder='Ad yazın' />
                     </div>
                   </Field>
               }
@@ -399,12 +399,12 @@ const NewPage = () => {
               <Field className='mt-4'>
                 <div className="flex items-center justify-between">
                   <FieldLabel htmlFor="otp-verification">
-                    Verification code
+                    Təsdiqləmə kodu
                   </FieldLabel>
-                  <Button variant="outline" size="xs">
+                  {/* <Button variant="outline" size="xs">
                     <RefreshCwIcon />
                     Resend Code
-                  </Button>
+                  </Button> */}
                 </div>
                 <InputOTP 
                   maxLength={6} 
@@ -426,9 +426,9 @@ const NewPage = () => {
                     <InputOTPSlot index={5} />
                   </InputOTPGroup>
                 </InputOTP>
-                <FieldDescription>
+                {/* <FieldDescription>
                   <a href="#">I no longer have access to this email address.</a>
-                </FieldDescription>
+                </FieldDescription> */}
               </Field>
             </CardContent>
             <CardFooter>
@@ -436,13 +436,13 @@ const NewPage = () => {
                 <Button 
                   type="submit" 
                   size={'lg'} 
-                  className="w-full"
+                  className="w-full py-5"
                   onClick={handleVerify}
                   disabled={verifyOtpMutation.isPending || otp.length < 6}
                 >
-                  {verifyOtpMutation.isPending ? 'Yoxlanılır...' : 'Gonder'}
+                  {verifyOtpMutation.isPending ? 'Yoxlanılır...' : 'Göndər'}
                 </Button>
-                <div className="text-sm text-muted-foreground">
+                {/* <div className="text-sm text-muted-foreground">
                   Having trouble signing in?{" "}
                   <a
                     href="#"
@@ -450,7 +450,7 @@ const NewPage = () => {
                   >
                     Contact support
                   </a>
-                </div>
+                </div> */}
               </Field>
             </CardFooter>
           </Card>

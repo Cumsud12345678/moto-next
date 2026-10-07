@@ -47,7 +47,7 @@ const Step3 = ({setForm, isSubmitting, userData, phone, setPhone, name, setName,
             type="text"
             inputMode="numeric"
             value={phone}
-            className='border-2 w-full rounded-2xl p-3 bg-[#f5f5f5]' placeholder='55 555 55 55'
+            className='border-2 w-full rounded-xl p-3 bg-[#f5f5f5]' placeholder='55 555 55 55'
           />
         </div>
 

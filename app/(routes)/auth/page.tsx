@@ -111,7 +111,7 @@ const AuthPage = () => {
             <CardHeader>
               <CardTitle className='text-lg font-semibold'>Girişinizi təsdiqləyin</CardTitle>
               <CardDescription>
-                {email} e-poçt ünvanınıza göndərdiyimiz təsdiq kodunu daxil edin.
+                {email} E-poçt ünvanınıza göndərdiyimiz təsdiq kodunu daxil edin.
               </CardDescription>
             </CardHeader>
             <CardContent>
