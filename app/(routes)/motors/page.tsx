@@ -6,6 +6,41 @@ import { cookies } from 'next/headers';
 import Ads from '../(home)/_components/Ads';
 import { serverApi } from '@/lib/axios-server';
 import ListingPagination from '@/components/ListingPagination';
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
+  const params = await searchParams;
+
+  const hasFilters = Object.entries(params).some(
+    ([key, value]) =>
+      key !== "page" &&
+      value !== undefined &&
+      value !== ""
+  );
+
+  const hasPagination =
+    typeof params.page === "string" &&
+    Number(params.page) > 1;
+
+  return {
+    title: "Motosiklet Elanları",
+
+    description:
+      "Azərbaycanda satılan motosiklet elanlarına bax. Marka, model, qiymət, il və digər xüsusiyyətlərə görə motosiklet tap.",
+
+    alternates: {
+      canonical: "/motors",
+    },
+
+    robots: {
+      index: !hasFilters && !hasPagination,
+      follow: true,
+    },
+  };
+}
+
 
 const LIMIT = 20
 

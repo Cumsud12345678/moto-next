@@ -2,13 +2,22 @@ import ProductList from '@/components/ProductList';
 import Filter from './_components/Filter';
 import { Suspense } from 'react'
 import { ProductCard } from '@/types/product';
-import { Metadata } from '@/types/metadata';
 import { getMetadata } from '@/lib/api/metadata';
 import { cookies } from 'next/headers';
 import Ads from './_components/Ads';
 import { serverApi } from '@/lib/axios-server';
 import HeaderTab from './_components/HeaderTab';
 // import { getListings } from '@/lib/api/listings';
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Motosiklet Elanları — Azərbaycanda Motosiklet Al və Sat",
+  description:
+    "Azərbaycanda motosiklet elanları. Motosiklet al, sat və yeni elanları kəşf et. Motoelan-da motosiklet elanlarına bax.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 type Adsense = {
   _id: string

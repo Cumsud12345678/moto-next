@@ -47,6 +47,8 @@ interface PageProps {
   }>;
 }
 
+const SITE_URL = process.env.SITE_URL!
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -80,7 +82,7 @@ export async function generateMetadata({
   const make = product.make?.label || "";
   const model = product.model?.label || "";
 
-  const title = `${make} ${model} — ${product.price} AZN | Motoelan`;
+  const title = `${make} ${model}${product.year ? ` ${product.year}` : ""} — ${product.price} AZN | Motoelan`;
 
   const description =
     product.description
@@ -91,7 +93,7 @@ export async function generateMetadata({
 
   const image = product.images?.[0];
 
-  const url = `https://motoelan.com/elanlar/${slug}`;
+  const url = `${SITE_URL}/elanlar/${slug}`;
 
   const imageUrl = image
   ? `${process.env.IMAGE_URL}/${image}`   // IMAGE_URL = https://... olmalıdır
@@ -151,20 +153,7 @@ const ElanlarPage = async ({params}: PageProps) => {
     getProduct(id),
     getSimilars(id)
   ])
-
-  // if(data == null) {
-  //   return (
-  //     <div className='w-full h-screen flex items-center justify-center flex-col'>
-  //       <span>Elan tapılmadı</span>
-  //       <button className='p-2 px-3 border-2 mt-3 rounded-lg bg-orange-500 text-white'>
-  //         <Link href={'/'}>
-  //           Ana səyfəyə qayıt
-  //         </Link>
-  //       </button>
-  //     </div>
-  //   )
-  // }
-
+  
   if (!data) notFound();
 
   return (

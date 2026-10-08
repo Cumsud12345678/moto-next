@@ -3,6 +3,14 @@ import { cookies } from 'next/headers';
 import { ProductCard as CardType } from '@/types/product'
 import BookmarkList from './_components/BookmarkList'
 import { serverApi } from '@/lib/axios-server';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 async function getProducts(): Promise<CardType[]> {
   try {
