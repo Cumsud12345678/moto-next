@@ -301,7 +301,7 @@ const Filter = ({ initialMetadata }: Props) => {
           }
           
           <ThreeButton data={usedTypes} state={used} setState={setUsed} />
-          <SearchAndSelect data={metadata.cities} state={region} setState={setRegion} label="Region" />
+          <SearchAndSelect data={metadata.cities} state={region} setState={setRegion} label="Şəhər" />
         </div>
 
         {/* 2-Cİ SƏTİR */}
@@ -327,7 +327,7 @@ const Filter = ({ initialMetadata }: Props) => {
                   stateMax={maxPrice}
                   setStateMax={setMaxPrice}
                   length={200}
-                  label='Qiymet min.'
+                  label='Qiymət min.'
                 />
                 <div className='flex items-center justify-between py-2 bg-white p-3 rounded-lg'>
                   Kredit?
@@ -343,7 +343,7 @@ const Filter = ({ initialMetadata }: Props) => {
                   <SearchAndSelect data={metadata.fuelTypes} state={fuelType} setState={setFuelType} label="Yanacaq" />
                 </div>
                 <div className='rounded-lg flex flex-col gap-2'>
-                  <SearchAndSelect data={metadata.transmissions} state={transmission} setState={setTransmission} label="Suretler qutusu" />
+                  <SearchAndSelect data={metadata.transmissions} state={transmission} setState={setTransmission} label="Sürətlər qutusu" />
                 </div>
                 <div className='rounded-lg flex flex-col gap-2'>
                   <TwoSearchAndSelect
@@ -362,7 +362,7 @@ const Filter = ({ initialMetadata }: Props) => {
                     setMinState={setMinVolume}
                     maxState={maxVolume}
                     setMaxState={setMaxVolume}
-                    label='hecm min.'
+                    label='həcm min.'
                   />
                 </div>
 
@@ -373,7 +373,7 @@ const Filter = ({ initialMetadata }: Props) => {
                   stateMax={maxPower}
                   setStateMax={setMaxPower}
                   length={200}
-                  label='Guc min.'
+                  label='Güc min.'
                 />
                 <TwoInputGroup
                   stateMin={minDistance}
@@ -381,10 +381,10 @@ const Filter = ({ initialMetadata }: Props) => {
                   stateMax={maxDistance}
                   setStateMax={setMaxDistance}
                   length={200}
-                  label='Yuruyush min.'
+                  label='Yürüyüş min.'
                 />
                 <div className='rounded-lg flex flex-col gap-2'>
-                  <SearchAndSelect data={metadata.colors} state={color} setState={setColor} label="Reng" />
+                  <SearchAndSelect data={metadata.colors} state={color} setState={setColor} label="Rəng" />
                 </div>
               </div>
 
@@ -400,7 +400,7 @@ const Filter = ({ initialMetadata }: Props) => {
           <div className="flex items-center justify-between gap-4 z-20">
 
             <div className='flex items-center justify-between py-3 bg-white p-3 rounded-lg flex-1'>
-              Sened?
+              Sənəd?
               <CustomSwitch checked={document} setChecked={setDocument} />
             </div>
             <ButtonGroup data={metadata.categories} state={category} setState={setCategory} wrap={false} isNew={false} />
