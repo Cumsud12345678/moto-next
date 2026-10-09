@@ -23,7 +23,7 @@ const GropusPage = () => {
     const getData = async () => {
       try{
         const res = await api.get(
-          `api/groups`,
+          `/api/groups`,
           { withCredentials: true }
         )
 

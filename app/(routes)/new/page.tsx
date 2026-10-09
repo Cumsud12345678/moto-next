@@ -22,6 +22,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { createVideoUrl } from '@/lib/api/listings'
 import { useDispatch } from 'react-redux'
 import { setUser } from '@/redux/slices/userSlice'
+import { api } from '@/lib/axios'
 
 const API = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -51,8 +52,8 @@ const NewPage = () => {
   useEffect(() => {
     const getMe = async () => {
       try {
-        const res = await axios.get(
-          `${API}/api/auth/me`,
+        const res = await api.get(
+          `/api/auth/me`,
           { withCredentials: true }
         )
 
@@ -376,7 +377,6 @@ const NewPage = () => {
               <CardTitle className='text-xl'>Girişinizi təsdiqləyin</CardTitle>
               <CardDescription>
                 {email} E-poçt ünvanınıza göndərdiyimiz təsdiq kodunu daxil edin.
-                <span className="font-medium">{email}</span>.
               </CardDescription>
             </CardHeader>
             <CardContent>
