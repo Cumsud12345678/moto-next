@@ -24,7 +24,7 @@ export const useMetadata = () => {
     },
     {
       _id: '1b',
-      label: 'Surulmus',
+      label: 'Sürülmüş',
       status: false
     }
   ]

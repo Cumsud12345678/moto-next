@@ -101,7 +101,7 @@ const Filter = ({ initialMetadata }: Props) => {
     },
     {
       _id: '1b',
-      label: 'Surulmus',
+      label: 'Sürülmüş',
       status: false
     }
   ]

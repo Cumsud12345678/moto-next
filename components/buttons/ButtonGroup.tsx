@@ -28,7 +28,7 @@ const ButtonGroup = ({data, state, setState, wrap=false, isNew=false}: ButtonGro
 
   useEffect(() => {
     if(!data) return;
-    setNewData([{_id: '', label: 'Hamisi'}, ...data])
+    setNewData([{_id: '', label: 'Hamısı'}, ...data])
   }, [data])
 
 
@@ -42,7 +42,7 @@ const ButtonGroup = ({data, state, setState, wrap=false, isNew=false}: ButtonGro
     <div className={`flex items-center gap-2 ${wrap ? 'flex-nowrap' : 'flex-wrap'}`}>
       {
         newData.map((item, index) => {
-          if(isNew && item.label === 'Hamisi') return; 
+          if(isNew && item.label === 'Hamısı') return; 
           const active = item._id === state
           return (
             <button 
