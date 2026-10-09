@@ -4,7 +4,7 @@ import ThreeButton from '@/components/buttons/ThreeButton'
 import SearchAndSelect from '@/components/inputs/SearchAndSelect'
 import { useFilter } from '@/hooks/useFilter'
 import {Funnel} from '@gravity-ui/icons';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import FilterModal from './FilterModal'
 import CustomDrawer from '@/components/CustomDrawer'
 import { Default, Metadata } from '@/types/metadata'
@@ -168,7 +168,7 @@ const Filter = ({ initialMetadata }: Props) => {
   }
 
   const [filterOpen, setFilterOpen] = useState<boolean>(false)
-
+  const [isPending, startTransition] = useTransition()
 
   const applyFilter = (overrides?: { make?: string; model?: string; category?: string }) => {
     const params = new URLSearchParams()
@@ -208,7 +208,9 @@ const Filter = ({ initialMetadata }: Props) => {
 
     // if (equipment.length) params.set('equipment', equipment.join(','));
 
-    router.push(`/motors?${params.toString()}`)
+    startTransition(() => {
+      router.push(`/motors?${params.toString()}`)
+    })
   }
 
 
@@ -411,10 +413,17 @@ const Filter = ({ initialMetadata }: Props) => {
                 Sıfırla
               </button>
               <button
+                disabled={isPending}
                 onClick={() => applyFilter()}
-                className="bg-orange-500 text-white p-2.5 px-4 rounded-lg cursor-pointer shadow"
+                className={`text-white p-2.5 w-35 rounded-lg cursor-pointer shadow ${isPending ? 'bg-orange-300' : 'bg-orange-500'}`}
               >
-                Elanları gösdər
+                {
+                  isPending
+                  ?
+                  'Axtarılır...'
+                  :
+                  'Elanları gösdər'
+                }
               </button>
               <button
                 onClick={() => setFilterOpen(prev => !prev)}

@@ -6,6 +6,7 @@ import ReduxProvider from "@/redux/Provider";
 import { Toaster } from "@/components/ui/toast";
 import { Providers } from "./providers";
 import AuthProvider from "@/components/AuthProvider";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -96,6 +97,7 @@ export default function RootLayout({
           </Providers>
         </ReduxProvider>
       </body>
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
     </html>
   );
 }
