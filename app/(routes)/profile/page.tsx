@@ -37,12 +37,17 @@ const ProfilePage = () => {
 
   // page.tsx
   useEffect(() => {
-    if (!user?._id) return router.push('/auth')
+    if (authLoading) return            // auth yoxlanışı bitməyibsə gözlə
+
+    if (!user?._id) {
+      router.push('/auth')
+      return
+    }
 
     const fetchListings = async () => {
       setLoading(true)
       try {
-        const listings = await getMyListings()  // artıq id lazım deyil
+        const listings = await getMyListings()
         const notViewCount = await getNotViewCount()
         setData(listings || [])
         setTotalNotViewMsg(notViewCount || 0)
@@ -54,7 +59,7 @@ const ProfilePage = () => {
     }
 
     fetchListings()
-  }, [user?._id])
+  }, [authLoading, user?._id])
 
   const handleDelete = async (id: string) => {
     const prevData = data
