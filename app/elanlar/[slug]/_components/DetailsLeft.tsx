@@ -299,7 +299,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
         <div className="lg:hidden border-b py-3">
           <div className="flex p-2 rounded-lg items-center bg-[#f5f5f5]">
             <Avatar size='lg'>
-              <AvatarImage src="./profile.jpg" />
+              <AvatarImage src="/profile.jpg" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             {/* <img className="rounded-full w-[60px] h-[60px] object-contain border-2" src={profile ? `${BASE_URL}/uploads/${profile}` : '/profile.jpg'} alt="" /> */}

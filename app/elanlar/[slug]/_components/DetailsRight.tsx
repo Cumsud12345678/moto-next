@@ -74,7 +74,7 @@ const DetailsRight = ({ data }: { data: ProductDescription }) => {
         <div className="p-4">
           <div className="flex">
             <Avatar size='lg'>
-              <AvatarImage src="./profile.jpg" />
+              <AvatarImage src="/profile.jpg" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             {/* <img
