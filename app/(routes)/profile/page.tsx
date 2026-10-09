@@ -159,7 +159,7 @@ const ProfilePage = () => {
           <div className="flex gap-2 w-[75%]">
             <div className="relative size-12 shrink-0 overflow-hidden rounded-full border">
               <Image
-                src={user.avatar && user.avatar !== 'default' ? user.avatar : '/profile.png'}
+                src={user.avatar && user.avatar !== 'default' ? user.avatar : '/profile.jpg'}
                 alt="Profil şəkli"
                 fill
                 className="object-cover"
