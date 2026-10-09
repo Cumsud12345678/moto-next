@@ -307,6 +307,8 @@ const NewPage = () => {
   if (error) return null;
   if (!metadata) return null;
 
+  console.log(userData)
+
   return (
     <div>
       {
