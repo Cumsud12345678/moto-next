@@ -65,7 +65,7 @@ const AuthPage = () => {
             description: data.message
           })
           dispatch(setUser(data.user))
-          router.push('/')
+          window.location.href = '/'
         }
       },
       onError: () => {

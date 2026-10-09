@@ -31,7 +31,7 @@ const RejectedProductCard = ({ product }: Props) => {
 
           <Image
             src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${product.images[0]}`}
-            alt=''
+            alt={`${product.make.label} ${product.model.label} ${product.year}`}
             fill
             className='object-cover hover:scale-105 transition-transform duration-300'
           />

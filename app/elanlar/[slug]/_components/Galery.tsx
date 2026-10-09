@@ -242,7 +242,7 @@ const Galery = ({images, video, price, make, model, volume, year, phone}: Galery
               {/* Ön plan - əsl şəkil */}
               <Image
                 src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
-                alt=""
+                alt={`${make} ${model} ${year}`}
                 fill
                 className="absolute w-full h-full object-contain hidden lg:block top-1/2 left-1/2 -transform-y-1/2 -transform-x-1/2"
               />
@@ -295,7 +295,7 @@ const Galery = ({images, video, price, make, model, volume, year, phone}: Galery
             <SwiperSlide key={index}>
               <Image
                 src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
-                alt=""
+                alt={`${make} ${model} ${year}`}
                 fill
                 className="object-contain bg-black rounded-lg cursor-pointer"
                 onClick={() => handleOpenLightbox(index + videoOffset)}
@@ -356,7 +356,7 @@ const Galery = ({images, video, price, make, model, volume, year, phone}: Galery
               >
                 <Image
                   src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
-                  alt=""
+                  alt={`${make} ${model} ${year}`}
                   fill
                   className="object-cover"
                 />

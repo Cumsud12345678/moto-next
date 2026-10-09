@@ -45,7 +45,7 @@ const ProductCard = ({product}: {product: CardType}) => {
 
         <LikeButton listingId={product._id} initialLiked={product.isLiked} />
         
-        <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${product.images[0]}`} alt='' fill className='object-cover hover:scale-105 transition-transform duration-300'/>
+        <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${product.images[0]}`} alt={`${product.make.label} ${product.model.label} ${product.year}`} fill className='object-cover hover:scale-105 transition-transform duration-300'/>
         <div className='absolute bottom-0 right-0 m-2 flex gap-1 z-10'>
           {
             product.barter && 

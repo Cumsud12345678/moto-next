@@ -69,7 +69,7 @@ const CustomDrawer = ({open, setOpen, state, setState, data, label}: CustomDrawe
                   <div className='flex items-center gap-2'>
                     {
                       item.logo
-                      && <Image src={item.logo} alt='' width={30} height={30} />
+                      && <Image src={item.logo} alt={item.label} width={30} height={30} />
                     }
                     {item.label}
                   </div>
