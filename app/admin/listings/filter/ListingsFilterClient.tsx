@@ -115,7 +115,7 @@ export default function ListingsFilterPage() {
   }
 
   const handleGallery = (listing: Listing) => {
-    console.log('aa')
+    // console.log('aa')
   }
 
   const [openUrgent, setOpenUrgent] = useState<boolean>(false)

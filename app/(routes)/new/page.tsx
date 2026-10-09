@@ -98,7 +98,6 @@ const NewPage = () => {
     if(make && metadata) {
       setFilteredModels(metadata.models.filter((model: Default) => model.make === make))
     }else if(!make) {
-      console.log('sifirladim')
       setModel('')
       setFilteredModels([])
     }

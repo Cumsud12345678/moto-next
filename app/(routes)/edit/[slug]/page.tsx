@@ -229,8 +229,6 @@ const EditListingPage = ({ params }: { params: Promise<{ slug: string }> }) => {
 
     const newImages = images.filter((img) => !img.key)
 
-    console.log('newImages say:', newImages.length)
-
     const formData = new FormData()
 
     formData.append('price', String(price))
