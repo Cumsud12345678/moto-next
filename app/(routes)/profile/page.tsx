@@ -16,6 +16,7 @@ import DeactiveProductCard from './_components/DeactiveProductCard'
 import RejectedProductCard from './_components/RejectedProductCard'
 import { api } from '@/lib/axios'
 import { decGiftCount } from '@/redux/slices/userSlice'
+import { useRouter } from 'next/navigation'
 
 
 async function urgentListing(userId: string, listingId: string) {
@@ -28,6 +29,7 @@ const ProfilePage = () => {
   const user = useSelector((state: RootState) => state.user.user)
   const authLoading = useSelector((state: RootState) => state.user.loading)
   const dispatch = useDispatch()
+  const router = useRouter()
 
   const [data, setData] = useState<CardType[]>([])
   const [totalNotViewMsg, setTotalNotViewMsg] = useState<number>(0)
@@ -35,7 +37,7 @@ const ProfilePage = () => {
 
   // page.tsx
   useEffect(() => {
-    if (!user?._id) return
+    if (!user?._id) return router.push('/auth')
 
     const fetchListings = async () => {
       setLoading(true)

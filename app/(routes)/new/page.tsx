@@ -265,7 +265,7 @@ const NewPage = () => {
       onSuccess: (data) => {
         toast.add({ type: 'success', description: data.message })
         setLoading(false)
-        router.push('/')
+        window.location.href = '/'
       },
       onError: () => {
         toast.add({ type: 'error', description: 'Elan yaradıla bilmədi.', priority: 'high' })
