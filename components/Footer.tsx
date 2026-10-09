@@ -48,7 +48,7 @@ export default function Footer({ makes }: FooterProps) {
         &&
         <div className='bg-[#ebedf3]'>
           <div className='container max-w-250 mx-auto px-3'>
-            <div className='flex flex-col md:flex-row lg:items-center justify-between border-y-gray-400 border-y border-red-50 py-3 gap-2'>
+            {/* <div className='flex flex-col md:flex-row lg:items-center justify-between border-y-gray-400 border-y border-red-50 py-3 gap-2'>
               <span>Reklam yerləşdirin</span>
               <div className='flex gap-3 text-[14px] items-center'>
                 <a href="">
@@ -64,7 +64,7 @@ export default function Footer({ makes }: FooterProps) {
                   </div>
                 </a>
               </div>
-            </div>
+            </div> */}
             <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-2'>
               {
                 makes.map(make => (
