@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toast";
 import { Providers } from "./providers";
 import AuthProvider from "@/components/AuthProvider";
 import { GoogleAnalytics } from '@next/third-parties/google'
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -96,8 +97,15 @@ export default function RootLayout({
             <Toaster />
           </Providers>
         </ReduxProvider>
+
+        <Script
+          async
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7998830269416325"
+          crossOrigin="anonymous"
+        />
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       </body>
-      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
     </html>
   );
 }
