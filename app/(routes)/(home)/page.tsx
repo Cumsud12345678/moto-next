@@ -98,7 +98,7 @@ const HomePage = async () => {
       }
       
 
-      <div className='container mx-auto max-w-250 p-3 mb-20'>
+      <div className='container mx-auto max-w-250 p-3'>
         <ProductList data={products} />
       </div>
 
