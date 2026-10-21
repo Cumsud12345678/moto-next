@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { listingPath } from '@/lib/slug'
 
 const SITE_URL = process.env.SITE_URL!
 const API_URL = process.env.NEXT_PUBLIC_API_URL!
@@ -58,11 +59,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${SITE_URL}/elanlar`,
-      changeFrequency: 'hourly',
-      priority: 0.9,
-    },
-    {
       url: `${SITE_URL}/motors`,
       changeFrequency: 'daily',
       priority: 0.8,
@@ -70,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   const listingPages: MetadataRoute.Sitemap = listings.map((listing) => ({
-    url: `${SITE_URL}/elanlar/${listing.make?.label}-${listing.model?.label}-${listing._id}`,
+    url: `${SITE_URL}${listingPath(listing.make?.label, listing.model?.label, listing._id)}`,
     lastModified: listing.updatedAt
       ? new Date(listing.updatedAt)
       : undefined,

@@ -8,6 +8,7 @@ import {FileText} from '@gravity-ui/icons';
 import Link from 'next/link';
 import { ProductCard as CardType } from '@/types/product';
 import LikeButton from './LikeButton';
+import { listingPath } from '@/lib/slug'
 
 const ProductCard = ({product}: {product: CardType}) => {
 
@@ -27,7 +28,7 @@ const ProductCard = ({product}: {product: CardType}) => {
 
   return (
     <Link
-      href={`/elanlar/${product.make.label}-${product.model.label}-${product._id}`}
+      href={listingPath(product.make?.label, product.model?.label, product._id)}
       onClick={() => {
         navigator.sendBeacon(
           `${process.env.NEXT_PUBLIC_API_URL}/api/listings/click/${product._id}`

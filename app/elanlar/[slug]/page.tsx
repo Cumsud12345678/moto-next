@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { cache } from 'react'
 import DetailsLeft from './_components/DetailsLeft'
 import DetailsRight from './_components/DetailsRight'
 import { ProductCard, ProductDescription } from '@/types/product'
@@ -7,23 +7,34 @@ import ProductList from '@/components/ProductList'
 import Link from 'next/link'
 import { serverApi } from '@/lib/axios-server'
 import type { Metadata } from "next";
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
+import { isAxiosError } from 'axios'
+import { idFromSlug, listingPath, safeDecode } from '@/lib/slug'
 
-async function getProduct(id: string): Promise<ProductDescription | null> {
+// cache(): generateMetadata və səhifə eyni sorğunu iki dəfə göndərməsin
+//
+// ƏVVƏL: backend cavab verməyəndə (Render yuxu rejimi, timeout) bu funksiya null
+// qaytarırdı -> səhifə 404 + "noindex" olurdu. Googlebot elə o anda gəlsəydi,
+// elanı "mövcud deyil" kimi yadda saxlayırdı.
+// İNDİ: yalnız elan həqiqətən yoxdursa null qaytarırıq. Şəbəkə/server xətasında
+// xəta atırıq -> Next 500 qaytarır və Google sonra yenidən yoxlayır.
+const getProduct = cache(async (id: string): Promise<ProductDescription | null> => {
+  const cookieStore = await cookies()
+
   try {
-    const cookieStore = await cookies()
-
     const res = await serverApi.get(`/api/listings/${id}`, {
-      headers: {
-        Cookie: cookieStore.toString()
-    }});
-
-    return res.data.data;
+      headers: { Cookie: cookieStore.toString() },
+    })
+    // backend tapmayanda 200 + null qaytarır
+    return res.data?.data ?? null
   } catch (err) {
-    console.error('Failed to fetch products:', err);
-    return null;
+    if (isAxiosError(err) && (err.response?.status === 404 || err.response?.status === 400)) {
+      return null
+    }
+    console.error('Failed to fetch product:', err)
+    throw err
   }
-}
+})
 
 async function getSimilars(id: string): Promise<ProductCard[] | []> {
   try {
@@ -54,7 +65,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
 
-  const id = slug.split("-").pop();
+  const id = idFromSlug(slug);
 
   if (!id) {
     return {
@@ -93,7 +104,10 @@ export async function generateMetadata({
 
   const image = product.images?.[0];
 
-  const url = `${SITE_URL}/elanlar/${slug}`;
+  // Canonical HƏMİŞƏ elanın məlumatından qurulur, gələn URL-dən yox.
+  // Əvvəl "/elanlar/<id>" və "/elanlar/Yamaha-FZ-S Fi..." kimi hər variant
+  // özünü canonical elan edirdi.
+  const url = `${SITE_URL}${listingPath(make, model, product._id)}`;
 
   const imageUrl = image
   ? `${process.env.IMAGE_URL}/${image}`   // IMAGE_URL = https://... olmalıdır
@@ -144,10 +158,9 @@ export async function generateMetadata({
 const ElanlarPage = async ({params}: PageProps) => {
 
   const {slug} = await params
-  const id: string | undefined = slug.split("-").pop()
-  // const product = products[Number(id) - 1]
+  const id = idFromSlug(slug)
 
-  if(!id) return
+  if(!id) notFound()
 
   const [data, similars] = await Promise.all([
     getProduct(id),
@@ -155,6 +168,12 @@ const ElanlarPage = async ({params}: PageProps) => {
   ])
   
   if (!data) notFound();
+
+  // Köhnə URL-lər (boşluqlu, böyük hərfli, yalnız id) düzgün URL-ə 308 ilə yönləndirilir
+  const correctPath = listingPath(data.make?.label, data.model?.label, data._id)
+  if (`/elanlar/${safeDecode(slug)}` !== correctPath) {
+    permanentRedirect(correctPath)
+  }
 
   return (
     <div className='container mx-auto max-w-250 pb-0'>

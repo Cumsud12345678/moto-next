@@ -5,6 +5,7 @@ import { useState } from 'react'
 import Link from 'next/link';
 import { ProductCard as CardType } from '@/types/product';
 import { toggleLike } from '@/lib/api/listings';
+import { listingPath } from '@/lib/slug'
 
 interface Props {
   product: CardType
@@ -45,7 +46,7 @@ const ProductCard = ({ product, onUnlike }: Props) => {
 
   return (
     <Link
-      href={`/elanlar/${product.make.label}-${product.model.label}-${product._id}`}
+      href={listingPath(product.make?.label, product.model?.label, product._id)}
       className={`rounded-lg overflow-hidden bg-white shadow border-2 transition-opacity duration-200 ${
         product.isUrgent ? "border-orange-400" : ""
       } ${removing ? 'opacity-0 scale-95' : 'opacity-100'}`}

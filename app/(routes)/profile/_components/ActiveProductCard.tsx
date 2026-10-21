@@ -47,6 +47,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { api } from '@/lib/axios'
 import { toast } from '@/components/ui/toast'
+import { listingPath } from '@/lib/slug'
 
 interface Props {
   product: CardType
@@ -121,7 +122,7 @@ const ActiveProductCard = ({ product, giftCount, setGiftCount, onDelete, onUrgen
   return (
     <>
       <Link
-        href={`/elanlar/${product.make.label}-${product.model.label}-${product._id}`}
+        href={listingPath(product.make?.label, product.model?.label, product._id)}
         className={`rounded-lg overflow-hidden bg-white shadow border-2 ${
           product.isUrgent ? "border-orange-400" : ""
         }`}
