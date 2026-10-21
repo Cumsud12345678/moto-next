@@ -6,15 +6,30 @@ interface CreateEventResponse {
   success: boolean
   message: string
   data: { _id: string }
+  duplicate?: boolean
 }
 
-async function sendEvent(fotmData: FormData): Promise<CreateEventResponse> {
+interface CreateEventPayload {
+  formData: FormData
+  // Eyni elan formu üçün həmişə eyni açar göndərilir.
+  // Backend bu açarla ikinci sorğunu tanıyıb yeni elan YARATMIR.
+  idempotencyKey: string
+}
+
+async function sendEvent({ formData, idempotencyKey }: CreateEventPayload): Promise<CreateEventResponse> {
   const { data } = await api.post(
     '/api/listings',
-    fotmData,
+    formData,
     {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      withCredentials: true
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Idempotency-Key': idempotencyKey,
+      },
+      withCredentials: true,
+      // Şəkillər serverdə emal olunur və R2-yə yüklənir — bu uzun çəkə bilər.
+      // Əvvəl 10 san. idi: brauzer "xəta" göstərirdi, amma server elanı yaradırdı,
+      // istifadəçi yenidən basırdı və 2-ci elan yaranırdı.
+      timeout: 120000,
     }
   )
 
@@ -22,8 +37,7 @@ async function sendEvent(fotmData: FormData): Promise<CreateEventResponse> {
 }
 
 export const useCreateEvent = () => {
-  return useMutation<CreateEventResponse, Error, FormData>({
+  return useMutation<CreateEventResponse, Error, CreateEventPayload>({
     mutationFn: sendEvent
   })
 }
-

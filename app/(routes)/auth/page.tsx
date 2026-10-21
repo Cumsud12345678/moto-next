@@ -8,8 +8,9 @@ import { useSendOtp } from '@/hooks/useSendOtp'
 import { useVerifyOtp } from '@/hooks/useVerifyOtp'
 import { setUser } from '@/redux/slices/userSlice'
 import { RefreshCwIcon } from 'lucide-react'
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
 import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { useRouter } from 'next/navigation'
 
@@ -27,24 +28,45 @@ const AuthPage = () => {
   const sendOtpMutation = useSendOtp()
   const verifyOtpMutation = useVerifyOtp()
 
+  const user = useSelector((state: RootState) => state.user.user)
+  const sendingRef = useRef(false)
+  const verifyingRef = useRef(false)
+
+  // Artıq giriş etmiş istifadəçi bu səhifəyə düşərsə (məs. köhnə link), formu göstərmə
+  useEffect(() => {
+    // verifyingRef true-dursa, bu səhifədə indicə login olunub — handleVerify özü yönləndirir
+    if (user?._id && !verifyingRef.current) router.replace('/profile')
+  }, [user?._id, router])
+
+  const errorMessage = (err: unknown, fallback: string) => {
+    const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+    return msg || fallback
+  }
+
   const handleSendOtp = () => {
-    if(!email) return toast.add({ type: "warning", description: 'Emailinizi daxil edin' });
+    if (sendingRef.current) return
+    const cleanEmail = email.trim().toLowerCase()
+    if(!cleanEmail) return toast.add({ type: "warning", description: 'Emailinizi daxil edin' });
+    sendingRef.current = true
+    setEmail(cleanEmail)
     setLoginStartLoading(true)
-    sendOtpMutation.mutate({ email }, {
+    sendOtpMutation.mutate({ email: cleanEmail }, {
       onSuccess: (data) => {
         if (data.success) {
           toast.add({
             type: 'success',
             description: data.message
           })
-          setLoginStartLoading(false)
           setIsOldUser(data.isOldUser)
           setFormStep('verify')
         }
-      },
-      onError: () => {
-        toast.add({ type: 'error', description: 'Kod göndərilmədi.', priority: 'high' })
         setLoginStartLoading(false)
+        sendingRef.current = false
+      },
+      onError: (err) => {
+        toast.add({ type: 'error', description: errorMessage(err, 'Kod göndərilmədi.'), priority: 'high' })
+        setLoginStartLoading(false)
+        sendingRef.current = false
       }
     })
   }
@@ -54,12 +76,15 @@ const AuthPage = () => {
 
   // ADDIM 2: OTP-ni yoxla, uğur olsa elanı göndər
   const handleVerify = () => {
+    if (verifyingRef.current) return
     if(!email) return toast.add({ type: "warning", description: 'Emailinizi daxil edin' });
-    if(!isOldUser && !name) return toast.add({ type: "warning", description: 'Adınızı daxil edin' })
+    if(!isOldUser && !name.trim()) return toast.add({ type: "warning", description: 'Adınızı daxil edin' })
     if(otp.length !== 6) return toast.add({ type: "warning", description: 'Kodu daxil edin' });
-    verifyOtpMutation.mutate({ email, name, otp }, {
+    verifyingRef.current = true
+    verifyOtpMutation.mutate({ email: email.trim().toLowerCase(), name: name.trim(), otp }, {
       onSuccess: (data) => {
         if (data.success) {
+          // verifyingRef-i sıfırlamırıq: səhifə yönləndirilir, ikinci klik olmasın
           toast.add({
             type: 'success',
             description: data.message
@@ -68,8 +93,9 @@ const AuthPage = () => {
           window.location.href = '/'
         }
       },
-      onError: () => {
-        toast.add({ type: 'error', description: 'Kod yanlışdır.', priority: 'high' })
+      onError: (err) => {
+        verifyingRef.current = false
+        toast.add({ type: 'error', description: errorMessage(err, 'Kod yanlışdır.'), priority: 'high' })
       },
     })
   }

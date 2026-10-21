@@ -9,6 +9,7 @@ import { serverApi } from '@/lib/axios-server';
 import HeaderTab from './_components/HeaderTab';
 // import { getListings } from '@/lib/api/listings';
 import type { Metadata } from "next";
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: "Motosiklet Elanları — Azərbaycanda Motosiklet Al və Sat",

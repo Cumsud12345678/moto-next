@@ -1,5 +1,5 @@
 'use client'
-import { RootState } from '@/redux/store'
+import { AppDispatch, RootState } from '@/redux/store'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -15,7 +15,7 @@ import ActiveProductCard from './_components/ActiveProductCard'
 import DeactiveProductCard from './_components/DeactiveProductCard'
 import RejectedProductCard from './_components/RejectedProductCard'
 import { api } from '@/lib/axios'
-import { decGiftCount } from '@/redux/slices/userSlice'
+import { decGiftCount, fetchMe } from '@/redux/slices/userSlice'
 import { useRouter } from 'next/navigation'
 
 
@@ -28,7 +28,8 @@ const ProfilePage = () => {
   // ============ BÜTÜN HOOK-LAR BURADA, ŞƏRTSİZ ============
   const user = useSelector((state: RootState) => state.user.user)
   const authLoading = useSelector((state: RootState) => state.user.loading)
-  const dispatch = useDispatch()
+  const authError = useSelector((state: RootState) => state.user.error)
+  const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
   const [data, setData] = useState<CardType[]>([])
@@ -40,7 +41,13 @@ const ProfilePage = () => {
     if (authLoading) return            // auth yoxlanışı bitməyibsə gözlə
 
     if (!user?._id) {
-      router.push('/auth')
+      // Server cavab verə bilmədisə, istifadəçini /auth-a ATMIRIQ —
+      // bu "login olmayıb" demək deyil, sadəcə əlaqə problemidir.
+      if (authError) {
+        setLoading(false)
+        return
+      }
+      router.replace('/auth')
       return
     }
 
@@ -59,7 +66,7 @@ const ProfilePage = () => {
     }
 
     fetchListings()
-  }, [authLoading, user?._id])
+  }, [authLoading, authError, user?._id])
 
   const handleDelete = async (id: string) => {
     const prevData = data
@@ -150,6 +157,20 @@ const ProfilePage = () => {
   const [messageOpen, setMessageOpen] = useState<boolean>(false)
 
   // ============ İNDİ ERKƏN RETURN ETMƏK OLAR — BÜTÜN HOOK-LAR ARTIQ ÇAĞIRILIB ============
+  if (!authLoading && !user && authError) {
+    return (
+      <div className="text-center mt-20 flex flex-col items-center gap-3">
+        <p>Serverlə əlaqə qurulmadı.</p>
+        <button
+          onClick={() => dispatch(fetchMe())}
+          className="px-4 py-2 rounded-lg bg-blue-500 text-white"
+        >
+          Yenidən cəhd et
+        </button>
+      </div>
+    )
+  }
+
   if (authLoading || !user) {
     return <div className="text-center mt-20">Yüklənir...</div>
   }

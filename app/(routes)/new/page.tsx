@@ -5,7 +5,7 @@ import { Spinner } from "@/components/ui/spinner"
 import Step1 from './steps/Step1'
 import Step2 from './steps/Step2'
 import Step3 from './steps/Step3'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { toast } from '@/components/ui/toast'
 import { useMetadata } from '@/hooks/useMetadata'
 import { Default } from '@/types/metadata'
@@ -20,9 +20,9 @@ import { RefreshCwIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createVideoUrl } from '@/lib/api/listings'
-import { useDispatch } from 'react-redux'
-import { setUser } from '@/redux/slices/userSlice'
-import { api } from '@/lib/axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchMe, setUser } from '@/redux/slices/userSlice'
+import { AppDispatch, RootState } from '@/redux/store'
 
 const API = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -42,28 +42,36 @@ interface ImageFile  {
 const NewPage = () => {
   
   const [formStep, setFormStep] = useState<string>('start')
-  const [userData, setUserData] = useState<User | undefined>(undefined)
   const [isOldUser, setIsOldUser] = useState<boolean>(false)
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const router = useRouter()
 
-  useEffect(() => {
-    const getMe = async () => {
-      try {
-        const res = await api.get(
-          `/api/auth/me`,
-          { withCredentials: true }
-        )
+  // Əvvəl bu səhifə /me-ni ÖZÜ çəkirdi və sorğu düşəndə (timeout, Render yuxu rejimi)
+  // giriş etmiş istifadəçiyə email + OTP formu göstərilirdi → "təkrar qeydiyyat".
+  // İndi AuthProvider-in Redux-dakı nəticəsini istifadə edirik.
+  const reduxUser = useSelector((state: RootState) => state.user.user)
+  const authLoading = useSelector((state: RootState) => state.user.loading)
+  const authInitialized = useSelector((state: RootState) => state.user.initialized)
+  const authError = useSelector((state: RootState) => state.user.error)
+  const userData: User | undefined = reduxUser ?? undefined
+  const authReady = authInitialized && !authLoading
 
-        setUserData(res.data.data)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    getMe()
-  }, [])
+  // Dublikat qoruması: eyni anda yalnız bir göndərmə
+  const submittingRef = useRef(false)
+  const verifyingRef = useRef(false)
+  // Bu formun unikal açarı — təkrar göndərilsə backend eyni elanı qaytarır
+  const idempotencyKeyRef = useRef<string>(
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  )
+
+  const errorMessage = (err: unknown, fallback: string) => {
+    const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+    return msg || fallback
+  }
 
   const filterStates = useFilter()
   const metadataHook = useMetadata()
@@ -159,7 +167,7 @@ const NewPage = () => {
     if (rawPhone.length !== 9) return warn('Telefon nömrəsi 9 rəqəmdən ibarət olmalıdır')
 
     if (!userData) {
-      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim().toLowerCase())
       if (!emailOk) return warn('Düzgün email daxil edin')
     }
 
@@ -168,7 +176,13 @@ const NewPage = () => {
 
   // ADDIM 1: email+name+phone göndər, OTP istə (yalnız userData yoxdursa lazımdır)
   const handleSendOtp = () => {
+    // setLoading növbəti render-də tətbiq olunur, ona görə sürətli double click
+    // funksiyanı 2 dəfə çağırırdı. ref dərhal dəyişir.
+    if (submittingRef.current) return
+    if (!authReady) return
     if (!validateListing()) return
+
+    submittingRef.current = true
     setLoading(true)
 
     if (userData) {
@@ -176,7 +190,10 @@ const NewPage = () => {
       return
     }
 
-    sendOtpMutation.mutate({ email }, {
+    const cleanEmail = email.trim().toLowerCase()
+    setEmail(cleanEmail)
+
+    sendOtpMutation.mutate({ email: cleanEmail }, {
       onSuccess: (data) => {
         if (data.success) {
           toast.add({ type: 'success', description: data.message })
@@ -184,30 +201,40 @@ const NewPage = () => {
           setIsOldUser(data.isOldUser)
         }
         setLoading(false)
+        submittingRef.current = false
       },
-      onError: () => {
-        toast.add({ type: 'error', description: 'Kod göndərilmədi.', priority: 'high' })
-        setLoading(false) // əvvəl yox idi, düymə donub qalırdı
+      onError: (err) => {
+        toast.add({ type: 'error', description: errorMessage(err, 'Kod göndərilmədi.'), priority: 'high' })
+        setLoading(false)
+        submittingRef.current = false
       },
     })
   }
 
   // ADDIM 2: OTP-ni yoxla, uğur olsa elanı göndər
   const handleVerify = () => {
+    if (verifyingRef.current || submittingRef.current) return
     if (!isOldUser && name.trim().length < 2) return warn('Adınızı daxil edin')
     if (otp.length < 6) return warn('6 rəqəmli kodu tam daxil edin')
 
-    verifyOtpMutation.mutate({ email, name, otp }, {
+    verifyingRef.current = true
+
+    verifyOtpMutation.mutate({ email: email.trim().toLowerCase(), name: name.trim(), otp }, {
       onSuccess: (data) => {
+        verifyingRef.current = false
         if (data.success) {
+          // İstifadəçi artıq giriş edib. Elan alınmasa belə, yenidən OTP istənməyəcək.
           dispatch(setUser(data.user))
+          submittingRef.current = true
+          setLoading(true)
           submitListing()
         } else {
           toast.add({ type: 'error', description: data.message ?? 'Kod yanlışdır.', priority: 'high' })
         }
       },
-      onError: () => {
-        toast.add({ type: 'error', description: 'Kod yanlışdır.', priority: 'high' })
+      onError: (err) => {
+        verifyingRef.current = false
+        toast.add({ type: 'error', description: errorMessage(err, 'Kod yanlışdır.'), priority: 'high' })
       },
     })
   }
@@ -234,6 +261,8 @@ const NewPage = () => {
       } catch {
         toast.add({ type: 'error', description: 'Video yüklənmədi.', priority: 'high' })
         setLoading(false)
+        submittingRef.current = false
+        setFormStep('start')
         return
       }
     }
@@ -261,15 +290,20 @@ const NewPage = () => {
     images.forEach((image) => formData.append('images', image.file))
     equipment.forEach((eq) => formData.append('equipment', eq))
 
-    createEventMutation.mutate(formData, {
+    createEventMutation.mutate({ formData, idempotencyKey: idempotencyKeyRef.current }, {
       onSuccess: (data) => {
         toast.add({ type: 'success', description: data.message })
-        setLoading(false)
+        // submittingRef-i sıfırlamırıq: səhifə yönləndirilənə qədər düymə kilidli qalsın
         window.location.href = '/'
       },
-      onError: () => {
-        toast.add({ type: 'error', description: 'Elan yaradıla bilmədi.', priority: 'high' })
+      onError: (err) => {
+        toast.add({ type: 'error', description: errorMessage(err, 'Elan yaradıla bilmədi.'), priority: 'high' })
         setLoading(false)
+        submittingRef.current = false
+        // OTP təsdiqindən sonra elan alınmasa, istifadəçi artıq login olub —
+        // formaya qaytarırıq ki, "Göndər" ilə yenidən cəhd etsin (yeni kod istəmədən).
+        // Eyni idempotency açarı göndərilir, ona görə dublikat yaranmır.
+        setFormStep('start')
       },
     })
   }
@@ -349,17 +383,37 @@ const NewPage = () => {
                       setVideo={setVideo}
                     />
 
-                    <Step3
-                      setForm={handleSendOtp}          // 'setFormAndLogin' əvəzinə
-                      isSubmitting={loading}
-                      userData={userData}
-                      phone={phone}
-                      setPhone={setPhone}
-                      name={name}
-                      setName={setName}
-                      email={email}
-                      setEmail={setEmail}
-                    />
+                    {
+                      !authReady
+                      ?
+                        <div className="lg:p-10 lg:border rounded-3xl flex items-center justify-center bg-white p-5">
+                          <Spinner />
+                        </div>
+                      :
+                      authError && !userData
+                      ?
+                        <div className="lg:p-10 lg:border rounded-3xl flex flex-col items-center gap-3 bg-white p-5">
+                          <p>Serverlə əlaqə qurulmadı.</p>
+                          <button
+                            onClick={() => dispatch(fetchMe())}
+                            className="px-4 py-2 rounded-xl bg-blue-500 text-white"
+                          >
+                            Yenidən cəhd et
+                          </button>
+                        </div>
+                      :
+                        <Step3
+                          setForm={handleSendOtp}
+                          isSubmitting={loading}
+                          userData={userData}
+                          phone={phone}
+                          setPhone={setPhone}
+                          name={name}
+                          setName={setName}
+                          email={email}
+                          setEmail={setEmail}
+                        />
+                    }
 
                   </Fragment>
                 }
@@ -439,9 +493,9 @@ const NewPage = () => {
                   size={'lg'} 
                   className="w-full py-5"
                   onClick={handleVerify}
-                  disabled={verifyOtpMutation.isPending || otp.length < 6}
+                  disabled={verifyOtpMutation.isPending || loading || otp.length < 6}
                 >
-                  {verifyOtpMutation.isPending ? 'Yoxlanılır...' : 'Göndər'}
+                  {verifyOtpMutation.isPending ? 'Yoxlanılır...' : loading ? 'Elan göndərilir...' : 'Göndər'}
                 </Button>
                 {/* <div className="text-sm text-muted-foreground">
                   Having trouble signing in?{" "}
