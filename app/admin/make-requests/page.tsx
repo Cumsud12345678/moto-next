@@ -1,17 +1,21 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { Suspense, useState } from 'react'
+import Link from 'next/link'
+import { useQueryClient } from '@tanstack/react-query'
+import ListingPagination from '@/components/ListingPagination'
 import { api } from '@/lib/axios'
 import { toast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import PageHeader from '../components/PageHeader'
+import EmptyState from '../components/EmptyState'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { ToneBadge } from '../components/StatusBadge'
+import { useAdminList } from '../_lib/useAdminList'
+import { usePageParam } from '../_lib/usePageParam'
+import { useUrlFilters } from '../_lib/useUrlFilters'
+import { errorMessage, formatDateTime } from '../_lib/utils'
 
 type Status = 'pending' | 'added' | 'rejected'
 
@@ -22,84 +26,49 @@ interface MakeRequest {
   status: Status
   notifiedAt: string | null
   user: { _id: string; name: string; email: string } | null
-  ip?: string
   createdAt: string
 }
 
-interface ListResponse {
-  data: MakeRequest[]
-  total: number
-  pendingCount: number
-  page: number
-  totalPages: number
+const ENDPOINT = '/api/admin/make-requests'
+
+const STATUS_BADGE: Record<Status, { label: string; tone: 'yellow' | 'green' | 'gray' }> = {
+  pending: { label: 'Gözləyir', tone: 'yellow' },
+  added: { label: 'Əlavə olundu', tone: 'green' },
+  rejected: { label: 'Rədd edildi', tone: 'gray' },
 }
 
-const STATUS_LABEL: Record<Status, string> = {
-  pending: 'Gözləyir',
-  added: 'Əlavə olundu',
-  rejected: 'Rədd edildi',
-}
-
-const STATUS_VARIANT: Record<Status, 'secondary' | 'default' | 'destructive'> = {
-  pending: 'secondary',
-  added: 'default',
-  rejected: 'destructive',
-}
-
-const FILTERS: { value: '' | Status; label: string }[] = [
+const TABS: { value: Status | 'all'; label: string }[] = [
   { value: 'pending', label: 'Gözləyənlər' },
   { value: 'added', label: 'Əlavə olunanlar' },
   { value: 'rejected', label: 'Rədd edilənlər' },
-  { value: '', label: 'Hamısı' },
+  { value: 'all', label: 'Hamısı' },
 ]
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleString('az-AZ', { dateStyle: 'short', timeStyle: 'short' })
+function MakeRequestsContent() {
+  const page = usePageParam()
+  const queryClient = useQueryClient()
+  const { values, setFilters } = useUrlFilters(['status'] as const)
+  const status = (values.status || 'pending') as Status | 'all'
 
-const errorMessage = (err: unknown, fallback: string) =>
-  (err as { response?: { data?: { message?: string } } })?.response?.data?.message || fallback
+  const { data, isLoading, isError, isFetching } = useAdminList<MakeRequest, { pendingCount: number }>(
+    ENDPOINT,
+    page,
+    20,
+    status === 'all' ? {} : { status }
+  )
+  const pendingCount = data?.pendingCount
 
-export default function MakeRequestsPage() {
-  const [status, setStatus] = useState<'' | Status>('pending')
-  const [page, setPage] = useState(1)
-  const [result, setResult] = useState<ListResponse | null>(null)
-  const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<MakeRequest | null>(null)
 
-  // reloadKey dəyişəndə siyahı yenidən yüklənir
-  const [reloadKey, setReloadKey] = useState(0)
-  const load = useCallback(() => {
-    setLoading(true)
-    setReloadKey((k) => k + 1)
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    const params = new URLSearchParams({ page: String(page), limit: '20' })
-    if (status) params.set('status', status)
-
-    api.get<ListResponse>(`/api/admin/make-requests?${params}`)
-      .then(({ data }) => {
-        if (!cancelled) setResult(data)
-      })
-      .catch((err) => {
-        if (!cancelled) toast.add({ type: 'error', description: errorMessage(err, 'Sorğular yüklənmədi') })
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [page, status, reloadKey])
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin'] })
 
   const changeStatus = async (id: string, next: Status) => {
     setBusyId(id)
     try {
-      const { data } = await api.patch(`/api/admin/make-requests/${id}`, { status: next })
+      const { data } = await api.patch(`${ENDPOINT}/${id}`, { status: next })
       toast.add({ type: 'success', description: data.message })
-      load()
+      refresh()
     } catch (err) {
       toast.add({ type: 'error', description: errorMessage(err, 'Status dəyişmədi') })
     } finally {
@@ -107,122 +76,105 @@ export default function MakeRequestsPage() {
     }
   }
 
-  const remove = async (id: string) => {
-    setBusyId(id)
+  const remove = async () => {
+    if (!deleteTarget) return
     try {
-      await api.delete(`/api/admin/make-requests/${id}`)
+      await api.delete(`${ENDPOINT}/${deleteTarget._id}`)
       toast.add({ type: 'success', description: 'Silindi' })
-      load()
+      refresh()
     } catch (err) {
       toast.add({ type: 'error', description: errorMessage(err, 'Silinmədi') })
-    } finally {
-      setBusyId(null)
+      throw err
     }
   }
 
   return (
-    <div className="p-4 w-full max-w-6xl">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <div>
-          <h1 className="text-2xl font-bold">Marka / model sorğuları</h1>
-          <p className="text-sm text-gray-500">
-            Gözləyən: {result?.pendingCount ?? '—'}. Markanı Make, Model səhifəsindən əlavə edib burada
-            &quot;Əlavə olundu&quot; basın — email yazan istifadəçiyə xəbər gedəcək.
-          </p>
-        </div>
-        <Button variant="outline" onClick={load} disabled={loading}>
-          Yenilə
-        </Button>
-      </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title="Marka sorğuları"
+        description={
+          <>
+            İstifadəçilərin tapa bilmədiyi markalar. Markanı{' '}
+            <Link href="/admin/metadata" className="text-sky-700 hover:underline">Marka, model</Link>{' '}
+            səhifəsində əlavə edin, sonra burada &quot;Əlavə olundu&quot; basın — email yazan istifadəçiyə xəbər gedəcək.
+          </>
+        }
+      />
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        {FILTERS.map((f) => (
+      <div className="mb-4 flex flex-wrap gap-2">
+        {TABS.map((t) => (
           <Button
-            key={f.value || 'all'}
-            variant={status === f.value ? 'default' : 'outline'}
+            key={t.value}
             size="sm"
-            onClick={() => {
-              setStatus(f.value)
-              setPage(1)
-              setLoading(true)
-            }}
+            variant={status === t.value ? 'default' : 'outline'}
+            onClick={() => setFilters({ status: t.value === 'pending' ? '' : t.value })}
           >
-            {f.label}
+            {t.label}
+            {t.value === 'pending' && pendingCount ? ` (${pendingCount})` : ''}
           </Button>
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-md border bg-white">
+      <div className="overflow-x-auto rounded-xl border bg-white">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Marka / model</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>İstifadəçi</TableHead>
+              <TableHead>Xəbər veriləcək email</TableHead>
+              <TableHead>Göndərən</TableHead>
               <TableHead>Tarix</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Əməliyyat</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {loading && !result ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">Yüklənir...</TableCell>
-              </TableRow>
-            ) : !result?.data.length ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">Sorğu yoxdur</TableCell>
-              </TableRow>
+          <TableBody className={isFetching && !isLoading ? 'opacity-60' : ''}>
+            {isLoading ? (
+              Array.from({ length: 5 }, (_, i) => (
+                <TableRow key={i}><TableCell colSpan={6}><Skeleton className="h-8" /></TableCell></TableRow>
+              ))
+            ) : isError ? (
+              <TableRow><TableCell colSpan={6}><EmptyState title="Yüklənmədi" description="Səhifəni yeniləyin" /></TableCell></TableRow>
+            ) : !data?.data.length ? (
+              <TableRow><TableCell colSpan={6}><EmptyState title="Sorğu yoxdur" /></TableCell></TableRow>
             ) : (
-              result.data.map((r) => (
+              data.data.map((r) => (
                 <TableRow key={r._id}>
                   <TableCell className="font-medium">{r.text}</TableCell>
                   <TableCell>
-                    {r.email ?? <span className="text-gray-400">—</span>}
-                    {r.notifiedAt && (
-                      <span className="block text-xs text-green-600">xəbər göndərildi</span>
+                    {r.email ?? <span className="text-muted-foreground">—</span>}
+                    {r.notifiedAt && <div className="text-xs text-green-700">xəbər göndərildi</div>}
+                  </TableCell>
+                  <TableCell>
+                    {r.user ? (
+                      <Link href={`/admin/users?q=${encodeURIComponent(r.user.email)}`} className="hover:underline">
+                        {r.user.name || r.user.email}
+                      </Link>
+                    ) : (
+                      <span className="text-muted-foreground">Qonaq</span>
                     )}
                   </TableCell>
+                  <TableCell className="whitespace-nowrap">{formatDateTime(r.createdAt)}</TableCell>
                   <TableCell>
-                    {r.user ? r.user.name || r.user.email : <span className="text-gray-400">qonaq</span>}
-                  </TableCell>
-                  <TableCell>{formatDate(r.createdAt)}</TableCell>
-                  <TableCell>
-                    <Badge variant={STATUS_VARIANT[r.status]}>{STATUS_LABEL[r.status]}</Badge>
+                    <ToneBadge tone={STATUS_BADGE[r.status].tone}>{STATUS_BADGE[r.status].label}</ToneBadge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-2 whitespace-nowrap">
                       {r.status !== 'added' && (
                         <Button size="sm" disabled={busyId === r._id} onClick={() => changeStatus(r._id, 'added')}>
                           Əlavə olundu
                         </Button>
                       )}
-                      {r.status !== 'rejected' && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={busyId === r._id}
-                          onClick={() => changeStatus(r._id, 'rejected')}
-                        >
+                      {r.status === 'pending' && (
+                        <Button size="sm" variant="outline" disabled={busyId === r._id} onClick={() => changeStatus(r._id, 'rejected')}>
                           Rədd et
                         </Button>
                       )}
                       {r.status !== 'pending' && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          disabled={busyId === r._id}
-                          onClick={() => changeStatus(r._id, 'pending')}
-                        >
+                        <Button size="sm" variant="ghost" disabled={busyId === r._id} onClick={() => changeStatus(r._id, 'pending')}>
                           Geri al
                         </Button>
                       )}
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        disabled={busyId === r._id}
-                        onClick={() => remove(r._id)}
-                      >
+                      <Button size="sm" variant="destructive" disabled={busyId === r._id} onClick={() => setDeleteTarget(r)}>
                         Sil
                       </Button>
                     </div>
@@ -234,24 +186,25 @@ export default function MakeRequestsPage() {
         </Table>
       </div>
 
-      {result && result.totalPages > 1 && (
-        <div className="flex items-center justify-end gap-2 mt-4">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => { setLoading(true); setPage((p) => p - 1) }}>
-            Əvvəlki
-          </Button>
-          <span className="text-sm">
-            {result.page} / {result.totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= result.totalPages}
-            onClick={() => { setLoading(true); setPage((p) => p + 1) }}
-          >
-            Növbəti
-          </Button>
-        </div>
-      )}
+      <ListingPagination currentPage={page} totalPages={data?.totalPages ?? 1} />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Sorğu silinsin?"
+        description={deleteTarget ? <><b>{deleteTarget.text}</b> sorğusu silinəcək.</> : undefined}
+        confirmLabel="Sil"
+        destructive
+        onConfirm={remove}
+      />
     </div>
+  )
+}
+
+export default function MakeRequestsPage() {
+  return (
+    <Suspense fallback={null}>
+      <MakeRequestsContent />
+    </Suspense>
   )
 }

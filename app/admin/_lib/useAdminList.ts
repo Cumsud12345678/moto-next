@@ -5,11 +5,11 @@ import { Paginated } from './utils'
 
 // Admin cədvəlləri üçün səhifələnmiş siyahı. Səhifə dəyişəndə köhnə data qalır,
 // cədvəl "tullanmır".
-export function useAdminList<T>(endpoint: string, page: number, limit = 20, params: Record<string, string> = {}) {
-  return useQuery<Paginated<T>>({
+export function useAdminList<T, Extra = object>(endpoint: string, page: number, limit = 20, params: Record<string, string> = {}) {
+  return useQuery<Paginated<T, Extra>>({
     queryKey: ['admin', endpoint, page, limit, params],
     queryFn: async () => {
-      const { data } = await api.get<Paginated<T>>(endpoint, { params: { page, limit, ...params } })
+      const { data } = await api.get<Paginated<T, Extra>>(endpoint, { params: { page, limit, ...params } })
       return data
     },
     placeholderData: keepPreviousData,

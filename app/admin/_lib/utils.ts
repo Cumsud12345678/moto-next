@@ -51,11 +51,12 @@ export const daysLeft = (value?: string | null) => {
 export const errorMessage = (err: unknown, fallback = 'Xəta baş verdi') =>
   (err as { response?: { data?: { message?: string } } })?.response?.data?.message || fallback
 
-export interface Paginated<T> {
+// Extra: bəzi endpoint-lərin əlavə sahələri (məs. pendingCount)
+export type Paginated<T, Extra = object> = {
   success: boolean
   data: T[]
   total: number
   page: number
   limit: number
   totalPages: number
-}
+} & Extra

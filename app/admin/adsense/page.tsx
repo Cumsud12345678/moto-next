@@ -1,337 +1,130 @@
 'use client'
-import Dropzone from '@/components/Dropzone'
-import { Label } from '@/components/ui/label'
-import { toast } from '@/components/ui/toast'
-import { useImageDrop } from '@/hooks/useImageDrop'
+import { useMemo, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/axios'
-import { Minus, Plus, Xmark } from '@gravity-ui/icons'
-import Image from 'next/image'
-import React, { useState } from 'react'
+import { toast } from '@/components/ui/toast'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import PageHeader from '../components/PageHeader'
+import EmptyState from '../components/EmptyState'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { ToneBadge } from '../components/StatusBadge'
+import { daysLeft, errorMessage, formatDate, formatNumber, imageSrc } from '../_lib/utils'
+import AdsenseDialog, { Adsense, POSITION_LABEL } from './adsense-dialog'
 
-import { columns, Adsense } from "./columns"
-import { DataTable } from "../components/data-table"
-import { useEffect } from "react"
-import EditDialog from "./edit-dialog"
+const QUERY_KEY = ['admin', 'adsense']
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { TrashBin } from "@gravity-ui/icons"
-import PlaceholderEffectInput from "@/components/inputs/PlaceholderEffectInput"
-import { useRouter } from "next/navigation"
-import CustomSwitch from '@/components/buttons/CustomSwitch'
-
-
-interface ImageFile  {
-  id: string 
-  url: string
-  file: File
+function ExpiryBadge({ expiresAt }: { expiresAt: string }) {
+  const left = daysLeft(expiresAt)
+  if (left === null || left <= 0) return <ToneBadge tone="red">Bitib</ToneBadge>
+  if (left <= 3) return <ToneBadge tone="orange">{left} gün qalıb</ToneBadge>
+  return <ToneBadge tone="green">{left} gün qalıb</ToneBadge>
 }
 
-async function setAdsense(formData: FormData) {
-  const res = await api.post(
-    `api/adsense`,
-    formData,
-    { 
-      withCredentials: true,
-      headers: { 'Content-Type': 'multipart/form-data' } // ya da tamamilə silin
-    }
-  )
-
-  return res.data
-}
-
-const AdsensePage = () => {
-
-  // Şəkillərin sürüklə-burax ilə sıralanması
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
-  const [overIndex, setOverIndex] = useState<number | null>(null)
-
-  const [images, setImages] = useState<ImageFile[]>([])
-
-  const [adsenseLink, setAdsenseLink] = useState<string>('')
-  const [adsensePosition, setAdsensePosition] = useState<'mobile' | 'deskop_left' | 'deskop_right' | string>('')
-  const [ownerName, setOwnerName] = useState<string>('')
-  const [ownerPhone, setOwnerPhone] = useState<string>('')
-  const [expiresDay, setExpiresDay] = useState<string>('')
-  const [isHome, setIsHome] = useState<boolean | null>(null)
-  const [isDetails, setIsDetails] = useState<boolean | null>(null)
-
-  const
-  {
-    handleDragMove,
-    handleDragEnd,
-    removeImage,
-    handleDragStart,
-    handleDrop
-  } =
-  useImageDrop({
-    images,
-    setImages,
-    draggedIndex,
-    setDraggedIndex,
-    overIndex,
-    setOverIndex,
+export default function AdsensePage() {
+  const queryClient = useQueryClient()
+  const { data, isLoading, isError } = useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: async () => (await api.get<{ data: Adsense[] }>('/api/adsense/all')).data.data,
   })
 
-  const handleDeleteImage = (id: string) => {
-    removeImage(id)
-  }
+  const [dialog, setDialog] = useState<Adsense | 'new' | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Adsense | null>(null)
 
-  const setAdsenseForm = () => {
-    if(!adsenseLink?.trim()) return toast.add({type: 'danger', description: 'Adsense link daxil edin'});
-    if(!adsensePosition?.trim()) return toast.add({type: 'danger', description: 'Adsense position daxil edin'});
-    if(!ownerName?.trim()) return toast.add({type: 'danger', description: 'Owner name daxil edin'});
-    if(!ownerPhone?.trim()) return toast.add({type: 'danger', description: 'Owner phone daxil edin'});
-    if(!expiresDay?.trim()) return toast.add({type: 'danger', description: 'Expires day daxil edin'});
-    
-    if(images.length === 0) return toast.add({type: 'danger', description: 'Sekil secin'});
+  const refresh = () => queryClient.invalidateQueries({ queryKey: QUERY_KEY })
 
-    const formData = new FormData()
+  const activeCount = useMemo(() => (data ?? []).filter((a) => (daysLeft(a.adsenseExpiresAt) ?? 0) > 0).length, [data])
 
-    formData.append('logo', images[0]?.file)
-    formData.append('link', adsenseLink)
-    formData.append('position', adsensePosition)
-    if (isHome !== null) formData.append('isHome', String(isHome));
-    if (isDetails !== null) formData.append('isDetails', String(isDetails));
-    formData.append('day', String(expiresDay))
-    formData.append('ownerName', ownerName)
-    formData.append('ownerPhone', String(ownerPhone))
-
-    toast.promise(
-      setAdsense(formData),
-      {
-        loading: 'Kayit etklenir',
-        success: () => {
-          return 'Kayit eklendi.'
-        },
-        error: (err) => err.message || 'Xeta bas verdi'
-      }
-    )
-  }
-
-
-
-  // liste
-  const router = useRouter()
-
-  const [data, setData] = useState<Adsense[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await api.get('/api/adsense', { withCredentials: true })
-        setData(res.data.data)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
+  const deleteAd = async () => {
+    if (!deleteTarget) return
+    try {
+      const { data } = await api.delete(`/api/adsense/${deleteTarget._id}`)
+      toast.add({ type: 'success', description: data.message })
+      refresh()
+    } catch (err) {
+      toast.add({ type: 'error', description: errorMessage(err, 'Silinmədi') })
+      throw err
     }
-    getData()
-  }, [])
-
-
-  const [deletedOpen, setDeletedOpen] = useState<boolean>(false)
-  const [deleteAdsenseData, setDeleteAdsenseData] = useState<Adsense | undefined>(undefined)
-
-  const handleDelete = async (adsense: Adsense) => {
-    setDeletedOpen(true)
-    setDeleteAdsenseData(adsense)
   }
-
-  async function deleteAdsense() {
-    const res = await api.delete(
-      `/api/adsense/${deleteAdsenseData?._id}`, {
-      withCredentials: true
-    }
-    )
-    return res.data
-  }
-
-  const handleDeleteAdsense = async () => {
-    toast.promise(
-      deleteAdsense(),
-      {
-        loading: 'Adsense silinir',
-        success: () => {
-          setData(prev => prev.filter(a => a._id !== deleteAdsenseData?._id))
-          return 'Grup silindi'
-        },
-        error: () => {
-          return 'Bir xəta oldu'
-        }
-      }
-    )
-  }
-
-
-  const [open, setOpen] = useState<boolean>(false)
-  const [editAdsenseData, setEditAdsenseData] = useState<Adsense | undefined>(undefined)
-
-  const handleEdit = (adsense: Adsense) => {
-    // Modal açın və ya edit səhifəsinə yönləndirin
-    setOpen(true)
-    setEditAdsenseData(adsense)
-  }
-
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
 
   return (
-    <div>
-      <div className='w-full flex flex-col lg:flex-row p-5 min-w-100'>
-        <div className='bg-white p-3 rounded-lg w-full'>
-          <div className='flex flex-col gap-5'>
-            <div>
-              <Label>Adsense link</Label>
-              <input 
-                value={adsenseLink} 
-                onChange={(e) => setAdsenseLink(e.target.value)} 
-                className='p-2 border rounded-lg bg-white max-w-75'
-                type="text" 
-                placeholder='Adsense link' 
-              />
-            </div>
-            <div>
-              <Label>Adsense position</Label>
-              <input 
-                value={adsensePosition} 
-                onChange={(e) => setAdsensePosition(e.target.value)}
-                className='p-2 border rounded-lg bg-white max-w-75'
-                type="text"
-                placeholder='mobile | desktop_left | desktop_right' 
-              />
-            </div>
-            <div>
-              <Label>Owner name</Label>
-              <input 
-                value={ownerName} 
-                onChange={(e) => setOwnerName(e.target.value)}
-                className='p-2 border rounded-lg bg-white max-w-75'
-                type="text"
-                placeholder='Owner name' 
-              />
-            </div>
-            <div>
-              <Label>Owner phone</Label>
-              <input 
-                value={ownerPhone} 
-                onChange={(e) => setOwnerPhone(e.target.value)}
-                className='p-2 border rounded-lg bg-white max-w-75'
-                type="text"
-                placeholder='Owner phone' 
-              />
-            </div>
-            <div>
-              <Label>Gun </Label>
-              <input 
-                value={expiresDay} 
-                onChange={(e) => setExpiresDay(e.target.value)}
-                className='p-2 border rounded-lg bg-white max-w-75'
-                type="text"
-                placeholder='Gun' 
-              />
-            </div>
-            <div className='flex items-center justify-between w-full pl-5'>
-              <span>Home?</span>
-              <CustomSwitch checked={isHome} setChecked={setIsHome} />
-            </div>
-            <div className='flex items-center justify-between w-full pl-5'>
-              <span>Details?</span>
-              <CustomSwitch checked={isDetails} setChecked={setIsDetails} />
-            </div>
-            {
-              images.length === 0 
-              ?
-              <div>
-                <Dropzone onDrop={handleDrop} />
-              </div>
-              :
-              <div className='bg-white p-3 rounded'>
-                {
-                  images.map(img => (
-                    <div key={img.url} className='relative'>
-                      <Image 
-                        src={img.url}
-                        alt=""
-                        width={200}
-                        height={100}
-                      />
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title="Reklamlar"
+        description={data ? `Aktiv: ${activeCount}, cəmi: ${data.length}. Vaxtı bitən reklamlar saytda göstərilmir.` : undefined}
+        actions={<Button onClick={() => setDialog('new')}>+ Yeni reklam</Button>}
+      />
 
-                      <button onClick={() => handleDeleteImage(img.id)} className='absolute top-0 right-0 bg-gray-300 m-2 rounded-full'>
-                        <Xmark className='size-7 text-red-500' />
-                      </button>
+      <div className="overflow-x-auto rounded-xl border bg-white">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Banner</TableHead>
+              <TableHead>Sahibi</TableHead>
+              <TableHead>Yerləşmə</TableHead>
+              <TableHead className="text-right">Klik</TableHead>
+              <TableHead>Müddət</TableHead>
+              <TableHead className="text-right">Əməliyyat</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              Array.from({ length: 4 }, (_, i) => (
+                <TableRow key={i}><TableCell colSpan={6}><Skeleton className="h-14" /></TableCell></TableRow>
+              ))
+            ) : isError ? (
+              <TableRow><TableCell colSpan={6}><EmptyState title="Yüklənmədi" description="Səhifəni yeniləyin" /></TableCell></TableRow>
+            ) : !data?.length ? (
+              <TableRow><TableCell colSpan={6}><EmptyState title="Hələ reklam yoxdur" description='"Yeni reklam" düyməsi ilə əlavə edin' /></TableCell></TableRow>
+            ) : (
+              data.map((ad) => (
+                <TableRow key={ad._id}>
+                  <TableCell>
+                    <a href={ad.link} target="_blank" rel="noreferrer" className="block w-48" title={ad.link}>
+                      {/* eslint-disable-next-line @next/next/no-img-element -- banner ölçüsü dəyişkəndir */}
+                      <img src={imageSrc(ad.logo)} alt="" className="h-12 w-48 rounded-md bg-gray-100 object-cover" />
+                    </a>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium">{ad.ownerName || '—'}</div>
+                    <div className="text-xs text-muted-foreground">{ad.ownerPhone}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div>{POSITION_LABEL[ad.position] ?? ad.position}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {[ad.isHome && 'Ana səhifə', ad.isDetails && 'Elan səhifəsi'].filter(Boolean).join(', ') || '—'}
                     </div>
-                    
-                  ))
-                }
-              </div>
-            }
-
-            <button
-              onClick={setAdsenseForm}
-              className='w-full bg-blue-500 p-2 rounded-xl text-white mt-5 cursor-pointer'
-            >
-              Kaydet
-            </button>
-            
-          </div>
-        </div>
-
-        <div className="container mx-auto p-4">
-
-          <DataTable
-            columns={columns}
-            data={data}
-            meta={{ onEdit: handleEdit, onDelete: handleDelete }}
-          />
-
-          <EditDialog
-            open={open}
-            setOpen={setOpen}
-            data={data}
-            setData={setData}
-            adsense={editAdsenseData}
-          />
-
-          <AlertDialog open={deletedOpen} onOpenChange={setDeletedOpen}>
-            <AlertDialogContent size="sm">
-              <AlertDialogHeader>
-                <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                  <TrashBin />
-                </AlertDialogMedia>
-                <AlertDialogTitle>Delete chat?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  <div>
-                    Silmek isdediyinize eminsiniz?
-                  </div>
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteAdsense} variant="destructive">Delete</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">{formatNumber(ad.clickCount ?? 0)}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <ExpiryBadge expiresAt={ad.adsenseExpiresAt} />
+                    <div className="mt-1 text-xs text-muted-foreground">{formatDate(ad.adsenseExpiresAt)}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-end gap-2 whitespace-nowrap">
+                      <Button size="sm" variant="outline" onClick={() => setDialog(ad)}>Redaktə</Button>
+                      <Button size="sm" variant="destructive" onClick={() => setDeleteTarget(ad)}>Sil</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
+
+      <AdsenseDialog ad={dialog} onOpenChange={(open) => !open && setDialog(null)} onSaved={refresh} />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Reklam silinsin?"
+        description={deleteTarget ? <><b>{deleteTarget.ownerName}</b> reklamı və şəkli silinəcək.</> : undefined}
+        confirmLabel="Sil"
+        destructive
+        onConfirm={deleteAd}
+      />
     </div>
-    
   )
 }
-
-export default AdsensePage
