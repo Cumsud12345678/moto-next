@@ -1,134 +1,129 @@
+'use client'
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar"
-
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+  House,
+  Persons,
+  PersonXmark,
+  HardDrive,
+  TrashBin,
+  Star,
+  LayoutCells,
+  Megaphone,
+  Tag,
+  CircleQuestion,
+  CircleExclamation,
+  ArrowLeft,
+} from '@gravity-ui/icons'
 
-import {House} from '@gravity-ui/icons';
-import {Persons} from '@gravity-ui/icons';
-import {HardDrive} from '@gravity-ui/icons';
-import {Box} from '@gravity-ui/icons';
-import {CircleExclamation} from '@gravity-ui/icons';
-import Link from "next/link";
+interface NavItem {
+  href: string
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+// Menyu bir yerdə saxlanılır: yeni səhifə əlavə etmək üçün bura bir sətir yazmaq kifayətdir
+const NAV: { label: string; items: NavItem[] }[] = [
+  {
+    label: 'Ümumi',
+    items: [
+      { href: '/admin', label: 'Dashboard', icon: House },
+    ],
+  },
+  {
+    label: 'İstifadəçilər',
+    items: [
+      { href: '/admin/users', label: 'Bütün istifadəçilər', icon: Persons },
+      { href: '/admin/deleted/users', label: 'Silinmiş istifadəçilər', icon: PersonXmark },
+    ],
+  },
+  {
+    label: 'Elanlar',
+    items: [
+      { href: '/admin/listings', label: 'Bütün elanlar', icon: HardDrive },
+      { href: '/admin/premium/listings', label: 'Premium elanlar', icon: Star },
+      { href: '/admin/deleted/listings', label: 'Silinmiş elanlar', icon: TrashBin },
+    ],
+  },
+  {
+    label: 'Məzmun',
+    items: [
+      { href: '/admin/metadata', label: 'Marka, model', icon: Tag },
+      { href: '/admin/make-requests', label: 'Marka sorğuları', icon: CircleQuestion },
+      { href: '/admin/groups', label: 'Qruplar', icon: LayoutCells },
+      { href: '/admin/adsense', label: 'Reklamlar', icon: Megaphone },
+    ],
+  },
+  {
+    label: 'Sistem',
+    items: [
+      { href: '/admin/error-logs', label: 'Xəta loqları', icon: CircleExclamation },
+    ],
+  },
+]
+
+const isActivePath = (pathname: string, href: string) =>
+  href === '/admin' ? pathname === '/admin' : pathname === href || pathname.startsWith(`${href}/`)
 
 export function AppSidebar() {
+  const pathname = usePathname()
+
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader>
+        <Link href="/admin" className="flex items-center gap-2 px-2 py-1">
+          <span className="flex size-8 items-center justify-center rounded-lg bg-orange-500 text-lg font-bold text-white">
+            M
+          </span>
+          <span className="text-lg font-bold">Admin panel</span>
+        </Link>
+      </SidebarHeader>
+
       <SidebarContent>
-        <div className="">
-          <div>
-            <h3 className="text-2xl font-bold pl-3">Admin panel</h3>
-          </div>
-
-          <div className="mt-5 p-2 text-[16px]">
-            <span className="pl-2">Platform</span>
-
-            <div>
-
-              <Accordion defaultValue={["item-1"]}>
-                <AccordionItem value="item-1" className={''}>
-                  <AccordionTrigger className={'hover:bg-gray-200 px-2 flex items-center gap-2'}>
-                    <House className='size-5' />
-                    Home
-                  </AccordionTrigger>
-                  <AccordionContent className={'ml-5 border-l flex flex-col gap-2 p-0 pl-3'}>
-                    <Link href={'/admin/charts'} className="button">
-                      Charts
-                    </Link>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-
-              <Accordion defaultValue={["item-1"]}>
-                <AccordionItem value="item-1" className={''}>
-                  <AccordionTrigger className={'hover:bg-gray-200 px-2 flex items-center gap-2'}>
-                    <Persons className='size-5' />
-                    Users
-                  </AccordionTrigger>
-                  <AccordionContent className={'ml-5 border-l flex flex-col p-0 pl-3'}>
-                    <Link href={'/admin/users'} className="button">
-                      All Users
-                    </Link>
-                    <Link href={'/admin/deleted/users'} className="button">
-                      Deleted Users
-                    </Link>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-
-              <Accordion defaultValue={["item-1"]}>
-                <AccordionItem value="item-1" className={''}>
-                  <AccordionTrigger className={'hover:bg-gray-200 px-2 flex items-center gap-2'}>
-                    <HardDrive className='size-5' />
-                    Listings
-                  </AccordionTrigger>
-                  <AccordionContent className={'ml-5 border-l flex flex-col p-0 pl-3'}>
-                    <Link href={'/admin/listings'} className="button">
-                      All Listings
-                    </Link>
-                    <Link href={'/admin/deleted/listings'} className="button">
-                      Deleted Listings
-                    </Link>
-                    <Link href={'/admin/premium/listings'} className="button">
-                      Premium Listings
-                    </Link>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-
-              <Accordion defaultValue={["item-1"]}>
-                <AccordionItem value="item-1" className={''}>
-                  <AccordionTrigger className={'hover:bg-gray-200 px-2 flex items-center gap-2'}>
-                    <Box className='size-5' />
-                    Metadata
-                  </AccordionTrigger>
-                  <AccordionContent className={'ml-5 border-l flex flex-col p-0 pl-3'}>
-                    <Link href={'/admin/groups'} className="button">
-                      Groups
-                    </Link>
-                    <Link href={'/admin/adsense'} className="button">
-                      Adsense
-                    </Link>
-                    <Link href={'/admin/metadata'} className="button">
-                      Make, Model
-                    </Link>
-                    <Link href={'/admin/make-requests'} className="button">
-                      Make requests
-                    </Link>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-
-              <Accordion defaultValue={["item-1"]}>
-                <AccordionItem value="item-1" className={''}>
-                  <AccordionTrigger className={'hover:bg-gray-200 px-2 flex items-center gap-2'}>
-                    <CircleExclamation className='size-5' />
-                    System
-                  </AccordionTrigger>
-                  <AccordionContent className={'ml-5 border-l flex flex-col p-0 pl-3'}>
-                    <Link href={'/admin/error-logs'} className="button">
-                      Error logs
-                    </Link>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-
-
-            </div>
-          </div>
-        </div>
+        {NAV.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      isActive={isActivePath(pathname, item.href)}
+                      render={<Link href={item.href} />}
+                    >
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
-      <SidebarFooter />
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton render={<Link href="/" />}>
+              <ArrowLeft />
+              <span>Sayta qayıt</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }
