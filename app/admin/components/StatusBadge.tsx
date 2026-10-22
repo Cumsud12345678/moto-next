@@ -48,3 +48,7 @@ export function BoolBadge({ value, yes = 'Bəli', no = 'Xeyr' }: { value?: boole
 }
 
 export const LISTING_STATUS_OPTIONS = Object.entries(LISTING_STATUS).map(([value, v]) => ({ value, label: v.label }))
+
+export const ROLE_OPTIONS = Object.entries(USER_ROLE)
+  .filter(([value]) => value !== 'system')
+  .map(([value, v]) => ({ value, label: v.label }))

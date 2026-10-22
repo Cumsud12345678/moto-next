@@ -50,6 +50,8 @@ export default function ConfirmDialog({
       await onConfirm(reason.trim())
       setReason('')
       onOpenChange(false)
+    } catch {
+      // Xəta mesajını çağıran tərəf göstərir; pəncərə açıq qalır ki, yenidən cəhd etmək olsun
     } finally {
       setBusy(false)
     }

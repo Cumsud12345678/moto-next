@@ -10,18 +10,11 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import type { Listing } from '../../listings/columns'
+import type { AdminListing as Listing } from '../../_lib/types'
 import PageHeader from '../../components/PageHeader'
 import EmptyState from '../../components/EmptyState'
 import ConfirmDialog from '../../components/ConfirmDialog'
+import PremiumDialog from '../../components/PremiumDialog'
 import { ListingStatusBadge, ToneBadge } from '../../components/StatusBadge'
 import { useAdminList } from '../../_lib/useAdminList'
 import { usePageParam } from '../../_lib/usePageParam'
@@ -45,10 +38,8 @@ function PremiumListingsContent() {
 
   const [removeTarget, setRemoveTarget] = useState<Listing | null>(null)
   const [extendTarget, setExtendTarget] = useState<Listing | null>(null)
-  const [days, setDays] = useState('7')
-  const [extending, setExtending] = useState(false)
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin', ENDPOINT] })
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin'] })
 
   const removePremium = async () => {
     if (!removeTarget) return
@@ -58,24 +49,6 @@ function PremiumListingsContent() {
       refresh()
     } catch (err) {
       toast.add({ type: 'error', description: errorMessage(err, 'Premium ləğv edilmədi') })
-    }
-  }
-
-  const extendPremium = async () => {
-    const day = parseInt(days, 10)
-    if (!extendTarget || !day || day < 1 || day > 365) {
-      return toast.add({ type: 'warning', description: '1 ilə 365 arasında gün yazın' })
-    }
-    setExtending(true)
-    try {
-      await api.put(`/api/admin/listings/urgent/${extendTarget._id}`, { day })
-      toast.add({ type: 'success', description: `Premium ${day} gün təyin edildi` })
-      setExtendTarget(null)
-      refresh()
-    } catch (err) {
-      toast.add({ type: 'error', description: errorMessage(err, 'Yenilənmədi') })
-    } finally {
-      setExtending(false)
     }
   }
 
@@ -143,10 +116,7 @@ function PremiumListingsContent() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          setDays('7')
-                          setExtendTarget(l)
-                        }}
+                        onClick={() => setExtendTarget(l)}
                       >
                         Müddəti dəyiş
                       </Button>
@@ -178,43 +148,12 @@ function PremiumListingsContent() {
         onConfirm={removePremium}
       />
 
-      <Dialog open={!!extendTarget} onOpenChange={(open) => !open && setExtendTarget(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Premium müddəti</DialogTitle>
-            <DialogDescription>
-              Premium bu gündən başlayaraq yazdığınız gün qədər aktiv olacaq.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="premium-days" className="text-sm">Gün sayı</label>
-            <input
-              id="premium-days"
-              type="number"
-              min={1}
-              max={365}
-              value={days}
-              onChange={(e) => setDays(e.target.value)}
-              className="rounded-lg border p-2 focus:outline-sky-500"
-            />
-            <div className="flex gap-2">
-              {[1, 3, 7, 30].map((d) => (
-                <Button key={d} size="sm" variant="outline" onClick={() => setDays(String(d))}>
-                  {d} gün
-                </Button>
-              ))}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setExtendTarget(null)} disabled={extending}>
-              İmtina
-            </Button>
-            <Button onClick={extendPremium} disabled={extending}>
-              {extending ? 'Gözləyin...' : 'Yadda saxla'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PremiumDialog
+        listingId={extendTarget?._id ?? null}
+        title={extendTarget ? `${extendTarget.make?.label ?? ''} ${extendTarget.model?.label ?? ''}` : undefined}
+        onOpenChange={(open) => !open && setExtendTarget(null)}
+        onSaved={refresh}
+      />
     </div>
   )
 }
