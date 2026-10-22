@@ -10,9 +10,11 @@ interface InputAndListStringProps {
   label: string,
   length: number,
   data: Default[]
+  // Input ilə siyahı arasında göstərilən əlavə element (məs. "tapılmadı?" düyməsi)
+  extra?: React.ReactNode
 }
 
-export default function InputAndListString({ state, setState, label, length=20, data }: InputAndListStringProps) {
+export default function InputAndListString({ state, setState, label, length=20, data, extra }: InputAndListStringProps) {
   
   const [value, setValue] = useState<string>('')
   const inputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +73,8 @@ export default function InputAndListString({ state, setState, label, length=20, 
           </button>
         )}
       </div>
+
+      {!state && extra}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 mt-2 lg:mt-6 max-h-screen overflow-auto">
         {

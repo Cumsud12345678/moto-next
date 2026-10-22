@@ -5,6 +5,7 @@ import InputAndListString from '../_components/InputAndListString'
 import InputAndListNumber from '../_components/InputAndListNumber'
 import ButtonGroup from '@/components/buttons/ButtonGroup'
 import { Default, Metadata } from '@/types/metadata'
+import MakeRequestDialog from '@/components/MakeRequestDialog'
 
 const Step1 = ({filterState, metadata, models}: {filterState: ReturnType<typeof useFilter>, metadata: Metadata, models: Array<Default>}) => {
 
@@ -73,11 +74,26 @@ const Step1 = ({filterState, metadata, models}: {filterState: ReturnType<typeof 
   return (
     <Fragment>
       <div className="lg:p-10 border rounded-3xl bg-white p-5 flex flex-col gap-2 lg:gap-0">
-        <InputAndListString state={make} setState={setMake} label='Marka' length={20} data={metadata.makes} />
+        <InputAndListString
+          state={make}
+          setState={setMake}
+          label='Marka'
+          length={20}
+          data={metadata.makes}
+          extra={<MakeRequestDialog />}
+        />
 
         {
           make
-          && <InputAndListString state={model} setState={setModel} label='Model' length={20} data={models} />
+          && <InputAndListString
+            state={model}
+            setState={setModel}
+            label='Model'
+            length={20}
+            data={models}
+            // Marka seçilib, model yoxdursa: mətnə marka adı əvvəlcədən yazılır
+            extra={<MakeRequestDialog initialText={metadata.makes.find((m: Default) => m._id === make)?.label} />}
+          />
         }
 
         {

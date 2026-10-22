@@ -17,6 +17,7 @@ import {House} from '@gravity-ui/icons';
 import {Persons} from '@gravity-ui/icons';
 import {HardDrive} from '@gravity-ui/icons';
 import {Box} from '@gravity-ui/icons';
+import {CircleExclamation} from '@gravity-ui/icons';
 import Link from "next/link";
 
 export function AppSidebar() {
@@ -100,6 +101,23 @@ export function AppSidebar() {
                     </Link>
                     <Link href={'/admin/metadata'} className="button">
                       Make, Model
+                    </Link>
+                    <Link href={'/admin/make-requests'} className="button">
+                      Make requests
+                    </Link>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
+              <Accordion defaultValue={["item-1"]}>
+                <AccordionItem value="item-1" className={''}>
+                  <AccordionTrigger className={'hover:bg-gray-200 px-2 flex items-center gap-2'}>
+                    <CircleExclamation className='size-5' />
+                    System
+                  </AccordionTrigger>
+                  <AccordionContent className={'ml-5 border-l flex flex-col p-0 pl-3'}>
+                    <Link href={'/admin/error-logs'} className="button">
+                      Error logs
                     </Link>
                   </AccordionContent>
                 </AccordionItem>
