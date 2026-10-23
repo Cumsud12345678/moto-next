@@ -3,6 +3,7 @@ import Filter from '../(home)/_components/Filter';
 import { Suspense } from 'react';
 import { getMetadata } from '@/lib/api/metadata';
 import { cookies } from 'next/headers';
+import DesktopAds from '../(home)/_components/DesktopAds'
 import Ads from '../(home)/_components/Ads';
 import { serverApi } from '@/lib/axios-server';
 import ListingPagination from '@/components/ListingPagination';
@@ -127,6 +128,7 @@ const MotoPage = async ({ searchParams }: Props) => {
       </div>
 
       {adsenseMobile.length !== 0 && <Ads data={adsenseMobile} />}
+      <DesktopAds data={adsenseData} />
 
       <div className='container mx-auto max-w-250 p-4 mb-20'>
         <ProductList data={data} infinite={false} />

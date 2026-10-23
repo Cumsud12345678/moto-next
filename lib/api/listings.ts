@@ -51,3 +51,12 @@ export async function expiredListingUpdate(listingId: string) {
   const res = await api.get(`/api/listings/expired/listing/update/${listingId}`, { withCredentials: true })
   return res.data
 }
+export type ReportCategory = 'fraud' | 'wrong_info' | 'sold' | 'duplicate' | 'inappropriate' | 'other'
+
+export async function reportListing(
+  listingId: string,
+  payload: { category: ReportCategory; message: string; email: string }
+) {
+  const res = await api.post(`/api/listings/${listingId}/report`, payload, { withCredentials: true })
+  return res.data as { success: boolean; message: string }
+}

@@ -5,7 +5,7 @@ import { Spinner } from "@/components/ui/spinner"
 import Step1 from './steps/Step1'
 import Step2 from './steps/Step2'
 import Step3 from './steps/Step3'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from '@/components/ui/toast'
 import { useMetadata } from '@/hooks/useMetadata'
 import { Default } from '@/types/metadata'
@@ -62,7 +62,8 @@ const NewPage = () => {
   const submittingRef = useRef(false)
   const verifyingRef = useRef(false)
   // Bu formun unikal açarı — təkrar göndərilsə backend eyni elanı qaytarır
-  const idempotencyKeyRef = useRef<string>(
+  // useState(() => ...) yalnız ilk render-də işləyir (useRef(uuid()) hər render-də yeni uuid yaradırdı)
+  const [idempotencyKey] = useState<string>(() =>
     typeof crypto !== 'undefined' && 'randomUUID' in crypto
       ? crypto.randomUUID()
       : `${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -101,16 +102,16 @@ const NewPage = () => {
     metadata
   } = metadataHook
 
-  const [filteredModels, setFilteredModels] = useState<Array<Default>>([])
+  // Seçilmiş markanın modelləri (state + effect əvəzinə hesablanan dəyər)
+  const filteredModels = useMemo<Default[]>(
+    () => (make && metadata ? metadata.models.filter((model: Default) => model.make === make) : []),
+    [make, metadata]
+  )
 
+  // Marka silinəndə seçilmiş model də sıfırlanır
   useEffect(() => {
-    if(make && metadata) {
-      setFilteredModels(metadata.models.filter((model: Default) => model.make === make))
-    }else if(!make) {
-      setModel('')
-      setFilteredModels([])
-    }
-  }, [make, metadata])
+    if (!make) setModel('')
+  }, [make, setModel])
 
 
   const [power, setPower] = useState<number>(0)
@@ -290,7 +291,7 @@ const NewPage = () => {
     images.forEach((image) => formData.append('images', image.file))
     equipment.forEach((eq) => formData.append('equipment', eq))
 
-    createEventMutation.mutate({ formData, idempotencyKey: idempotencyKeyRef.current }, {
+    createEventMutation.mutate({ formData, idempotencyKey }, {
       onSuccess: (data) => {
         toast.add({ type: 'success', description: data.message })
         // submittingRef-i sıfırlamırıq: səhifə yönləndirilənə qədər düymə kilidli qalsın

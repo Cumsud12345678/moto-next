@@ -109,7 +109,9 @@ export default function ListingDetailDialog({
             <Spec label="İl">{listing.year}</Spec>
             <Spec label="Həcm">{listing.volume ? `${listing.volume} sm³` : '—'}</Spec>
             <Spec label="Güc">{listing.power ? `${listing.power} a.g.` : '—'}</Spec>
-            <Spec label="Yürüş">{listing.used ? `${formatNumber(listing.mileage)} km` : 'Yeni'}</Spec>
+            {/* Saytda used=true "Yeni" deməkdir (elan formasında "Yeni" düyməsi true göndərir) */}
+            <Spec label="Vəziyyət">{listing.used ? 'Yeni' : 'Sürülmüş'}</Spec>
+            <Spec label="Yürüş">{`${formatNumber(listing.mileage ?? 0)} km`}</Spec>
             <Spec label="Ban növü">{listing.category?.label}</Spec>
             <Spec label="Rəng">{listing.color?.label}</Spec>
           </div>

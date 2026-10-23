@@ -115,7 +115,7 @@ export default function AdsenseDialog({ ad, onOpenChange, onSaved }: AdsenseDial
       <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{editing ? 'Reklamı redaktə et' : 'Yeni reklam'}</DialogTitle>
-          <DialogDescription>Hazırda saytda yalnız mobil reklamlar göstərilir (ana səhifə və axtarış nəticələri).</DialogDescription>
+          <DialogDescription>Mobil reklam telefonda elan siyahısının üstündə, kompüter reklamı geniş ekranlarda (1400px+) səhifənin sol/sağ tərəfində göstərilir. Banner üçün 160×600 ölçü yaxşıdır.</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-3">

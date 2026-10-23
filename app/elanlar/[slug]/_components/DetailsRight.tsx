@@ -1,66 +1,19 @@
 'use client'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { toggleLike } from '@/lib/api/listings'
-import { toggleGuestLike } from '@/lib/guestLikes'
+import ReportDialog from '@/components/ReportDialog'
 import { ProductDescription } from '@/types/product'
-import { ArrowUpRightFromSquare, Handset, Heart, HeartFill, TriangleExclamation } from '@gravity-ui/icons'
-import React, { useState } from 'react'
+import { ArrowUpRightFromSquare, Flag, Handset, Heart, HeartFill, TriangleExclamation } from '@gravity-ui/icons'
+import { phoneLinks, useListingActions } from './useListingActions'
 
 const DetailsRight = ({ data }: { data: ProductDescription }) => {
 
-  const [product, setProduct] = useState<ProductDescription>(data)
-  const [liked, setLiked] = useState(data.isLiked)
-  const [loading, setLoading] = useState(false)
+  const product = data
+  const { liked, handleLike, handleShare, reportOpen, openReport, setReportOpen } = useListingActions(product)
 
-  const handleLike = async () => {
-    if (loading) return // ikiqat klikin qarşısını al
-
-    setLoading(true)
-    const prevLiked = liked
-    setLiked(!prevLiked) // optimistic update
-
-    try {
-      const result = await toggleLike(product._id)
-      setLiked(result.liked) // server-in real cavabı ilə sinxronlaşdır
-    } catch (err: any) {
-      if (err?.response?.status === 401) {
-        // Qeydiyyatsız istifadəçi — cookie-yə yaz
-        const newLiked = toggleGuestLike(product._id)
-        setLiked(newLiked)
-      } else {
-        setLiked(prevLiked) // real xəta — geri qaytar
-        console.error('Like əməliyyatı uğursuz oldu:', err)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleShare = async () => {
-    const url = window.location.href;
-
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: `${product.make.label} ${product.model.label} - ${product.price} AZN`,
-          text: `${product.make.label} ${product.model.label} motosiklet elanı — Motoelan`,
-          url,
-        });
-      } else {
-        await navigator.clipboard.writeText(url);
-        alert("Link kopyalandı");
-      }
-    } catch (error) {
-      // İstifadəçi paylaşma pəncərəsini bağlayıbsa
-      if ((error as Error).name !== "AbortError") {
-        console.error("Share error:", error);
-      }
-    }
-  };
-
-  const formattedTelPhone = `+994${product.phone}`
-  const formattedViewPhone = `+994 ${String(product.phone).slice(0, 2)} ${String(product.phone).slice(2, 5)} ${String(product.phone).slice(5, 7)} ${String(product.phone).slice(7, 9)}`
+  const phone = phoneLinks(product.phone)
+  const formattedTelPhone = phone.tel
+  const formattedViewPhone = phone.view
 
   return (
     <div className="hidden lg:block lg:w-130 min-w-0">
@@ -106,10 +59,10 @@ const DetailsRight = ({ data }: { data: ProductDescription }) => {
             <span className="mx-2 text-xl font-medium">Paylaş</span>
           </div>
 
-          {/* <div className="my-3 flex flex-row items-center rounded-lg border p-2">
-            <OutlinedFlagIcon sx={{ fontSize: "30px" }} />
+          <div onClick={openReport} className="my-3 flex flex-row items-center rounded-lg border bg-white p-2 cursor-pointer">
+            <Flag className='size-6' />
             <span className="mx-2 text-xl font-medium">Şikayət et</span>
-          </div> */}
+          </div>
 
           <a
             href={`tel:${formattedTelPhone}`}
@@ -131,6 +84,8 @@ const DetailsRight = ({ data }: { data: ProductDescription }) => {
         </div>
 
       </div>
+
+      <ReportDialog listingId={product._id} open={reportOpen} onOpenChange={setReportOpen} />
     </div>
   )
 }

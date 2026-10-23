@@ -227,7 +227,7 @@ const Galery = ({images, video, price, make, model, volume, year, phone}: Galery
           <SwiperSlide key={index}>
 
             <div
-              className="relative w-full h-85 lg:h-115 overflow-hidden rounded-md cursor-pointer"
+              className="relative w-full h-85 lg:h-115 overflow-hidden lg:rounded-md cursor-pointer"
               onClick={() => handleOpenLightbox(index + videoOffset)}
             >
               {/* Arxa fon - bulanıq */}

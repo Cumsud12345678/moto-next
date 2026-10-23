@@ -5,6 +5,7 @@ import { ProductCard } from '@/types/product';
 import { getMetadata } from '@/lib/api/metadata';
 import { cookies } from 'next/headers';
 import Ads from './_components/Ads';
+import DesktopAds from './_components/DesktopAds';
 import { serverApi } from '@/lib/axios-server';
 import HeaderTab from './_components/HeaderTab';
 // import { getListings } from '@/lib/api/listings';
@@ -72,7 +73,9 @@ const HomePage = async () => {
   const products = await getProducts()
   const adsenseData = await getAdsense()
 
-  const adsenseMobile = adsenseData.filter(ads => ads.position === 'mobile')
+  // "Ana səhifədə" işarəsi olmayan reklamlar ana səhifədə göstərilmir (köhnə reklamlarda bu sahə yoxdursa, göstərilir)
+  const homeAds = adsenseData.filter(ads => ads.isHome !== false)
+  const adsenseMobile = homeAds.filter(ads => ads.position === 'mobile')
 
   return (
     <div>
@@ -83,10 +86,7 @@ const HomePage = async () => {
         </Suspense>
       </div>
 
-      {/* Desktop Adsense left */}
-      {/* <div className='fixed left-0 top-0 h-full w-30 bg-red-500'>
-
-      </div> */}
+      <DesktopAds data={homeAds} />
 
       <div className='bg-[#ebedf3] px-3 pb-3 flex flex-row gap-3 lg:hidden relative'>
         <HeaderTab />
@@ -103,10 +103,6 @@ const HomePage = async () => {
         <ProductList data={products} />
       </div>
 
-      {/* Desktop Adsense right */}
-      {/* <div className='fixed right-0 top-0 h-full w-30 bg-red-500'>
-
-      </div> */}
 
     </div>
   )

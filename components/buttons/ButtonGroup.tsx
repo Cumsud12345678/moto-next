@@ -1,6 +1,6 @@
 'use client'
 import { Default } from "@/types/metadata";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface ButtonGroupProps {
   data: Default[],
@@ -24,12 +24,7 @@ const ButtonGroup = ({data, state, setState, wrap=false, isNew=false}: ButtonGro
   //   )
   // }
   
-  const [newData, setNewData] = useState<Default[]>([])
-
-  useEffect(() => {
-    if(!data) return;
-    setNewData([{_id: '', label: 'Hamısı'}, ...data])
-  }, [data])
+  const newData = useMemo<Default[]>(() => (data ? [{ _id: '', label: 'Hamısı' }, ...data] : []), [data])
 
 
   const [hash, setHash] = useState('')

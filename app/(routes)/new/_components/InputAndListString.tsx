@@ -2,7 +2,7 @@
 import { Default } from "@/types/metadata";
 import { Xmark } from "@gravity-ui/icons";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 interface InputAndListStringProps {
   state: string,
@@ -18,28 +18,16 @@ export default function InputAndListString({ state, setState, label, length=20, 
   
   const [value, setValue] = useState<string>('')
   const inputRef = useRef<HTMLInputElement>(null);
-  const [newData, setNewData] = useState<Default[]>([])
-
-  const changeInput = (value: string) => {
-    if(typeof value === 'string') {
-      const rawValue = value.replace(/\s/g, "");
-      setState(rawValue);
-    }
-  }
+  // Yazılan mətnə görə süzülmüş siyahı (state + effect əvəzinə hesablanan dəyər)
+  const newData = useMemo<Default[]>(
+    () => data?.filter((item: Default) => item.label.toLowerCase().startsWith(value.toLowerCase())) ?? [],
+    [data, value]
+  )
 
   const handleChangeList = (id: string, label: string) => {
     setValue(label)
     setState(id)
   }
-
-  useEffect(() => {
-    setNewData(data)
-  }, [data])
-
-  useEffect(() => {
-    const a = data?.filter((item: Default) => item.label.toLowerCase().startsWith(value.toLowerCase()))
-    setNewData(a)
-  }, [value])
 
   const clearValue = () => {
     setState('')

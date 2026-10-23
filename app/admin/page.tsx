@@ -25,6 +25,7 @@ interface Stats {
   }
   makeRequestsPending: number
   errorsOpen: number
+  reportsNew?: number
   daily: { listings: DailyPoint[]; users: DailyPoint[] }
 }
 
@@ -110,7 +111,7 @@ export default function AdminDashboard() {
       ) : (
         <div className="flex flex-col gap-6">
           {/* Diqqət tələb edənlər */}
-          {(data.makeRequestsPending > 0 || data.errorsOpen > 0 || (data.listings.byStatus.pending ?? 0) > 0) && (
+          {(data.makeRequestsPending > 0 || data.errorsOpen > 0 || (data.reportsNew ?? 0) > 0 || (data.listings.byStatus.pending ?? 0) > 0) && (
             <div className="flex flex-wrap gap-3">
               {(data.listings.byStatus.pending ?? 0) > 0 && (
                 <Link
@@ -118,6 +119,14 @@ export default function AdminDashboard() {
                   className="rounded-lg border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-900 hover:bg-yellow-100"
                 >
                   {data.listings.byStatus.pending} elan yoxlama gözləyir →
+                </Link>
+              )}
+              {(data.reportsNew ?? 0) > 0 && (
+                <Link
+                  href="/admin/reports"
+                  className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-900 hover:bg-red-100"
+                >
+                  {data.reportsNew} yeni şikayət →
                 </Link>
               )}
               {data.makeRequestsPending > 0 && (

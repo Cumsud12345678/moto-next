@@ -125,7 +125,7 @@ const Step1 = ({filterState, metadata, models}: {filterState: ReturnType<typeof 
         {
           color &&
           <div className='pt-4'>
-            <h3 className='mb-2'>Mühərrik</h3>
+            <h3 className='mb-2'>Sürətlər qutusu</h3>
             <ButtonGroup data={metadata.transmissions} state={transmission} setState={setTransmission} wrap={false} isNew />
           </div>
         }
@@ -133,7 +133,7 @@ const Step1 = ({filterState, metadata, models}: {filterState: ReturnType<typeof 
         {
           transmission &&
           <div className='pt-4'>
-            <h3 className='mb-2'>Sürətlər qutusu</h3>
+            <h3 className='mb-2'>Mühərrik</h3>
             <ButtonGroup data={metadata.fuelTypes} state={fuelType} setState={setFuelType} wrap={false} isNew />
           </div>
         }

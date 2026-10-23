@@ -1,17 +1,6 @@
+/* eslint-disable @next/next/no-img-element -- kiçik statik ikonlar */
 'use client'
-import Image from 'next/image'
 import React, { Fragment, useEffect, useState } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Thumbs } from 'swiper/modules'
-
-// Lightbox və lazım olan CSS faylları
-import Lightbox from "yet-another-react-lightbox"
-import Zoom from "yet-another-react-lightbox/plugins/zoom"
-import "yet-another-react-lightbox/styles.css"
-
-// Swiper CSS faylları
-import 'swiper/css'
-import 'swiper/css/navigation'
 
 import {Handset, HeartFill} from '@gravity-ui/icons';
 
@@ -23,23 +12,22 @@ import {
 
 import {TriangleExclamation} from '@gravity-ui/icons';
 
-import { ChevronLeft, ArrowUpRightFromSquare, EllipsisVertical, Xmark, Heart } from '@gravity-ui/icons'
+import { ChevronLeft, ArrowUpRightFromSquare, Heart, Flag } from '@gravity-ui/icons'
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Galery from './Galery'
 import Header from '@/components/Header'
 import { useRouter } from 'next/navigation'
 import { ProductDescription } from '@/types/product'
-import { toggleLike } from '@/lib/api/listings'
-import { toggleGuestLike } from '@/lib/guestLikes'
+import ReportDialog from '@/components/ReportDialog'
+import { phoneLinks, useListingActions } from './useListingActions'
 
 const DetailsLeft = ({ data }: { data: ProductDescription }) => {
 
   const [scrolled, setScrolled] = useState(false)
-  const [product, setProduct] = useState<ProductDescription>(data)
-  const [liked, setLiked] = useState(data?.isLiked)
-  const [loading, setLoading] = useState(false)
+  const product = data
   const router = useRouter()
+  const { liked, handleLike, handleShare, reportOpen, openReport, setReportOpen } = useListingActions(product)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,58 +39,12 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
   }, [])
 
   const formatNumber = (value: number) => {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    return String(value ?? 0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   }
 
-  const handleLike = async () => {
-    if (loading) return // ikiqat klikin qarşısını al
-
-    setLoading(true)
-    const prevLiked = liked
-    setLiked(!prevLiked) // optimistic update
-
-    try {
-      const result = await toggleLike(product._id)
-      setLiked(result.liked) // server-in real cavabı ilə sinxronlaşdır
-    } catch (err: any) {
-      if (err?.response?.status === 401) {
-        // Qeydiyyatsız istifadəçi — cookie-yə yaz
-        const newLiked = toggleGuestLike(product._id)
-        setLiked(newLiked)
-      } else {
-        setLiked(prevLiked) // real xəta — geri qaytar
-        console.error('Like əməliyyatı uğursuz oldu:', err)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleShare = async () => {
-    const url = window.location.href;
-
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: `${product.make.label} ${product.model.label} - ${product.price} AZN`,
-          text: `${product.make.label} ${product.model.label} motosiklet elanı — Motoelan`,
-          url,
-        });
-      } else {
-        await navigator.clipboard.writeText(url);
-        alert("Link kopyalandı");
-      }
-    } catch (error) {
-      // İstifadəçi paylaşma pəncərəsini bağlayıbsa
-      if ((error as Error).name !== "AbortError") {
-        console.error("Share error:", error);
-      }
-    }
-  };
-
-  const formattedTelPhone = `+994${product.phone}`
-  const formattedViewPhone = `+994 ${String(product.phone).slice(0, 2)} ${String(product.phone).slice(2, 5)} ${String(product.phone).slice(5, 7)} ${String(product.phone).slice(7, 9)}`
-  const text = 'Salam. motoelan.com da paylaşdığınız elanla əlaqədar yazıram.'
+  const phone = phoneLinks(product.phone)
+  const formattedTelPhone = phone.tel
+  const formattedViewPhone = phone.view
 
   return (
     <div className="w-full overflow-x-hidden">
@@ -123,18 +65,19 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
             <ChevronLeft className="size-6" />
           </button>
           <div className="flex gap-3">
-            <button onClick={handleLike}>
+            <button onClick={handleLike} aria-label="Bəyən">
               {
                 liked
                 ? <HeartFill className='size-6 text-red-500' />
                 : <Heart className='size-6' />
               }
             </button>
-            <ArrowUpRightFromSquare 
-              onClick={handleShare}
-              className="size-6" 
-            />
-            {/* <EllipsisVertical className="size-6" /> */}
+            <button onClick={handleShare} aria-label="Paylaş">
+              <ArrowUpRightFromSquare className="size-6" />
+            </button>
+            <button onClick={openReport} aria-label="Şikayət et">
+              <Flag className="size-6" />
+            </button>
           </div>
         </div>
       </div>
@@ -146,7 +89,9 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
           <div className="max-w-250 mx-auto p-3 bg-white/90 backdrop-blur-md border-b text-black">
             <div className="flex items-center justify-between">
               <div className='flex items-center gap-2'>
-                <ChevronLeft className="size-7" />
+                <button onClick={() => router.back()} aria-label="Geri">
+                  <ChevronLeft className="size-7" />
+                </button>
                 <h3 className='text-xl font-semibold'>{product.make.label} {product.model.label}, {product.volume} sm³, {product.year} il, {product.price} AZN</h3>
               </div>
 
@@ -158,12 +103,12 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
                     : <Heart className='size-6' />
                   }
                 </button> */}
-                <button>
-                  <ArrowUpRightFromSquare onClick={handleShare} className="size-6" />
+                <button onClick={handleShare} aria-label="Paylaş">
+                  <ArrowUpRightFromSquare className="size-6" />
                 </button>
-                {/* <button>
-                  <EllipsisVertical className="size-6" />
-                </button> */}
+                <button onClick={openReport} aria-label="Şikayət et" title="Şikayət et">
+                  <Flag className="size-6" />
+                </button>
               </div>
             </div>
           </div>
@@ -349,7 +294,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
 
             <button className="w-full bg-[#2DA562] rounded-xl text-white shadow">
               <a
-                href={`https://wa.me/${product.phone}?text=${text}`}
+                href={phone.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full h-full flex items-center justify-center p-3"
@@ -362,6 +307,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
         </div>
       </div>
 
+      <ReportDialog listingId={product._id} open={reportOpen} onOpenChange={setReportOpen} />
     </div>
   )
 }
