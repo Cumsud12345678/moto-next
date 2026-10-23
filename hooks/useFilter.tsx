@@ -29,7 +29,8 @@ export const useFilter = () => {
   const [color, setColor] = useState<string>('')
   const [equipment, setEquipment] = useState<Array<string>>([])
   const years = Array.from({ length: 2026-1950 },(_, index) => 2026 - index)
-  const volumes = Array.from({ length: 3000/50 + 1 }, (_, index) => (index + 1) * 50)
+  // 50, 100, 150 ... 3050 + motosikletlərdə çox yayılmış 125 sm³
+  const volumes = [...Array.from({ length: 3000/50 + 1 }, (_, index) => (index + 1) * 50), 125].sort((a, b) => a - b)
   const addEquipment = (id: string) => {
     const shalter = equipment.find((eq: string) => eq === id)
     if(shalter) {
