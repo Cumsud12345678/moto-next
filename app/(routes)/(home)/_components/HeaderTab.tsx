@@ -20,9 +20,9 @@ const HeaderTab = () => {
           <img src="/hisseler2.png" alt="" className='size-50 object-contain absolute left-0 -top-17 opacity-70' />
         </div>
 
-        <div className='absolute text-[10px] -top-3 -right-3 bg-orange-500 p-1 rounded-full whitespace-nowrap'>
+        {/* <div className='absolute text-[10px] -top-3 -right-3 bg-orange-500 p-1 rounded-full whitespace-nowrap'>
           <span className='text-white font-semibold'>yeni</span>
-        </div>
+        </div> */}
         
       </div>
       <Link 
@@ -34,9 +34,9 @@ const HeaderTab = () => {
           <img src="/group.png" alt="" className='size-30 object-contain absolute -right-5 -top-7 opacity-80' />
         </div>
         
-        <div className='absolute text-[10px] -top-3 -right-3 bg-orange-500 p-1 rounded-full whitespace-nowrap'>
+        {/* <div className='absolute text-[10px] -top-3 -right-3 bg-orange-500 p-1 rounded-full whitespace-nowrap'>
           <span className='text-white font-semibold'>yeni</span>
-        </div>
+        </div> */}
       </Link>
       
     </Fragment>

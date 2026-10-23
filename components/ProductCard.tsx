@@ -50,13 +50,13 @@ const ProductCard = ({product}: {product: CardType}) => {
         <div className='absolute bottom-0 right-0 m-2 flex gap-1 z-10'>
           {
             product.barter && 
-            <div className='bg-green-500 p-1.5 rounded-full z-10'>
+            <div className='bg-green-500 p-1 rounded-full z-10'>
               <ArrowsRotateLeft className='text-white' />
             </div>
           }
           {
             product.document &&
-            <div className='bg-blue-500 p-1.5 rounded-full'>
+            <div className='bg-blue-500 p-1 rounded-full'>
               <FileText className='text-white' />
             </div>
           }
