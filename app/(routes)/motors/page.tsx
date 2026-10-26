@@ -7,6 +7,7 @@ import DesktopAds from '../(home)/_components/DesktopAds'
 import Ads from '../(home)/_components/Ads';
 import { serverApi } from '@/lib/axios-server';
 import ListingPagination from '@/components/ListingPagination';
+import SortSelect from '@/components/SortSelect';
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -96,6 +97,7 @@ async function getFilteredListings(params: Record<string, string>, page: number)
   const body = await res.json()
   return {
     data: body.data ?? [],
+    total: (body.total ?? 0) as number,
     totalPages: body.totalPages ?? Math.ceil((body.total ?? 0) / LIMIT),
   }
 }
@@ -111,7 +113,7 @@ const MotoPage = async ({ searchParams }: Props) => {
   }
   const currentPage = Math.max(1, Number(pageParam) || 1)
 
-  const [{ data, totalPages }, metadata, adsenseData] = await Promise.all([
+  const [{ data, total, totalPages }, metadata, adsenseData] = await Promise.all([
     getFilteredListings(filters, currentPage),
     getMetadata(),
     getAdsense(),
@@ -131,6 +133,9 @@ const MotoPage = async ({ searchParams }: Props) => {
       <DesktopAds data={adsenseData} />
 
       <div className='container mx-auto max-w-250 p-4 mb-20'>
+        <Suspense fallback={null}>
+          <SortSelect total={total} />
+        </Suspense>
         <ProductList data={data} infinite={false} />
         <Suspense fallback={null}>
           <ListingPagination currentPage={currentPage} totalPages={totalPages} />

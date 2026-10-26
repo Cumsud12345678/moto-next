@@ -35,7 +35,8 @@ const ProductList = ({ data, infinite = true }: ProductListProps) => {
       const nextPage = page + 1
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/listings?page=${nextPage}&limit=${PAGE_SIZE}`,
+        // Nisbi ünvan: sorğu saytın öz /api rewrite-ından keçir, CORS problemi olmur
+        `/api/listings?page=${nextPage}&limit=${PAGE_SIZE}`,
         {
           credentials: "include",
           cache: "no-store",
@@ -72,6 +73,8 @@ const ProductList = ({ data, infinite = true }: ProductListProps) => {
       )
     } catch (error) {
       console.error(error)
+      // Xəta olanda dayan: əks halda observer sorğunu dayanmadan təkrarlayır
+      setHasMore(false)
     } finally {
       setLoading(false)
     }

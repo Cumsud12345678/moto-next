@@ -5,11 +5,13 @@ import ReportDialog from '@/components/ReportDialog'
 import { ProductDescription } from '@/types/product'
 import { ArrowUpRightFromSquare, Flag, Handset, Heart, HeartFill, TriangleExclamation } from '@gravity-ui/icons'
 import { phoneLinks, useListingActions } from './useListingActions'
+import OwnerActions, { useIsOwner } from './OwnerActions'
 
 const DetailsRight = ({ data }: { data: ProductDescription }) => {
 
   const product = data
   const { liked, handleLike, handleShare, reportOpen, openReport, setReportOpen } = useListingActions(product)
+  const isOwner = useIsOwner(product.seller?._id)
 
   const phone = phoneLinks(product.phone)
   const formattedTelPhone = phone.tel
@@ -42,6 +44,8 @@ const DetailsRight = ({ data }: { data: ProductDescription }) => {
             </div>
           </div>
 
+          <OwnerActions listingId={product._id} sellerId={product.seller?._id} viewCount={product.viewCount} className='mt-3' />
+
           <div
             onClick={handleLike}
             className={`my-3 flex flex-row items-center rounded-lg border p-2 cursor-pointer bg-white`}
@@ -59,10 +63,12 @@ const DetailsRight = ({ data }: { data: ProductDescription }) => {
             <span className="mx-2 text-xl font-medium">Paylaş</span>
           </div>
 
-          <div onClick={openReport} className="my-3 flex flex-row items-center rounded-lg border bg-white p-2 cursor-pointer">
-            <Flag className='size-6' />
-            <span className="mx-2 text-xl font-medium">Şikayət et</span>
-          </div>
+          {!isOwner && (
+            <div onClick={openReport} className="my-3 flex flex-row items-center rounded-lg border bg-white p-2 cursor-pointer">
+              <Flag className='size-6' />
+              <span className="mx-2 text-xl font-medium">Şikayət et</span>
+            </div>
+          )}
 
           <a
             href={`tel:${formattedTelPhone}`}

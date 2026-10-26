@@ -13,7 +13,9 @@ export interface Default {
   _id: string,
   label: string,
   logo?: string,
-  make?: string
+  make?: string,
+  // Markalar üçün: aktiv elan sayı
+  count?: number
 }
 
 export interface Type1 {

@@ -208,6 +208,10 @@ const Filter = ({ initialMetadata }: Props) => {
 
     // if (equipment.length) params.set('equipment', equipment.join(','));
 
+    // Seçilmiş sıralama filtr dəyişəndə itməsin
+    const sort = searchParams.get('sort')
+    if (sort) params.set('sort', sort)
+
     startTransition(() => {
       router.push(`/motors?${params.toString()}`)
     })

@@ -67,11 +67,17 @@ export default function Footer({ makes }: FooterProps) {
             </div> */}
             <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-2'>
               {
-                makes.map(make => (
-                  <Link key={make._id} href={`/motors?make=${make._id}`} className='py-1'>
-                    <span className='text-[15px] text-gray-500 hover:text-orange-500'>{make.label}</span>
-                  </Link>
-                ))
+                makes
+                  // Elanı olmayan markalar boş axtarış səhifəsinə aparmasın
+                  .filter(make => make.count === undefined || make.count > 0)
+                  .map(make => (
+                    <Link key={make._id} href={`/motors?make=${make._id}`} className='py-1'>
+                      <span className='text-[15px] text-gray-500 hover:text-orange-500'>
+                        {make.label}
+                        {make.count !== undefined && <span className='text-gray-400'> ({make.count})</span>}
+                      </span>
+                    </Link>
+                  ))
               }
             </div>
           </div>

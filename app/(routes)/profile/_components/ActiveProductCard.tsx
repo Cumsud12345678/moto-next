@@ -2,7 +2,7 @@
 import { PencilToSquare, TrashBin } from '@gravity-ui/icons'
 import Image from 'next/image'
 import { useState } from 'react'
-import { ArrowsRotateLeft, FileText } from '@gravity-ui/icons'
+import { ArrowsRotateLeft, Eye, FileText } from '@gravity-ui/icons'
 import Link from 'next/link'
 import { ProductCard as CardType } from '@/types/product'
 import { Trash2Icon } from "lucide-react"
@@ -170,6 +170,10 @@ const ActiveProductCard = ({ product, giftCount, setGiftCount, onDelete, onUrgen
           <p className='text-[16px] truncate'>{product.make.label} {product.model.label}</p>
           <p className='truncate text-[15px]'>{product.year}, {product.volume} sm³, {formatNumber(product.mileage)}</p>
           <p className='text-[14px] text-gray-400 truncate'>{product.region.label}, {product.createdAt}</p>
+          <p className='text-[14px] text-gray-500 flex items-center gap-1 mt-0.5'>
+            <Eye className='size-4' />
+            {formatNumber(product.viewCount ?? 0)} baxış
+          </p>
         </div>
 
         <div className='flex flex-col px-2 pb-2 gap-2'>

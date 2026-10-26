@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation'
 import { ProductDescription } from '@/types/product'
 import ReportDialog from '@/components/ReportDialog'
 import { phoneLinks, useListingActions } from './useListingActions'
+import OwnerActions, { useIsOwner } from './OwnerActions'
 
 const DetailsLeft = ({ data }: { data: ProductDescription }) => {
 
@@ -28,6 +29,7 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
   const product = data
   const router = useRouter()
   const { liked, handleLike, handleShare, reportOpen, openReport, setReportOpen } = useListingActions(product)
+  const isOwner = useIsOwner(product.seller?._id)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,9 +77,11 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
             <button onClick={handleShare} aria-label="Paylaş">
               <ArrowUpRightFromSquare className="size-6" />
             </button>
-            <button onClick={openReport} aria-label="Şikayət et">
-              <Flag className="size-6" />
-            </button>
+            {!isOwner && (
+              <button onClick={openReport} aria-label="Şikayət et">
+                <Flag className="size-6" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -106,9 +110,11 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
                 <button onClick={handleShare} aria-label="Paylaş">
                   <ArrowUpRightFromSquare className="size-6" />
                 </button>
-                <button onClick={openReport} aria-label="Şikayət et" title="Şikayət et">
-                  <Flag className="size-6" />
-                </button>
+                {!isOwner && (
+                  <button onClick={openReport} aria-label="Şikayət et" title="Şikayət et">
+                    <Flag className="size-6" />
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -129,6 +135,8 @@ const DetailsLeft = ({ data }: { data: ProductDescription }) => {
       <div className='p-3 bg-white'>
         <p className='text-xl font-semibold'>{formatNumber(product.price)} AZN</p>
         <p className='text-xl'>{product.make.label} {product.model.label}, {product.volume} sm³, {product.year} il, {formatNumber(product.mileage)} km</p>
+
+        <OwnerActions listingId={product._id} sellerId={product.seller?._id} viewCount={product.viewCount} className='mt-3 lg:hidden' />
 
         <div className='flex flex-row py-3 gap-3 flex-nowrap overflow-auto scrollbar-none'>
           <div className='shrink-0 border flex items-center p-2 pr-4 gap-2 bg-gray-200 rounded-xl'>

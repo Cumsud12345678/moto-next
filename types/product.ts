@@ -18,6 +18,8 @@ export interface ProductCard {
   seller: { _id: string, role: string }
   createdAt: string
   status?: string
+  // Yalnız sahibin öz elanlarında gəlir
+  viewCount?: number
 }
 
 
@@ -47,4 +49,6 @@ export interface ProductDescription {
   isLiked: boolean
   isUrgent: boolean,
   video?: string
+  // Yalnız elanın sahibinə göndərilir
+  viewCount?: number
 }

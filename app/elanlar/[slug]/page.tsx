@@ -1,6 +1,7 @@
 import React, { cache } from 'react'
 import DetailsLeft from './_components/DetailsLeft'
 import DetailsRight from './_components/DetailsRight'
+import ViewTracker from './_components/ViewTracker'
 import { ProductCard, ProductDescription } from '@/types/product'
 import { cookies } from 'next/headers'
 import ProductList from '@/components/ProductList'
@@ -50,6 +51,86 @@ async function getSimilars(id: string): Promise<ProductCard[] | []> {
     console.error('Failed to fetch products:', err)
     return []
   }
+}
+
+// Eyni satıcının digər aktiv elanları
+async function getSellerListings(id: string): Promise<{ data: ProductCard[], total: number }> {
+  try {
+    const cookieStore = await cookies()
+    const res = await serverApi.get(`/api/listings/${id}/seller`, {
+      headers: { Cookie: cookieStore.toString() },
+    })
+    return { data: res.data?.data ?? [], total: res.data?.total ?? 0 }
+  } catch (err) {
+    console.error('Failed to fetch seller listings:', err)
+    return { data: [], total: 0 }
+  }
+}
+
+// Google üçün strukturlaşdırılmış məlumat (JSON-LD): axtarışda qiymət, şəkil və s. göstərilə bilər
+function buildJsonLd(product: ProductDescription, url: string) {
+  const make = product.make?.label || ''
+  const model = product.model?.label || ''
+  const name = [make, model, product.year].filter(Boolean).join(' ')
+  const images = (product.images ?? []).slice(0, 10).map((img) => `${process.env.IMAGE_URL}/${img}`)
+
+  const motorcycle = {
+    '@context': 'https://schema.org',
+    '@type': ['Product', 'Motorcycle'],
+    name,
+    url,
+    ...(images.length && { image: images }),
+    description:
+      product.description?.replace(/\s+/g, ' ').trim().slice(0, 500) ||
+      `${name} motosiklet elanı, ${product.price} AZN.`,
+    sku: product._id,
+    category: 'Motosiklet',
+    ...(make && { brand: { '@type': 'Brand', name: make } }),
+    ...(model && { model }),
+    ...(product.year && { vehicleModelDate: String(product.year) }),
+    ...(product.mileage !== undefined && {
+      mileageFromOdometer: { '@type': 'QuantitativeValue', value: product.mileage, unitCode: 'KMT' },
+    }),
+    ...(product.volume && {
+      vehicleEngine: {
+        '@type': 'EngineSpecification',
+        engineDisplacement: { '@type': 'QuantitativeValue', value: product.volume, unitCode: 'CMQ' },
+        ...(product.fuelType?.label && { fuelType: product.fuelType.label }),
+      },
+    }),
+    ...(product.transmission?.label && { vehicleTransmission: product.transmission.label }),
+    ...(product.color?.label && { color: product.color.label }),
+    // Bazada used=true "Yeni" deməkdir
+    itemCondition: product.used ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
+    offers: {
+      '@type': 'Offer',
+      url,
+      price: product.price,
+      priceCurrency: 'AZN',
+      availability: 'https://schema.org/InStock',
+      itemCondition: product.used ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
+      ...(product.region?.label && {
+        availableAtOrFrom: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: product.region.label, addressCountry: 'AZ' } },
+      }),
+      ...(product.seller?.name && { seller: { '@type': 'Person', name: product.seller.name } }),
+    },
+  }
+
+  const breadcrumbs = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Ana səhifə', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Motosikletlər', item: `${SITE_URL}/motors` },
+      ...(make && product.make?._id
+        ? [{ '@type': 'ListItem', position: 3, name: make, item: `${SITE_URL}/motors?make=${product.make._id}` }]
+        : []),
+      { '@type': 'ListItem', position: make ? 4 : 3, name: name || 'Elan', item: url },
+    ],
+  }
+
+  // "</script>" mətni JSON-un içindən skripti bağlamasın
+  return JSON.stringify([motorcycle, breadcrumbs]).replace(/</g, '\\u003c')
 }
 
 interface PageProps {
@@ -162,9 +243,10 @@ const ElanlarPage = async ({params}: PageProps) => {
 
   if(!id) notFound()
 
-  const [data, similars] = await Promise.all([
+  const [data, similarsRaw, sellerListings] = await Promise.all([
     getProduct(id),
-    getSimilars(id)
+    getSimilars(id),
+    getSellerListings(id),
   ])
   
   if (!data) notFound();
@@ -175,16 +257,38 @@ const ElanlarPage = async ({params}: PageProps) => {
     permanentRedirect(correctPath)
   }
 
+  // Satıcının elanları oxşar elanlarda təkrar görünməsin
+  const sellerIds = new Set(sellerListings.data.map((l) => l._id))
+  const similars = similarsRaw.filter((l) => !sellerIds.has(l._id))
+
+  const jsonLd = buildJsonLd(data, `${SITE_URL}${correctPath}`)
+
   return (
     <div className='container mx-auto max-w-250 pb-0'>
+      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: jsonLd }} />
+      <ViewTracker listingId={data._id} />
+
       <div className='flex flex-col lg:flex-row lg:p-4 lg:bg-white gap-5'>
         <DetailsLeft data={data} />
         <DetailsRight data={data} />
       </div>
 
-      <div className='p-3 mt-3'>
-        <ProductList data={similars} />
-      </div>
+      {sellerListings.data.length > 0 && (
+        <div className='p-3 mt-3'>
+          <h2 className='text-xl font-medium mb-3'>
+            Satıcının digər elanları
+            {sellerListings.total > 0 && <span className='text-gray-400'> ({sellerListings.total})</span>}
+          </h2>
+          <ProductList data={sellerListings.data} infinite={false} />
+        </div>
+      )}
+
+      {similars.length > 0 && (
+        <div className='p-3 mt-3'>
+          <h2 className='text-xl font-medium mb-3'>Oxşar elanlar</h2>
+          <ProductList data={similars} infinite={false} />
+        </div>
+      )}
 
     </div>
   )
