@@ -27,9 +27,11 @@ interface GaleryProps {
   volume: number
   year: number,
   phone: number
+  // Verilərsə mobil şəkil üzərindəki ikinci sətir bununla əvəz olunur (məs: ehtiyat hissələri)
+  subtitle?: string
 }
 
-const Galery = ({images, video, price, make, model, volume, year, phone}: GaleryProps) => {
+const Galery = ({images, video, price, make, model, volume, year, phone, subtitle}: GaleryProps) => {
 
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null)
   const [imageCount, setImageCount] = useState<number>(1)
@@ -399,7 +401,7 @@ const Galery = ({images, video, price, make, model, volume, year, phone}: Galery
                 <div className='absolute bottom-0 left-0 z-10 text-white w-full p-4 flex items-center justify-between'>
                   <div>
                     <p className='text-xl'>{formatNumber(price)} AZN</p>
-                    <p className='text-[17px] truncate'>{make} {model}, {formatNumber(volume)} sm³, {year} il</p>
+                    <p className='text-[17px] truncate'>{subtitle ?? `${make} ${model}, ${formatNumber(volume)} sm³, ${year} il`}</p>
                   </div>
                   <a 
                     href={`tel:${formattedTelPhone}`}

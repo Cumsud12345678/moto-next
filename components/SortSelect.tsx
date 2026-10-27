@@ -10,8 +10,17 @@ export const SORT_OPTIONS = [
   { value: 'year_desc', label: 'Buraxılış ili: yenidən köhnəyə' },
 ] as const
 
+// Ehtiyat hissələri üçün (yürüş və il yoxdur)
+export const PART_SORT_OPTIONS = [
+  { value: 'newest', label: 'Ən yenilər' },
+  { value: 'price_asc', label: 'Əvvəlcə ucuz' },
+  { value: 'price_desc', label: 'Əvvəlcə bahalı' },
+] as const
+
+type SortOption = { value: string, label: string }
+
 // Axtarış nəticələrinin sıralaması (?sort=...). Digər filtrlər saxlanılır, səhifə 1-ə qayıdır.
-export default function SortSelect({ total }: { total?: number }) {
+export default function SortSelect({ total, options = SORT_OPTIONS }: { total?: number, options?: readonly SortOption[] }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -40,7 +49,7 @@ export default function SortSelect({ total }: { total?: number }) {
         onChange={(e) => onChange(e.target.value)}
         className='rounded-lg border bg-white px-3 py-2 text-[15px] outline-none cursor-pointer disabled:opacity-60'
       >
-        {SORT_OPTIONS.map((o) => (
+        {options.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
         ))}
       </select>

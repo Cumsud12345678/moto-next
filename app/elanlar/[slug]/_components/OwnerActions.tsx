@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { toast } from '@/components/ui/toast'
 import { deleteListing } from '@/lib/api/listings'
+import { deletePart } from '@/lib/api/parts'
 import { RootState } from '@/redux/store'
 
 // Giriş etmiş istifadəçi öz elanına baxırsa: "Düzəliş et" və "Sil"
@@ -32,9 +33,11 @@ interface OwnerActionsProps {
   sellerId?: string
   viewCount?: number
   className?: string
+  // 'part' — ehtiyat hissəsi elanı (fərqli düzəliş səhifəsi və silmə endpoint-i)
+  kind?: 'listing' | 'part'
 }
 
-export default function OwnerActions({ listingId, sellerId, viewCount, className = '' }: OwnerActionsProps) {
+export default function OwnerActions({ listingId, sellerId, viewCount, className = '', kind = 'listing' }: OwnerActionsProps) {
   const isOwner = useIsOwner(sellerId)
   const router = useRouter()
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -46,10 +49,10 @@ export default function OwnerActions({ listingId, sellerId, viewCount, className
     if (deleting) return
     setDeleting(true)
     try {
-      const data = await deleteListing(listingId)
+      const data = kind === 'part' ? await deletePart(listingId) : await deleteListing(listingId)
       toast.add({ type: 'success', description: data?.message || 'Elan silindi' })
       setConfirmOpen(false)
-      router.replace('/profile')
+      router.replace(kind === 'part' ? '/profile?tab=parts' : '/profile')
     } catch {
       toast.add({ type: 'error', description: 'Elan silinmədi, yenidən cəhd edin', priority: 'high' })
       setDeleting(false)
@@ -67,7 +70,7 @@ export default function OwnerActions({ listingId, sellerId, viewCount, className
       )}
       <div className="flex gap-3">
         <Link
-          href={`/edit/${listingId}`}
+          href={kind === 'part' ? `/hisseler/duzelis/${listingId}` : `/edit/${listingId}`}
           className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-500 p-3 font-medium text-white"
         >
           <PencilToSquare className="size-5" />
@@ -89,7 +92,7 @@ export default function OwnerActions({ listingId, sellerId, viewCount, className
           <AlertDialogHeader>
             <AlertDialogTitle>Elan silinsin?</AlertDialogTitle>
             <AlertDialogDescription>
-              Elan, şəkilləri və videosu birdəfəlik silinəcək. Bu əməliyyatı geri qaytarmaq olmur.
+              {kind === 'part' ? 'Elan və şəkilləri' : 'Elan, şəkilləri və videosu'} birdəfəlik silinəcək. Bu əməliyyatı geri qaytarmaq olmur.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

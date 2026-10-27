@@ -7,9 +7,8 @@ export const menuNavs: Menu[] = [
   {
     title: 'Ehtiyyat hissələri',
     icon: Wrench,
-    content: 'Çox yaxında...',
-    active: false,
-    toastMessage: 'Çox yaxında...'
+    url: '/hisseler',
+    active: true
   },
   {
     title: 'Elan qrupları',

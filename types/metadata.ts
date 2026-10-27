@@ -7,6 +7,8 @@ export interface Metadata {
   transmissions: Array<Default>
   colors: Array<Default>
   equipments: Array<Default>
+  // Ehtiyat hissəsi kateqoriyaları (köhnə backend göndərmirsə boş ola bilər)
+  partCategories?: Array<Default>
 }
 
 export interface Default {

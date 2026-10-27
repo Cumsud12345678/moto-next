@@ -27,6 +27,7 @@ import {
   CircleExclamation,
   ArrowLeft,
   Flag,
+  Wrench,
 } from '@gravity-ui/icons'
 
 interface NavItem {
@@ -55,6 +56,7 @@ const NAV: { label: string; items: NavItem[] }[] = [
     items: [
       { href: '/admin/listings', label: 'Bütün elanlar', icon: HardDrive },
       { href: '/admin/premium/listings', label: 'Premium elanlar', icon: Star },
+      { href: '/admin/parts', label: 'Ehtiyat hissələri', icon: Wrench },
       { href: '/admin/reports', label: 'Şikayətlər', icon: Flag },
       { href: '/admin/deleted/listings', label: 'Silinmiş elanlar', icon: TrashBin },
     ],

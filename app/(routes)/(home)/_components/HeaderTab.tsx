@@ -1,7 +1,6 @@
 'use client'
-import { toast } from '@/components/ui/toast'
 import Link from 'next/link'
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 
 const HeaderTab = () => {
   
@@ -9,10 +8,8 @@ const HeaderTab = () => {
 
   return (
     <Fragment>
-      <div 
-        onClick={() => {
-          toast.add({type: "warning", description: 'Çox yaxında...'})
-        }}
+      <Link
+        href={'/hisseler'}
         className='bg-white rounded-xl w-full relative'
       >
         <div className='overflow-hidden relative pl-3 py-4 rounded-xl'>
@@ -20,11 +17,10 @@ const HeaderTab = () => {
           <img src="/hisseler2.png" alt="" className='size-50 object-contain absolute left-0 -top-17 opacity-70' />
         </div>
 
-        {/* <div className='absolute text-[10px] -top-3 -right-3 bg-orange-500 p-1 rounded-full whitespace-nowrap'>
+        <div className='absolute text-[10px] -top-2 -right-1 bg-orange-500 px-1.5 py-0.5 rounded-full whitespace-nowrap'>
           <span className='text-white font-semibold'>yeni</span>
-        </div> */}
-        
-      </div>
+        </div>
+      </Link>
       <Link 
         href={'/groups'}
         className='bg-white rounded-xl w-full relative'

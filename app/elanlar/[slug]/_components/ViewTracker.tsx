@@ -3,11 +3,12 @@ import { useEffect } from 'react'
 
 // Elan səhifəsi açılanda baxış sayını artırır.
 // Backend eyni IP-ni 1 saatda bir dəfə sayır, sahibin öz baxışlarını saymır.
-export default function ViewTracker({ listingId }: { listingId: string }) {
+// url verilməsə motosiklet elanı sayılır
+export default function ViewTracker({ listingId, url }: { listingId: string, url?: string }) {
   useEffect(() => {
-    fetch(`/api/listings/click/${listingId}`, { method: 'POST', credentials: 'include', keepalive: true })
+    fetch(url ?? `/api/listings/click/${listingId}`, { method: 'POST', credentials: 'include', keepalive: true })
       .catch(() => {})
-  }, [listingId])
+  }, [listingId, url])
 
   return null
 }

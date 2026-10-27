@@ -11,6 +11,7 @@ const EMPTY_METADATA: Metadata = {
   transmissions: [],
   colors: [],
   equipments: [],
+  partCategories: [],
 }
 
 const ATTEMPTS = 3

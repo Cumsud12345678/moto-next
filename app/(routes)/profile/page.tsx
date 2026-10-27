@@ -14,6 +14,7 @@ import { getNotViewCount } from '@/lib/api/messages'
 import ActiveProductCard from './_components/ActiveProductCard'
 import DeactiveProductCard from './_components/DeactiveProductCard'
 import RejectedProductCard from './_components/RejectedProductCard'
+import MyParts from './_components/MyParts'
 import { api } from '@/lib/axios'
 import { decGiftCount, fetchMe } from '@/redux/slices/userSlice'
 import { useRouter } from 'next/navigation'
@@ -156,6 +157,11 @@ const ProfilePage = () => {
 
   const [messageOpen, setMessageOpen] = useState<boolean>(false)
 
+  // /profile?tab=parts — hissə elanı silinəndən/yaradılandan sonra birbaşa "Hissələr" tabı açılsın
+  const [tab, setTab] = useState<string>(() =>
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('tab') === 'parts' ? 'parts' : 'active'
+  )
+
   // ============ İNDİ ERKƏN RETURN ETMƏK OLAR — BÜTÜN HOOK-LAR ARTIQ ÇAĞIRILIB ============
   if (!authLoading && !user && authError) {
     return (
@@ -215,11 +221,12 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="active" className="w-full mt-6">
+        <Tabs value={tab} onValueChange={(v) => setTab(String(v))} className="w-full mt-6">
           <TabsList className='bg-gray-300 w-full'>
             <TabsTrigger value="active">Aktiv</TabsTrigger>
             <TabsTrigger value="deactive">Deaktiv</TabsTrigger>
             <TabsTrigger value="rejected">İmtina</TabsTrigger>
+            <TabsTrigger value="parts">Hissələr</TabsTrigger>
           </TabsList>
 
           <TabsContent value="active">
@@ -255,6 +262,10 @@ const ProfilePage = () => {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="parts">
+            {tab === 'parts' && <MyParts />}
           </TabsContent>
 
           <TabsContent value="rejected">

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { listingPath } from '@/lib/slug'
+import { listingPath, partPath } from '@/lib/slug'
 
 const SITE_URL = process.env.SITE_URL!
 const API_URL = process.env.NEXT_PUBLIC_API_URL!
@@ -49,8 +49,32 @@ async function getAllListings(): Promise<SitemapListing[]> {
   return listings
 }
 
+interface SitemapPart {
+  _id: string
+  title: string
+  createdAt?: string
+}
+
+// Ehtiyat hissəsi elanları (backend köhnədirsə boş siyahı)
+async function getAllParts(): Promise<SitemapPart[]> {
+  const parts: SitemapPart[] = []
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    try {
+      const res = await fetch(`${API_URL}/api/parts?page=${page}&limit=${LIMIT}`, { next: { revalidate: 3600 } })
+      if (!res.ok) break
+      const json = await res.json()
+      const items: SitemapPart[] = json.data ?? []
+      parts.push(...items)
+      if (items.length < LIMIT) break
+    } catch {
+      break
+    }
+  }
+  return parts
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const listings = await getAllListings()
+  const [listings, parts] = await Promise.all([getAllListings(), getAllParts()])
 
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -63,7 +87,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.8,
     },
+    {
+      url: `${SITE_URL}/hisseler`,
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
   ]
+
+  const partPages: MetadataRoute.Sitemap = parts.map((part) => ({
+    url: `${SITE_URL}${partPath(part.title, part._id)}`,
+    changeFrequency: 'weekly',
+    priority: 0.6,
+  }))
 
   const listingPages: MetadataRoute.Sitemap = listings.map((listing) => ({
     url: `${SITE_URL}${listingPath(listing.make?.label, listing.model?.label, listing._id)}`,
@@ -77,5 +112,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages,
     ...listingPages,
+    ...partPages,
   ]
 }

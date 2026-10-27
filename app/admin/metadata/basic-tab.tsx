@@ -19,6 +19,7 @@ const GROUPS: { dataModel: string; listKey: keyof Metadata; usageKey: string; ti
   { dataModel: 'fueltype', listKey: 'fuelTypes', usageKey: 'fuelType', title: 'Mühərrik növləri', placeholder: 'Məs: Elektrik' },
   { dataModel: 'transmission', listKey: 'transmissions', usageKey: 'transmission', title: 'Sürətlər qutusu', placeholder: 'Məs: Avtomat' },
   { dataModel: 'equipment', listKey: 'equipments', usageKey: 'equipment', title: 'Avadanlıqlar', placeholder: 'Məs: ABS' },
+  { dataModel: 'partcategory', listKey: 'partCategories', usageKey: 'partCategory', title: 'Hissə kateqoriyaları', placeholder: 'Məs: Güzgülər' },
 ]
 
 function BasicList({

@@ -24,6 +24,12 @@ export function listingPath(make: string | undefined, model: string | undefined,
   return `/elanlar/${listingSlug(make, model, id)}`
 }
 
+// Ehtiyat hissəsi elanı: /hisseler/yamaha-r1-porsen-<id>
+export function partPath(title: string | undefined, id: string): string {
+  const prefix = slugify(title).split('-').filter(Boolean).slice(0, 8).join('-')
+  return `/hisseler/${prefix ? `${prefix}-${id}` : id}`
+}
+
 export function safeDecode(value: string): string {
   try {
     return decodeURIComponent(value)

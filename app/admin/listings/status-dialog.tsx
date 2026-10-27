@@ -23,12 +23,14 @@ const DEFAULT_MESSAGE: Partial<Record<ListingStatus, string>> = {
 }
 
 interface StatusDialogProps {
-  listing: AdminListing | null
+  listing: Pick<AdminListing, '_id' | 'status'> | null
   onOpenChange: (open: boolean) => void
   onSaved: () => void
+  // Hissə elanları üçün: '/api/admin/parts/status'
+  endpointBase?: string
 }
 
-export default function StatusDialog({ listing, onOpenChange, onSaved }: StatusDialogProps) {
+export default function StatusDialog({ listing, onOpenChange, onSaved, endpointBase = '/api/admin/listings/edit/status' }: StatusDialogProps) {
   const [status, setStatus] = useState<ListingStatus>(listing?.status ?? 'active')
   const [message, setMessage] = useState('')
   const [notify, setNotify] = useState(true)
@@ -52,7 +54,7 @@ export default function StatusDialog({ listing, onOpenChange, onSaved }: StatusD
   const save = async () => {
     setSaving(true)
     try {
-      const { data } = await api.put(`/api/admin/listings/edit/status/${listing._id}`, {
+      const { data } = await api.put(`${endpointBase}/${listing._id}`, {
         status,
         message: notify ? message.trim() : '',
       })

@@ -16,6 +16,7 @@ import { useSendOtp } from '@/hooks/useSendOtp'
 import { useCreateEvent } from '@/hooks/useCreateEvent'
 import { useVerifyOtp } from '@/hooks/useVerifyOtp'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { RefreshCwIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -356,6 +357,14 @@ const NewPage = () => {
                 <div className="flex items-center justify-center p-4 bg-white mt-3 lg:mt-0">
                   <h1 className="lg:text-3xl text-2xl font-bold">Yeni elan</h1>
                 </div>
+
+                <Link
+                  href="/hisseler/yeni"
+                  className="flex items-center justify-between gap-3 rounded-3xl bg-white p-4 lg:px-10 lg:border"
+                >
+                  <span>Ehtiyat hissəsi və ya ekipirovka satırsınız?</span>
+                  <span className="text-orange-500 font-semibold whitespace-nowrap">Hissə elanı →</span>
+                </Link>
 
                 <Step1
                   metadata={metadata}
