@@ -25,7 +25,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 export async function getMetadata(): Promise<Metadata> {
   for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
     try {
-      const res = await fetch(`${process.env.API_URL}/api/metadata`, {
+      // ?v=2: Vercel-in "Data Cache"-i deploy-lar arasında qalır. Köhnə cavabda (hissə
+      // kateqoriyaları olmayan) ilişib qalmamaq üçün açarı dəyişdik. Sxem yenə dəyişsə, rəqəmi artırın.
+      const res = await fetch(`${process.env.API_URL}/api/metadata?v=2`, {
         next: { revalidate: 3600 },
         signal: AbortSignal.timeout(TIMEOUT_MS),
       })

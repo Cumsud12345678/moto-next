@@ -11,6 +11,7 @@ import TwoInputGroup from '../../(home)/_components/TwoInputGroup'
 import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { toast } from '@/components/ui/toast'
 import { Default, Metadata } from '@/types/metadata'
+import { useMetadata } from '@/hooks/useMetadata'
 
 const CONDITION_TYPES = [
   { _id: 'c-new', label: 'Yeni', status: true },
@@ -41,7 +42,9 @@ const PartFilter = ({ metadata }: { metadata: Metadata }) => {
   const [modelOpen, setModelOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
 
-  const categories = metadata.partCategories ?? []
+  // Server-dən gələn metadata köhnə keşdirsə (kateqoriyalar yoxdursa), brauzerdən təzəsini götürürük
+  const { metadata: fresh } = useMetadata()
+  const categories = metadata.partCategories?.length ? metadata.partCategories : (fresh?.partCategories ?? [])
   const models = useMemo<Default[]>(
     () => (make ? metadata.models.filter((m) => m.make === make) : []),
     [make, metadata.models]
