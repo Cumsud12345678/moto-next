@@ -103,8 +103,6 @@ const HomePage = async () => {
         <ProductList data={products} />
       </div>
 
-      <script src="http://localhost:4000/widget.js" data-key="wk_f5957386b26e0650a77f654487eb0988" defer></script>
-
     </div>
   )
 }

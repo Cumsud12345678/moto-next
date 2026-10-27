@@ -98,12 +98,12 @@ export default function RootLayout({
           </Providers>
         </ReduxProvider>
 
-        <Script
+        {/* <Script
           async
           strategy="afterInteractive"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7998830269416325"
           crossOrigin="anonymous"
-        />
+        /> */}
 
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       </body>
